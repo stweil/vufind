@@ -3,7 +3,6 @@
 //Coordinate order:  Storage and Query: WENS ; Display: WSEN
 
 function loadMapTab(mapData, mapGraticule, basemap) {
-  var init = true;
   var basemapLayer = new L.TileLayer(basemap[0], {attribution: basemap[1]});	
   var geoFeatureGroup = L.featureGroup();
   // Define styles for icons
@@ -108,5 +107,4 @@ function loadMapTab(mapData, mapGraticule, basemap) {
     }
   };
   init();
-  init = false;
 }

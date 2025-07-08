@@ -25,6 +25,10 @@ $fa-font-path: "../../bootstrap5/css/vendor/font-awesome/webfonts";
 // Include remainder of required parts
 @import "bootstrap/scss/maps";
 @import "bootstrap/scss/mixins";
+
+// Include mixin overrides
+@import "mixin-overrides/mixin-overrides";
+
 @import "bootstrap/scss/root";
 @import "bootstrap/scss/reboot";
 

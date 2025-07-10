@@ -25,13 +25,21 @@
   }
 
   $toggleAttrs = array_merge($defaultAttrs, $this->toggleAttrs ?? []);
+
+  $toggleLabel = $this->transEsc($this->toggleLabel);
+  if ($this->toggleLabelIconOnly) {
+    $toggleLabel = '<span class="sr-only">' . $toggleLabel . '</span>';
+  }
+  if ($this->toggleLabelIcon) {
+    $toggleLabel = $this->icon($this->toggleLabelIcon) . $toggleLabel;
+  }
 ?>
 
 <?php ob_start(); ?>
   <?=$this
       ->makeTag(
           $toggleTag,
-          $this->transEsc($this->toggleLabel) . $this->icon('dropdown-caret'),
+          $toggleLabel . $this->icon('dropdown-caret'),
           $toggleAttrs,
           ['escapeContent' => false]
       )
@@ -46,6 +54,7 @@
           <?php if ($current['lightbox'] ?? false): ?> data-lightbox="true"<?php endif; ?>
           rel="nofollow"
         >
+          <?php if ($current['icon'] ?? false): ?> <?=$this->icon($current['icon']) ?> <?php endif; ?>
           <?=$this->transEsc($current['label']) ?>
         </a>
       </li>

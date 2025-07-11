@@ -2,8 +2,16 @@
 
 a {
   text-decoration: underline;
-
-  &:hover { color: black; }
+}
+@include color-mode(light, true) {
+  a:hover {
+    color: black;
+  }
+}
+@include color-mode(dark, true) {
+  a:hover {
+    color: white;
+  }
 }
 
 /* AAA Color Contrasts */

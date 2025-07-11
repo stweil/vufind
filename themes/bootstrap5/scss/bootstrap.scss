@@ -517,8 +517,8 @@ body.rtl .dropdown-menu {
     align-items: baseline;
 
     &:hover {
-      background-color: $nav-link-hover-bg;
-      outline: dotted 1px #000;
+      outline-style: dotted;
+      outline-width: 1px;
     }
     &:focus {
       background-color: $nav-link-hover-bg;
@@ -574,6 +574,26 @@ body.rtl .dropdown-menu {
     color: #fff;
     background-color: transparent;
     border: 1px solid #fff;
+  }
+}
+@include color-mode(light, true) {
+  .myresearch-menu {
+    a {
+      &:hover {
+        background-color: $nav-link-hover-bg;
+        outline-color: #000;
+      }
+    }
+  }
+}
+@include color-mode(dark, true) {
+  .myresearch-menu {
+    a {
+      &:hover {
+        background-color: shade-color($nav-link-hover-bg, 70%);
+        outline-color: #000;
+      }
+    }
   }
 }
 

@@ -31,6 +31,15 @@ $alert-default-border-color: color.adjust($alert-default-bg, $lightness: -7%) !d
 }
 
 @include color-mode(light, true) {
+  .navbar {
+    --bs-navbar-color: #{$primary};
+    --bs-navbar-active-color: #{#fff};
+    --bs-navbar-brand-color: #{$primary};
+    --bs-navbar-brand-hover-color: #{$primary};
+  }
+}
+
+@include color-mode(light, true) {
   table.table-striped {
     --bs-table-striped-bg: #f9f9f9;
   }

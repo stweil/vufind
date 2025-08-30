@@ -3,10 +3,19 @@
     <div class="footer-column">
       <?php $this->slot('footer-left')->start(); ?>
         <h2><?=$this->transEsc('footer_header_search_options')?></h2>
-        <ul>
-          <li><a href="<?=$this->url('search-history')?>"><?=$this->transEsc('Search History')?></a></li>
-          <li><a href="<?=$this->url('search-advanced')?>"><?=$this->transEsc('Advanced Search')?></a></li>
-        </ul>
+<!--
+      Wählen Sie einen Suchraum für Ihre Recherche:<p>
+-->
+      <div>
+      <strong>UB-Bestand</strong><br>
+      Hier finden Sie mehr als 2,7 Millionen Medien der UB Mannheim: Bücher, E-Books, Zeitschriften, E-Journals, CDs, DVDs und psychologische Tests.<p>
+      </div>
+      <div>
+      <strong>Aufsätze & UB-Bestand</strong><p>
+      Zusätzlich zum UB-Bestand durchsuchen Sie 100 Millionen Datensätze nach wissenschaftlichen Papers, Aufsätzen in E-Journals und Beiträgen in E-Books.<p>
+      </div>
+      <strong>Fernleihe</strong><p>
+      Ihre Suche war ergebnislos? Hier recherchieren Sie deutschlandweit im Bestand wissenschaftlicher Bibliotheken und bestellen Ihr Medium mit wenigen Klicks.<p>
       <?=$this->slot('footer-left')->end(); ?>
     </div>
     <div class="footer-column">
@@ -18,6 +27,8 @@
           <li><a href="<?=$this->url('channels-home')?>"><?=$this->transEsc('channel_explore')?></a></li>
           <li><a href="<?=$this->url('search-reserves')?>"><?=$this->transEsc('Course Reserves')?></a></li>
           <li><a href="<?=$this->url('search-newitem')?>"><?=$this->transEsc('New Items')?></a></li>
+          <li><a href="<?=$this->url('search-history')?>"><?=$this->transEsc('Search History')?></a></li>
+          <li><a href="<?=$this->url('search-advanced')?>"><?=$this->transEsc('Advanced Search')?></a></li>
         </ul>
       <?=$this->slot('footer-center')->end(); ?>
     </div>
@@ -31,7 +42,43 @@
           <?php if ($this->cookieConsent()->isEnabled()): ?>
             <li><a href="#" data-cc="show-preferencesModal" aria-haspopup="dialog"><?=$this->transEsc('Cookie Settings')?></a></li>
           <?php endif; ?>
-        </ul>
+	</ul>
+
+                <div class="lib-konto">
+                    <div class="lib-img"><img src="themes/ubma/images/icon-sign-in.png" alt=""></div>
+                    <div class="lib-content">
+                        <div class="lib-title"><a href="https://primo.bib.uni-mannheim.de/primo-explore/account?vid=MAN_UB&amp;lang=de_DE" id="ma-login-link" class="md-primoExplore-theme">Mein Bibliothekskonto</a></div>
+                    </div>
+                </div>
+                <ma-prm-main-page-library-account-after></ma-prm-main-page-library-account-after>
+                <div class="lib-sitz">
+                    <div class="lib-img"><img src="themes/ubma/images/icon-ampel.png" alt=""></div>
+                    <div class="lib-content">
+                        <div class="lib-title"><a href="https://www.bib.uni-mannheim.de/standortuebersicht/" target="_blank" class="md-primoExplore-theme">Freie Sitzplätze</a></div>
+                    </div>
+                </div>
+                <div class="lib-oeffnung">
+                    <div class="lib-img"><img src="themes/ubma/images/icon-clock-o.png" alt=""></div>
+                    <div class="lib-content">
+                        <div class="lib-title"><a href="https://www.bib.uni-mannheim.de/oeffnungszeiten/" target="_blank" class="md-primoExplore-theme">Öffnungszeiten</a></div>
+                    </div>
+                </div>
+                <div class="lib-auskunft">
+                    <div class="lib-img"><img src="themes/ubma/images/icon-info-circle.png" alt=""></div>
+                    <div class="lib-content">
+                        <div class="lib-title"><a href="https://www.bib.uni-mannheim.de/linkes-menue/auskunft-beratung/" target="_blank" class="md-primoExplore-theme">Auskunft <span class="noCapital">&amp;</span> Beratung</a></div>
+                    </div>
+                </div>
+                <div class="lib-chat">
+                    <div class="lib-img"><img src="themes/ubma/images/icon-comments-o.png" alt=""></div>
+                    <div class="lib-content">
+                        <div class="lib-title"><a href="https://www2.bib.uni-mannheim.de/mibew/index.php/chat?locale=de" target="_blank" class="md-primoExplore-theme">Chat <span class="noCapital">(Mo-Fr 10-18)</span></a></div>
+                    </div>
+                </div>
+  <div>
+    <a href="https://www.uni-mannheim.de/datenschutzerklaerung/datenschutzinformationen-der-universitaetsbibliothek/">Datenschutzerklärung</a> |
+    <a href="https://www.uni-mannheim.de/impressum/"><?=$this->transEsc('Imprint')?></a>
+  </div>
       <?=$this->slot('footer-right')->end(); ?>
     </div>
   </div>

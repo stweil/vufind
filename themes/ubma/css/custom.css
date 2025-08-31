@@ -1,0 +1,53 @@
+.lib-img {
+  clear: both;
+  float: left;
+  padding-right: 20px;
+}
+
+.lib-konto,
+.lib-sitz,
+.lib-oeffnung,
+.lib-auskunft,
+.lib-chat {
+    clear: both;
+}
+
+.lib-content {
+    margin-left: 43px;
+/*
+    top: -2px;
+ */
+    position: relative;
+}
+/* Zentrieren von Icons */
+.lib-sitz .lib-img,
+.lib-oeffnung .lib-img,
+.lib-auskunft .lib-img,
+.lib-chat .lib-img {
+    width: 42px;
+}
+.lib-sitz .lib-img {
+    padding-left: 9px;
+}
+.lib-oeffnung .lib-img,
+.lib-auskunft .lib-img,
+.lib-chat .lib-img {
+    padding-left: 5px;
+}
+
+.lib-img img {
+    height: 20px;
+}
+
+.lib-konto a,
+.lib-sitz a,
+.lib-oeffnung a,
+.lib-auskunft a,
+.lib-chat a {
+/*
+    font-variant: small-caps;
+    font-stretch: expanded;
+    font-size: 1rem;
+ */
+    /*font-size: 16.8px;*/
+}

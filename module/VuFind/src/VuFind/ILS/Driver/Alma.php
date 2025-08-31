@@ -448,6 +448,81 @@ class Alma extends AbstractBase implements
     }
 
     /**
+     * Get Departments
+     *
+     * Obtain a list of departments for use in limiting the reserves list.
+     *
+     * @return array An associative array with key = dept. ID, value = dept. name.
+     */
+    public function getDepartments()
+    {
+        // https://developers.exlibrisgroup.com/alma/apis/courses
+        // GET /almaws/v1/courses
+        $xml = $this->makeRequest('/courses');
+        $result = [];
+        foreach ($xml->course ?? [] as $course) {
+            $departmentId = (string)$course->academic_department;
+            $departmentName = (string)$course->academic_department['desc'];
+            $result[$departmentId] = $departmentName;
+        }
+        return $result;
+    }
+
+    /**
+     * Get Instructors
+     *
+     * Obtain a list of instructors for use in limiting the reserves list.
+     *
+     * @return array An associative array with key = ID, value = name.
+     */
+    public function getInstructors()
+    {
+        // https://developers.exlibrisgroup.com/alma/apis/courses
+        // GET /almaws/v1/courses
+        $xml = $this->makeRequest('/courses');
+        $result = [];
+        foreach ($xml->course ?? [] as $course) {
+            foreach ($course->instructors->instructor ?? [] as $instructor) {
+                $primary_id = (string)$instructor->primary_id;
+                $first_name = (string)$instructor->first_name;
+                $last_name = (string)$instructor->last_name;
+                $full_name = trim("$first_name $last_name");
+                $result[$primary_id] = $full_name;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Get New Items
+     *
+     * Retrieve the IDs of items recently added to the catalog.
+     *
+     * @param int $page    Page number of results to retrieve (counting starts at 1)
+     * @param int $limit   The size of each page of results to retrieve
+     * @param int $daysOld The maximum age of records to retrieve in days (max. 30)
+     * @param int $fundId  optional fund ID to use for limiting results (use a value
+     * returned by getFunds, or exclude for no limit); note that "fund" may be a
+     * misnomer - if funds are not an appropriate way to limit your new item
+     * results, you can return a different set of values from getFunds. The
+     * important thing is that this parameter supports an ID returned by getFunds,
+     * whatever that may mean.
+     *
+     * @return array       Associative array with 'count' and 'results' keys
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    public function getNewItems($page, $limit, $daysOld, $fundId = null)
+    {
+        $results = $this->config['Records']['new_items'] ?? [];
+        $retVal = ['count' => count($results), 'results' => []];
+        foreach ($results as $result) {
+            $retVal['results'][] = ['id' => $result];
+        }
+        return $retVal;
+    }
+
+    /**
      * Check if request is valid
      *
      * This is responsible for determining if an item is requestable
@@ -1635,7 +1710,7 @@ class Alma extends AbstractBase implements
         // GET /almaws/v1/courses
         $xml = $this->makeRequest('/courses');
         $courses = [];
-        foreach ($xml as $course) {
+        foreach ($xml->course ?? [] as $course) {
             $courses[(string)$course->id] = (string)$course->name;
         }
         return $courses;
@@ -1667,7 +1742,7 @@ class Alma extends AbstractBase implements
                 $listsBase . '/' . rawurlencode($listId) . '/citations'
             );
             foreach ($listXML as $citation) {
-                $reserves[$citation->id] = $citation->metadata;
+                $reserves[(string)$citation->id] = $citation->metadata;
             }
         }
         return $reserves;
@@ -2044,13 +2119,23 @@ class Alma extends AbstractBase implements
     /**
      * Get list of funds
      *
-     * @return array with key = course ID, value = course name
+     * @return array with key = fund ID, value = fund name
      */
     public function getFunds()
     {
-        // TODO: implement me!
         // https://developers.exlibrisgroup.com/alma/apis/acq
         // GET /almaws/v1/acq/funds
-        return [];
+        try {
+            $xml = $this->makeRequest('/acq/funds');
+        } catch (ILSException $e) {
+            $xml = [];
+        }
+        $result = [];
+        foreach ($xml->fund ?? [] as $fund) {
+            $fundId = (string)$fund->id;
+            $fundName = (string)$fund->name;
+            $result[$fundId] = $fundName;
+        }
+        return $result;
     }
 }

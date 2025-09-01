@@ -1,7 +1,7 @@
 .lib-img {
   clear: both;
   float: left;
-  padding-right: 20px;
+  padding-right: 10px;
 }
 
 .lib-konto,
@@ -13,7 +13,7 @@
 }
 
 .lib-content {
-    margin-left: 43px;
+    margin-left: 34px;
 /*
     top: -2px;
  */
@@ -24,7 +24,7 @@
 .lib-oeffnung .lib-img,
 .lib-auskunft .lib-img,
 .lib-chat .lib-img {
-    width: 42px;
+    width: 35px;
 }
 .lib-sitz .lib-img {
     padding-left: 9px;

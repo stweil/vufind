@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<reading_lists
+    link="http://localhost/v1/courses/1234/reading-lists">
+    <reading_list
+        link="http://localhost/v1/courses/1234/reading-lists/1234">
+        <id>1234</id>
+        <code>VRL</code>
+        <name>VuFind Reading List</name>
+        <due_back_date>2026-01-01Z</due_back_date>
+        <status desc="Complete">Complete</status>
+        <syllabus />
+        <visibility desc="Draft">DRAFT</visibility>
+        <publishingStatus desc="Draft">DRAFT</publishingStatus>
+        <notes />
+        <locked>false</locked>
+        <last_modified_date>2025-09-05T22:54:00.246Z</last_modified_date>
+    </reading_list>
+</reading_lists>

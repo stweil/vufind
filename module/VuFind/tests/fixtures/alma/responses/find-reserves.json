@@ -1,0 +1,15 @@
+[
+    {
+        "expectedParams": [
+            "/courses/1234/reading-lists",
+            [],
+            [],
+            "GET",
+            null,
+            null,
+            [],
+            false
+        ],
+        "resultFixture": "find-reserves.xml"
+    }
+]

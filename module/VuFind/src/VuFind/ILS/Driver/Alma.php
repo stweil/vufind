@@ -265,7 +265,7 @@ class Alma extends AbstractBase implements
      *
      * @return array Availability and status
      */
-    protected function getItemAvailabilityAndStatus(\SimpleXMLElement $item): array
+    protected function getItemAvailabilityAndStatus(SimpleXMLElement $item): array
     {
         // Check location type to status mappings first since they override
         // everything else:
@@ -379,7 +379,7 @@ class Alma extends AbstractBase implements
             . '&expand=due_date'
             . $apiPagingParams;
 
-        if ($items = $this->makeRequest($itemsPath)) {
+        if (is_numeric($id) && $items = $this->makeRequest($itemsPath)) {
             // Get the total number of items returned from the API call and set it to
             // a class variable. It is then used in VuFind\RecordTab\HoldingsILS for
             // the items paginator.
@@ -445,6 +445,52 @@ class Alma extends AbstractBase implements
         }
 
         return $results;
+    }
+
+    /**
+     * Get Departments.
+     *
+     * Obtain a list of departments for use in limiting the reserves list.
+     *
+     * @return array An associative array with key = dept. ID, value = dept. name.
+     */
+    public function getDepartments()
+    {
+        // https://developers.exlibrisgroup.com/alma/apis/courses
+        // GET /almaws/v1/courses
+        $xml = $this->makeRequest('/courses');
+        $result = [];
+        foreach ($xml->course ?? [] as $course) {
+            $departmentId = (string)$course->academic_department;
+            $departmentName = (string)$course->academic_department['desc'];
+            $result[$departmentId] = $departmentName;
+        }
+        return $result;
+    }
+
+    /**
+     * Get Instructors.
+     *
+     * Obtain a list of instructors for use in limiting the reserves list.
+     *
+     * @return array An associative array with key = ID, value = name.
+     */
+    public function getInstructors()
+    {
+        // https://developers.exlibrisgroup.com/alma/apis/courses
+        // GET /almaws/v1/courses
+        $xml = $this->makeRequest('/courses');
+        $result = [];
+        foreach ($xml->course ?? [] as $course) {
+            foreach ($course->instructors->instructor ?? [] as $instructor) {
+                $primary_id = (string)$instructor->primary_id;
+                $first_name = (string)$instructor->first_name;
+                $last_name = (string)$instructor->last_name;
+                $full_name = trim("$first_name $last_name");
+                $result[$primary_id] = $full_name;
+            }
+        }
+        return $result;
     }
 
     /**
@@ -1107,6 +1153,7 @@ class Alma extends AbstractBase implements
         );
         $holdList = [];
         for ($i = 0; $i < count($xml->user_requests); $i++) {
+            // TODO: check for missing (string) casts.
             $request = $xml->user_requests[$i];
             if (
                 !isset($request->item_policy)
@@ -1148,6 +1195,7 @@ class Alma extends AbstractBase implements
         );
         $holdList = [];
         for ($i = 0; $i < count($xml->user_requests); $i++) {
+            // TODO: check for missing (string) casts.
             $request = $xml->user_requests[$i];
             if (
                 !isset($request->item_policy)
@@ -1224,6 +1272,7 @@ class Alma extends AbstractBase implements
         // If there is an API result, process it
         $totalCount = 0;
         if ($apiResult) {
+            // TODO: check for missing (string) casts.
             $totalCount = $apiResult->attributes()->total_record_count;
             // Iterate over all item loans
             foreach ($apiResult->item_loan as $itemLoan) {
@@ -1246,6 +1295,7 @@ class Alma extends AbstractBase implements
                 //$loan['message'] = ;
                 $loan['title'] = (string)$itemLoan->title;
                 $loan['item_id'] = (string)$itemLoan->loan_id;
+                // TODO: check for missing (string) casts.
                 $loan['institution_name']
                     = $this->getTranslatableString($itemLoan->library);
                 //$loan['isbn'] = ;
@@ -1625,13 +1675,20 @@ class Alma extends AbstractBase implements
         $listsBase = '/courses/' . rawurlencode($courseID) . '/reading-lists';
         $xml = $this->makeRequest($listsBase);
         $reserves = [];
-        foreach ($xml as $list) {
-            $listId = $list->id;
+        foreach ($xml->reading_list as $list) {
+            $listId = (string)$list->id;
             $listXML = $this->makeRequest(
                 $listsBase . '/' . rawurlencode($listId) . '/citations'
             );
-            foreach ($listXML as $citation) {
-                $reserves[$citation->id] = $citation->metadata;
+            foreach ($listXML->citation as $citation) {
+                $reserves[] = [
+                    'BIB_ID' => (string)$citation->id,
+                    'DISPLAY_CALL_NO' => (string)$citation->metadata->mms_id,
+                    'AUTHOR' => (string)$citation->metadata->author,
+                    'TITLE' => (string)$citation->metadata->title,
+                    'PUBLISHER' => (string)$citation->metadata->publisher,
+                    'PUBLISHER_DATE' => (string)$citation->metadata->publication_date,
+                ];
             }
         }
         return $reserves;
@@ -1765,11 +1822,13 @@ class Alma extends AbstractBase implements
     protected function getStatusesForInventoryTypes($ids, $types)
     {
         $results = [];
+        // Alma only accepts numeric IDs.
+        $numericIds = array_filter($ids, 'is_numeric');
         $params = [
-            'mms_id' => implode(',', $ids),
+            'mms_id' => implode(',', $numericIds),
             'expand' => implode(',', $types),
         ];
-        if ($bibs = $this->makeRequest('/bibs', $params)) {
+        if (!empty($numericIds) && $bibs = $this->makeRequest('/bibs', $params)) {
             foreach ($bibs as $bib) {
                 $marc = new MarcReader($bib->record->asXML());
                 $status = [];

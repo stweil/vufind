@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<citations link="string">
+    <citation link="string">
+        <id>1234</id>
+        <status desc="string">
+            <xml_value>BeingPrepared</xml_value>
+        </status>
+        <copyrights_status desc="string">
+            <xml_value>NOTDETERMINED</xml_value>
+        </copyrights_status>
+        <secondary_type desc="string">
+            <xml_value>BK</xml_value>
+        </secondary_type>
+        <type desc="string">
+            <xml_value>CR</xml_value>
+        </type>
+        <metadata>
+            <title>Cat royal</title>
+            <author>brady</author>
+            <publisher>Sheed and Ward</publisher>
+            <publication_date>1947</publication_date>
+            <mms_id>9913231040001021</mms_id>
+            <place_of_publication>New York,</place_of_publication>
+            <chapter_author>John Smith</chapter_author>
+            <year>1947</year>
+            <pages>56</pages>
+            <pmid>12100343800</pmid>
+            <author_initials>Charles A.</author_initials>
+            abc
+        </metadata>
+        <open_url>/almaws/v1/courses/995100660001021/reading-lists/995100680001021</open_url>
+        <notes>
+            <note>
+                <content>This is a note</content>
+                <creation_date>2019-11-10Z</creation_date>
+                <created_by>exl_api</created_by>
+                <type>ADDRESS</type>
+            </note>
+        </notes>
+        <due_date>2023-01-12Z</due_date>
+        <license_type>None</license_type>
+        <visibility_start_date>2013-02-01Z</visibility_start_date>
+        <visibility_end_date>2023-04-12Z</visibility_end_date>
+        <material_visibility_start_date>2015-03-03Z</material_visibility_start_date>
+        <material_visibility_end_date>2025-04-04Z</material_visibility_end_date>
+        <sipx_doc_id>10213355410</sipx_doc_id>
+        <sipx_user_price>1000</sipx_user_price>
+        <sipx_list_price>10000</sipx_list_price>
+        <sipx_funded>true</sipx_funded>
+        <sticker_price>1000</sticker_price>
+        <defined_fields>
+            <type_attributes>
+                <attribute desc="string">
+                    <xml_value>BOOK</xml_value>
+                </attribute>
+                <attribute_type desc="string">
+                    <xml_value>Requested_format</xml_value>
+                </attribute_type>
+            </type_attributes>
+        </defined_fields>
+        <section_info>
+            <id>995100700001021</id>
+            <start_date>2013-02-01Z</start_date>
+            <end_date>2023-01-02Z</end_date>
+            <visibility>true</visibility>
+            <citation_tags total_record_count="0" link="string">
+                <citation_tag>
+                    <type desc="string">
+                        <xml_value>PUBLIC</xml_value>
+                    </type>
+                    <value desc="string">
+                        <xml_value>DGT</xml_value>
+                    </value>
+                </citation_tag>
+            </citation_tags>
+            <section_locked>true</section_locked>
+        </section_info>
+        <citation_tags total_record_count="0" link="string">
+            <citation_tag>
+                <type desc="string">
+                    <xml_value>PUBLIC</xml_value>
+                </type>
+                <value desc="string">
+                    <xml_value>DGT</xml_value>
+                </value>
+            </citation_tag>
+        </citation_tags>
+    </citation>
+</citations>

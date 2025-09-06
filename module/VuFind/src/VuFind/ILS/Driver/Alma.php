@@ -1109,6 +1109,7 @@ class Alma extends AbstractBase implements
         );
         $holdList = [];
         for ($i = 0; $i < count($xml->user_requests); $i++) {
+            // TODO: check for missing (string) casts.
             $request = $xml->user_requests[$i];
             if (
                 !isset($request->item_policy)
@@ -1150,6 +1151,7 @@ class Alma extends AbstractBase implements
         );
         $holdList = [];
         for ($i = 0; $i < count($xml->user_requests); $i++) {
+            // TODO: check for missing (string) casts.
             $request = $xml->user_requests[$i];
             if (
                 !isset($request->item_policy)
@@ -1226,6 +1228,7 @@ class Alma extends AbstractBase implements
         // If there is an API result, process it
         $totalCount = 0;
         if ($apiResult) {
+            // TODO: check for missing (string) casts.
             $totalCount = $apiResult->attributes()->total_record_count;
             // Iterate over all item loans
             foreach ($apiResult->item_loan as $itemLoan) {
@@ -1248,6 +1251,7 @@ class Alma extends AbstractBase implements
                 //$loan['message'] = ;
                 $loan['title'] = (string)$itemLoan->title;
                 $loan['item_id'] = (string)$itemLoan->loan_id;
+                // TODO: check for missing (string) casts.
                 $loan['institution_name']
                     = $this->getTranslatableString($itemLoan->library);
                 //$loan['isbn'] = ;
@@ -1628,12 +1632,12 @@ class Alma extends AbstractBase implements
         $xml = $this->makeRequest($listsBase);
         $reserves = [];
         foreach ($xml as $list) {
-            $listId = $list->id;
+            $listId = (string)$list->id;
             $listXML = $this->makeRequest(
                 $listsBase . '/' . rawurlencode($listId) . '/citations'
             );
             foreach ($listXML as $citation) {
-                $reserves[$citation->id] = $citation->metadata;
+                $reserves[(string)$citation->id] = $citation->metadata;
             }
         }
         return $reserves;

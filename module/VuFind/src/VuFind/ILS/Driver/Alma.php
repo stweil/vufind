@@ -2128,6 +2128,8 @@ class Alma extends AbstractBase implements
         try {
             $xml = $this->makeRequest('/acq/funds');
         } catch (ILSException $e) {
+            // API key not defined or not configured to allow this API.
+            // Required permission: Acquisition Read.
             $xml = [];
         }
         $result = [];

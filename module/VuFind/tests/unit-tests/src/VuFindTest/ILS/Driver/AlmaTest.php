@@ -202,8 +202,7 @@ class AlmaTest extends \VuFindTest\Unit\ILSDriverTestCase
         $this->createConnector('find-reserves');
         $result = $this->driver->findReserves('1234', 'instructor', 'department');
         $expected = [
-            '1234' => 'VuFind Basics',
-            '5678' => 'Advanced VuFind',
+            '1234' => 'abc',
         ];
         $this->assertEquals($expected, $result);
     }

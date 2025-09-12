@@ -11,5 +11,18 @@
             false
         ],
         "resultFixture": "find-reserves.xml"
+    },
+    {
+        "expectedParams": [
+            "/courses/1234/reading-lists/1234/citations",
+            [],
+            [],
+            "GET",
+            null,
+            null,
+            [],
+            false
+        ],
+        "resultFixture": "find-reserves-citations.xml"
     }
 ]

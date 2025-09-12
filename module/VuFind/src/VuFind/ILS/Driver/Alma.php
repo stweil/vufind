@@ -1633,13 +1633,13 @@ class Alma extends AbstractBase implements
         $listsBase = '/courses/' . rawurlencode($courseID) . '/reading-lists';
         $xml = $this->makeRequest($listsBase);
         $reserves = [];
-        foreach ($xml as $list) {
+        foreach ($xml->reading_list as $list) {
             $listId = (string)$list->id;
             $listXML = $this->makeRequest(
                 $listsBase . '/' . rawurlencode($listId) . '/citations'
             );
-            foreach ($listXML as $citation) {
-                $reserves[(string)$citation->id] = $citation->metadata;
+            foreach ($listXML->citation as $citation) {
+                $reserves[(string)$citation->id] = (string)$citation->metadata;
             }
         }
         return $reserves;

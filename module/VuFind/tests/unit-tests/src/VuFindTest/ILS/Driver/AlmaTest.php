@@ -210,6 +210,26 @@ class AlmaTest extends \VuFindTest\Unit\ILSDriverTestCase
     }
 
     /**
+     * Test the getAccountBlocks() method
+     *
+     * @return void
+     */
+    public function testGetAccountBlocks(): void
+    {
+        // TODO.
+    }
+
+    /**
+     * Test the getRequestBlocks() method
+     *
+     * @return void
+     */
+    public function testGetRequestBlocks(): void
+    {
+        // TODO.
+    }
+
+    /**
      * Testing getCourses
      *
      * @return void
@@ -239,6 +259,106 @@ class AlmaTest extends \VuFindTest\Unit\ILSDriverTestCase
             'FUND-02' => 'VuFind Sponsors',
         ];
         $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * Test the getMyFines() method
+     *
+     * @return void
+     */
+    public function testGetMyFines(): void
+    {
+        // TODO.
+    }
+
+    /**
+     * Testing method for getMyHolds
+     *
+     * @return void
+     */
+    public function testGetMyHolds()
+    {
+        // TODO.
+    }
+
+    /**
+     * Testing method for getMyILLRequests
+     *
+     * @return void
+     */
+    public function testGetMyILLRequests()
+    {
+        // TODO.
+    }
+
+    /**
+     * Testing method for getMyStorageRetrievalRequests
+     *
+     * @return void
+     */
+    public function testGetMyStorageRetrievalRequests()
+    {
+        // TODO.
+    }
+
+    /**
+     * Testing method for getMyTransactions
+     *
+     * @return void
+     */
+    public function testGetMyTransactions()
+    {
+        // TODO.
+    }
+
+    /**
+     * Testing method for getPickupLocations
+     *
+     * @return void
+     */
+    public function testGetPickupLocations()
+    {
+        // TODO.
+    }
+
+    /**
+     * Testing method for getPurchaseHistory
+     *
+     * @return void
+     */
+    public function testGetPurchaseHistory()
+    {
+        // TODO (implementation in Alma driver is missing, too).
+    }
+
+    /**
+     * Testing method for getRenewDetails
+     *
+     * @return void
+     */
+    public function testGetRenewDetails()
+    {
+        // TODO.
+    }
+
+    /**
+     * Testing method for getStatus
+     *
+     * @return void
+     */
+    public function testGetStatus()
+    {
+        // TODO.
+    }
+
+    /**
+     * Testing method for getStatuses
+     *
+     * @return void
+     */
+    public function testGetStatuses()
+    {
+        // TODO.
     }
 
     /**

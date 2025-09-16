@@ -1637,7 +1637,7 @@ class Alma extends AbstractBase implements
                 $listsBase . '/' . rawurlencode($listId) . '/citations'
             );
             foreach ($listXML->citation as $citation) {
-                $reserves[(string)$citation->id] = (string)$citation->metadata;
+                $reserves[(string)$citation->id] = trim((string)$citation->metadata);
             }
         }
         return $reserves;

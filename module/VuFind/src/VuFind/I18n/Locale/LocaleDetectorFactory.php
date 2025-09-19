@@ -73,7 +73,7 @@ class LocaleDetectorFactory implements DelegatorFactoryInterface
         ContainerInterface $container,
         $name,
         callable $callback,
-        array $options = null
+        ?array $options = null
     ) {
         $detector = call_user_func($callback);
         $settings = $container->get(LocaleSettings::class);

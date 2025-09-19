@@ -78,7 +78,7 @@ class User extends Gateway
         $cfg,
         ?RowGateway $rowObj,
         Config $config,
-        Container $session = null,
+        ?Container $session = null,
         $table = 'user'
     ) {
         $this->config = $config;

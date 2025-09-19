@@ -108,8 +108,8 @@ interface TagServiceInterface extends DbServiceInterface
      */
     public function getResourcesMatchingTagQuery(
         string $q,
-        string $source = null,
-        string $sort = null,
+        ?string $source = null,
+        ?string $sort = null,
         int $offset = 0,
         ?int $limit = null,
         bool $fuzzy = true,

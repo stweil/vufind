@@ -90,7 +90,7 @@ class Backend extends AbstractBackend
         AbstractQuery $query,
         $offset,
         $limit,
-        ParamBag $params = null
+        ?ParamBag $params = null
     ) {
         if (null === $params) {
             $params = new ParamBag();
@@ -111,7 +111,7 @@ class Backend extends AbstractBackend
      *
      * @return RecordCollectionInterface
      */
-    public function retrieve($id, ParamBag $params = null)
+    public function retrieve($id, ?ParamBag $params = null)
     {
         $response   = $this->connector->getRecord($id, $params);
         $collection = $this->createRecordCollection($response);

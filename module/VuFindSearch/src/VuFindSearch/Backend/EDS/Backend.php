@@ -164,7 +164,7 @@ class Backend extends AbstractBackend
         RecordCollectionFactoryInterface $factory,
         CacheAdapter $cache,
         SessionContainer $session,
-        Config $config = null,
+        ?Config $config = null,
         $isGuest = true
     ) {
         // Save dependencies/incoming parameters:
@@ -199,7 +199,7 @@ class Backend extends AbstractBackend
         AbstractQuery $query,
         $offset,
         $limit,
-        ParamBag $params = null
+        ?ParamBag $params = null
     ) {
         // process EDS API communication tokens.
         $authenticationToken = $this->getAuthenticationToken();
@@ -297,7 +297,7 @@ class Backend extends AbstractBackend
      *
      * @return \VuFindSearch\Response\RecordCollectionInterface
      */
-    public function retrieve($id, ParamBag $params = null)
+    public function retrieve($id, ?ParamBag $params = null)
     {
         $an = $dbId = $authenticationToken = $sessionToken = $hlTerms = null;
         try {

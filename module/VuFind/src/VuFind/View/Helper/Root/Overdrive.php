@@ -54,7 +54,7 @@ class Overdrive extends \Laminas\View\Helper\AbstractHelper
      *
      * @param OverdriveConnector $connector Overdrive connector
      */
-    public function __construct(OverdriveConnector $connector = null)
+    public function __construct(?OverdriveConnector $connector = null)
     {
         $this->connector = $connector;
     }

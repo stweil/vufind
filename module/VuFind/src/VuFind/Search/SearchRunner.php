@@ -86,7 +86,7 @@ class SearchRunner
      */
     public function __construct(
         ResultsManager $resultsManager,
-        EventManager $events = null
+        ?EventManager $events = null
     ) {
         $this->resultsManager = $resultsManager;
         if (null !== $events) {

@@ -65,7 +65,7 @@ class AdapterFactory implements \Laminas\ServiceManager\Factory\FactoryInterface
      * @param Config $config VuFind configuration (provided when used as service;
      * omitted when used as factory)
      */
-    public function __construct(Config $config = null)
+    public function __construct(?Config $config = null)
     {
         $this->config = $config ?: new Config([]);
     }
@@ -87,7 +87,7 @@ class AdapterFactory implements \Laminas\ServiceManager\Factory\FactoryInterface
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory!');

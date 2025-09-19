@@ -82,7 +82,7 @@ class Backend extends AbstractBackend
      */
     public function __construct(
         Connector $connector,
-        RecordCollectionFactoryInterface $factory = null,
+        ?RecordCollectionFactoryInterface $factory = null,
         $defaultSearch = null
     ) {
         if (null !== $factory) {
@@ -107,7 +107,7 @@ class Backend extends AbstractBackend
         AbstractQuery $query,
         $offset,
         $limit,
-        ParamBag $params = null
+        ?ParamBag $params = null
     ) {
         $baseParams = $this->getQueryBuilder()->build($query);
         if (null !== $params) {
@@ -143,7 +143,7 @@ class Backend extends AbstractBackend
      *
      * @return RecordCollectionInterface
      */
-    public function retrieve($id, ParamBag $params = null)
+    public function retrieve($id, ?ParamBag $params = null)
     {
         throw new \Exception('retrieve() not supported by LibGuides.');
     }

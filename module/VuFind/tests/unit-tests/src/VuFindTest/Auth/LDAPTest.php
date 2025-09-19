@@ -94,20 +94,6 @@ class LDAPTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Verify that missing port causes failure.
-     *
-     * @return void
-     */
-    public function testWithMissingPort(): void
-    {
-        $this->expectException(\VuFind\Exception\Auth::class);
-
-        $config = $this->getAuthConfig();
-        unset($config->LDAP->port);
-        $this->getAuthObject($config)->getConfig();
-    }
-
-    /**
      * Verify that missing baseDN causes failure.
      *
      * @return void

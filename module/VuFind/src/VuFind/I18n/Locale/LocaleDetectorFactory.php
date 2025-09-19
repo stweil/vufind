@@ -107,7 +107,7 @@ class LocaleDetectorFactory implements DelegatorFactoryInterface
      *
      * @return \Generator
      */
-    protected function getStrategies(LocaleSettings $settings = null): \Generator
+    protected function getStrategies(?LocaleSettings $settings = null): \Generator
     {
         yield new LocaleDetectorParamStrategy();
 

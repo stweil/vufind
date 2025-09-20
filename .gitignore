@@ -32,3 +32,23 @@ local/config/vufind/*.ini
 local/config/vufind/*.json
 local/config/vufind/*.key
 local/config/vufind/*.yaml
+
+# Created files
+compiled.css
+compiled.scss
+/themes/bootprint3/scss/bootprint.scss
+/themes/bootprint3/scss/common.scss
+/themes/bootprint3/scss/forms.scss
+/themes/bootprint3/scss/icons.scss
+/themes/bootprint3/scss/search.scss
+/themes/bootprint3/scss/variables.scss
+/themes/bootstrap3/scss/bootstrap.scss
+/themes/bootstrap3/scss/components/
+/themes/bootstrap3/scss/mixins/
+/themes/bootstrap3/scss/variables.scss
+/themes/sandal/scss/colors.scss
+/themes/sandal/scss/common.scss
+/themes/sandal/scss/rtl.scss
+/themes/sandal/scss/sandal.scss
+/themes/sandal/scss/search.scss
+/themes/sandal/scss/variables.scss

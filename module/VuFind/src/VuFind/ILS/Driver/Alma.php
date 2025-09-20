@@ -259,6 +259,25 @@ class Alma extends AbstractBase implements
     }
 
     /**
+     * Get Default Pick Up Location
+     *
+     * Returns the default pick up location set in VoyagerRestful.ini
+     *
+     * @param array $patron   Patron information returned by the patronLogin method.
+     * @param array $holdInfo Optional array, only passed in when getting a list
+     * in the context of placing a hold; contains most of the same values passed to
+     * placeHold, minus the patron data. May be used to limit the pickup options
+     * or may be ignored.
+     *
+     * @return string       The default pickup location for the patron.
+     */
+    public function getDefaultPickUpLocation($patron, $holdInfo = null)
+    {
+        // TODO: missing implementation
+        return '';
+    }
+
+    /**
      * Given an item, return its availability and status.
      *
      * @param \SimpleXMLElement $item Item data

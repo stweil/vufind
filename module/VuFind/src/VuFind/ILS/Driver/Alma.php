@@ -896,7 +896,7 @@ class Alma extends AbstractBase implements
             // We may already have some information, so just fill the gaps
             $patron['id'] = (string)$response->primary_id;
             $patron['cat_username'] = trim($username);
-            $patron['cat_password'] = trim($password);
+            $patron['cat_password'] = trim($password ?: '');
             $patron['firstname'] = (string)$response->first_name ?? '';
             $patron['lastname'] = (string)$response->last_name ?? '';
             $patron['email'] = $this->getPreferredEmail($response);

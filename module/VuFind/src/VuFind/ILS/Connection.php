@@ -1239,7 +1239,7 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
         $status = $this->__call('getStatus', [$id]);
 
         // parse availability and status to AvailabilityStatus object
-        return array_map($this->getStatusParser(), $status);
+        return array_map($this->getStatusParser(), $status ?: []);
     }
 
     /**

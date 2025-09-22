@@ -185,7 +185,7 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
         \Laminas\Config\Config $config,
         \VuFind\ILS\Driver\PluginManager $driverManager,
         \VuFind\Config\PluginManager $configReader,
-        \Laminas\Http\Request $request = null
+        ?\Laminas\Http\Request $request = null
     ) {
         if (!isset($config->driver)) {
             throw new \Exception('ILS driver setting missing.');
@@ -288,7 +288,7 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
      *
      * @return bool
      */
-    protected function failOverToNoILS(\Exception $e = null)
+    protected function failOverToNoILS(?\Exception $e = null)
     {
         // If the exception is caused by a configuration error, the administrator
         // needs to fix it, but failing over to NoILS will mask the error and cause
@@ -1218,7 +1218,7 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
         $status = $this->__call('getStatus', [$id]);
 
         // parse availability and status to AvailabilityStatus object
-        return array_map($this->getStatusParser(), $status);
+        return array_map($this->getStatusParser(), $status ?: []);
     }
 
     /**

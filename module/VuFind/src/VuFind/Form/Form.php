@@ -141,7 +141,7 @@ class Form extends \Laminas\Form\Form implements
         YamlReader $yamlReader,
         HelperPluginManager $viewHelperManager,
         HandlerManager $handlerManager,
-        array $config = null
+        ?array $config = null
     ) {
         parent::__construct();
 

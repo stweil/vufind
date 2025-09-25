@@ -101,7 +101,7 @@ class LDAP extends AbstractBase
      * Attempt to authenticate the current user. Throws exception if login fails.
      *
      * @param \Laminas\Http\PhpEnvironment\Request $request Request object containing
-     * account credentials.
+     *                                                      account credentials.
      *
      * @throws AuthException
      * @return UserEntityInterface Object representing logged-in user.
@@ -297,7 +297,8 @@ class LDAP extends AbstractBase
         $user = $this->getOrCreateUserByUsername($username);
 
         // Variable to hold catalog password (handled separately from other
-        // attributes since we need to pass it to saveUserAndCredentials method to store it):
+        // attributes since we need to pass it to saveUserAndCredentials
+        // method to store it):
         $catPassword = null;
 
         // Loop through LDAP response and map fields to database object based

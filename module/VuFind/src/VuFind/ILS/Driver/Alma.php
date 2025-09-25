@@ -1752,9 +1752,12 @@ class Alma extends AbstractBase implements
     {
         // https://developers.exlibrisgroup.com/alma/apis/courses
         // GET /almaws/v1/courses/{course_id}/reading-lists
+        $reserves = [];
+        if ($courseID === '') {
+            return $reserves;
+        }
         $listsBase = '/courses/' . rawurlencode($courseID) . '/reading-lists';
         $xml = $this->makeRequest($listsBase);
-        $reserves = [];
         foreach ($xml as $list) {
             $listId = $list->id;
             $listXML = $this->makeRequest(

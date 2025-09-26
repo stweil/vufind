@@ -108,6 +108,22 @@ header {
     width: 200px;
     height: 100%;
     margin-top: 5px;
+    @include background-image('vufind_logo_dark.png');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    &,
+    &:active,
+    &:hover,
+    &:focus { color: transparent; }
+    &.lang-ar { @include background-image('vufind_logo_ar_dark.png'); }
+  }
+
+  .navbar-ub {
+    width: 200px;
+    height: 100%;
+    line-height: 60px;
+    margin-top: 5px;
     @include background-image('../../ubma/images/logo-ub-de.svg');
     background-position: center center;
     background-repeat: no-repeat;
@@ -117,6 +133,22 @@ header {
     &:hover,
     &:focus { color: transparent; }
     &.lang-ar { @include background-image('vufind_logo_ar_dark.png'); }
+  }
+
+  .navbar-uni {
+    width: 200px;
+    height: 100%;
+    line-height: 60px;
+    margin-right: 16px;
+    margin-top: 5px;
+    @include background-image('../../ubma/images/logo-uni-de.svg');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    &,
+    &:active,
+    &:hover,
+    &:focus { color: transparent; }
   }
 }
 

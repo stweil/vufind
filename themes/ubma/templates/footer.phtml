@@ -7,15 +7,15 @@
       Wählen Sie einen Suchraum für Ihre Recherche:<p>
 -->
       <div>
-      <strong>UB-Bestand</strong><br>
-      Hier finden Sie mehr als 2,7 Millionen Medien der UB Mannheim: Bücher, E-Books, Zeitschriften, E-Journals, CDs, DVDs und psychologische Tests.<p>
+      <strong><?=$this->transEsc('ubma_holdings_title')?></strong><br>
+      <?=$this->transEsc('ubma_holdings_text')?><p>
       </div>
       <div>
-      <strong>Aufsätze & UB-Bestand</strong><p>
-      Zusätzlich zum UB-Bestand durchsuchen Sie 100 Millionen Datensätze nach wissenschaftlichen Papers, Aufsätzen in E-Journals und Beiträgen in E-Books.<p>
+      <strong><?=$this->transEsc('ubma_articles_title')?></strong><p>
+      <?=$this->transEsc('ubma_articles_text')?><p>
       </div>
-      <strong>Fernleihe</strong><p>
-      Ihre Suche war ergebnislos? Hier recherchieren Sie deutschlandweit im Bestand wissenschaftlicher Bibliotheken und bestellen Ihr Medium mit wenigen Klicks.<p>
+      <strong><?=$this->transEsc('ubma_ill_title')?></strong><p>
+      <?=$this->transEsc('ubma_ill_text')?><p>
       <?=$this->slot('footer-left')->end(); ?>
     </div>
     <div class="footer-column">
@@ -45,34 +45,34 @@
 	</ul>
 
                 <div class="lib-konto">
-                    <div class="lib-img"><img src="themes/ubma/images/icon-sign-in.png" alt=""></div>
+                    <div class="lib-img"><img src="/vufind/themes/ubma/images/icon-sign-in.png" alt=""></div>
                     <div class="lib-content">
-                        <div class="lib-title"><a href="https://disco.bib.uni-mannheim.de/vufind/MyResearch" id="ma-login-link">Mein Bibliothekskonto</a></div>
+                        <div class="lib-title"><a href="https://disco.bib.uni-mannheim.de/vufind/MyResearch" id="ma-login-link"><?=$this->transEsc('ubma_menu_account')?></a></div>
                     </div>
                 </div>
                 <ma-prm-main-page-library-account-after></ma-prm-main-page-library-account-after>
                 <div class="lib-sitz">
-                    <div class="lib-img"><img src="themes/ubma/images/icon-ampel.png" alt=""></div>
+                    <div class="lib-img"><img src="/vufind/themes/ubma/images/icon-ampel.png" alt=""></div>
                     <div class="lib-content">
-                        <div class="lib-title"><a href="https://www.bib.uni-mannheim.de/standortuebersicht/" target="_blank">Freie Sitzplätze</a></div>
+                        <div class="lib-title"><a href="https://www.bib.uni-mannheim.de/standortuebersicht/" target="_blank"><?=$this->transEsc('ubma_menu_seats')?></a></div>
                     </div>
                 </div>
                 <div class="lib-oeffnung">
-                    <div class="lib-img"><img src="themes/ubma/images/icon-clock-o.png" alt=""></div>
+                    <div class="lib-img"><img src="/vufind/themes/ubma/images/icon-clock-o.png" alt=""></div>
                     <div class="lib-content">
-                        <div class="lib-title"><a href="https://www.bib.uni-mannheim.de/oeffnungszeiten/" target="_blank">Öffnungszeiten</a></div>
+                        <div class="lib-title"><a href="https://www.bib.uni-mannheim.de/oeffnungszeiten/" target="_blank"><?=$this->transEsc('ubma_menu_opening')?></a></div>
                     </div>
                 </div>
                 <div class="lib-auskunft">
-                    <div class="lib-img"><img src="themes/ubma/images/icon-info-circle.png" alt=""></div>
+                    <div class="lib-img"><img src="/vufind/themes/ubma/images/icon-info-circle.png" alt=""></div>
                     <div class="lib-content">
-                        <div class="lib-title"><a href="https://www.bib.uni-mannheim.de/linkes-menue/auskunft-beratung/" target="_blank">Auskunft &amp; Beratung</a></div>
+                        <div class="lib-title"><a href="https://www.bib.uni-mannheim.de/linkes-menue/auskunft-beratung/" target="_blank"><?=$this->transEsc('ubma_menu_information')?></a></div>
                     </div>
                 </div>
                 <div class="lib-chat">
-                    <div class="lib-img"><img src="themes/ubma/images/icon-comments-o.png" alt=""></div>
+                    <div class="lib-img"><img src="/vufind/themes/ubma/images/icon-comments-o.png" alt=""></div>
                     <div class="lib-content">
-                        <div class="lib-title"><a href="https://www2.bib.uni-mannheim.de/mibew/index.php/chat?locale=de" target="_blank">Chat (Mo–Fr 10-18)</a></div>
+                        <div class="lib-title"><a href="https://www2.bib.uni-mannheim.de/mibew/index.php/chat?locale=de" target="_blank"><?=$this->transEsc('ubma_menu_chat')?></a></div>
                     </div>
                 </div>
   <br>

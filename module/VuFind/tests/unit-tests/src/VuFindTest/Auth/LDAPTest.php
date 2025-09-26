@@ -65,9 +65,10 @@ class LDAPTest extends \PHPUnit\Framework\TestCase
      *
      * @return array
      */
-    public function getAuthConfig(): array
+    protected function getAuthConfig(): array
     {
         $ldapConfig = [
+            'uri' => 'ldap://localhost',
             'host' => 'localhost',
             'port' => 1234,
             'basedn' => 'basedn',

@@ -30,6 +30,86 @@
           <li><a href="<?=$this->url('search-history')?>"><?=$this->transEsc('Search History')?></a></li>
           <li><a href="<?=$this->url('search-advanced')?>"><?=$this->transEsc('Advanced Search')?></a></li>
         </ul>
+        <?php
+        // Simple RSS fetch function
+        function getLatestNewsFromRSS($rssUrl, $limit = 5) {
+            $cacheFile = '/tmp/vufind_rss_cache_' . md5($rssUrl) . '.txt';
+            $cacheTime = 300; // 5 minutes
+
+            // Check cache
+            if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < $cacheTime) {
+                $cachedData = file_get_contents($cacheFile);
+                return json_decode($cachedData, true);
+            }
+
+            $newsItems = [];
+
+            try {
+                $rssContent = @file_get_contents($rssUrl, false, stream_context_create([
+                    'http' => [
+                        'timeout' => 10,
+                        'user_agent' => 'VuFind Footer News Bot 1.0'
+                    ]
+                ]));
+
+                if ($rssContent) {
+                    $rss = simplexml_load_string($rssContent);
+
+                    if ($rss && isset($rss->channel->item)) {
+                        $count = 0;
+                        foreach ($rss->channel->item as $item) {
+                            if ($count >= $limit) break;
+
+                            $description = (string)$item->description;
+                            $cleanDesc = strip_tags($description);
+                            $cleanDesc = html_entity_decode($cleanDesc, ENT_QUOTES, 'UTF-8');
+                            if (strlen($cleanDesc) > 150) {
+                                $cleanDesc = substr($cleanDesc, 0, 147) . '...';
+                            }
+
+                            $newsItems[] = [
+                                'title' => (string)$item->title,
+                                'link' => (string)$item->link,
+                                'description' => $cleanDesc,
+                                'pubDate' => (string)$item->pubDate,
+                                'formattedDate' => date('d.m.Y', strtotime((string)$item->pubDate))
+                            ];
+                            $count++;
+                        }
+                    }
+
+                    // Cache results
+                    file_put_contents($cacheFile, json_encode($newsItems));
+                }
+            } catch (Exception $e) {
+                // Return cached data if available
+                if (file_exists($cacheFile)) {
+                    $cachedData = file_get_contents($cacheFile);
+                    return json_decode($cachedData, true);
+                }
+            }
+
+            return $newsItems;
+        }
+
+        // Fetch the news
+        $rssUrl = 'https://blog.bib.uni-mannheim.de/Aktuelles/?feed=rss2&cat=4';
+        $latestNews = getLatestNewsFromRSS($rssUrl, 5);
+        ?>
+
+        <!-- Latest News Column -->
+        <?php if (!empty($latestNews)): ?>
+          <h2><?=$this->transEsc('ubma_news')?></h2>
+            <ul>
+              <?php foreach (array_slice($latestNews, 0, 4) as $news): ?>
+                <li>
+                  <a href="<?= $this->escapeHtml($news['link']) ?>" target="_blank">
+                    <?= $this->escapeHtml($news['title']) ?>
+                  </a>
+                </li>
+              <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
       <?=$this->slot('footer-center')->end(); ?>
     </div>
     <div class="footer-column">
@@ -42,44 +122,44 @@
           <?php if ($this->cookieConsent()->isEnabled()): ?>
             <li><a href="#" data-cc="show-preferencesModal" aria-haspopup="dialog"><?=$this->transEsc('Cookie Settings')?></a></li>
           <?php endif; ?>
-	</ul>
+       </ul>
 
-                <div class="lib-konto">
-                    <div class="lib-img"><img src="/vufind/themes/ubma/images/icon-sign-in.png" alt=""></div>
-                    <div class="lib-content">
-                        <div class="lib-title"><a href="https://disco.bib.uni-mannheim.de/vufind/MyResearch" id="ma-login-link"><?=$this->transEsc('ubma_menu_account')?></a></div>
-                    </div>
-                </div>
-                <ma-prm-main-page-library-account-after></ma-prm-main-page-library-account-after>
-                <div class="lib-sitz">
-                    <div class="lib-img"><img src="/vufind/themes/ubma/images/icon-ampel.png" alt=""></div>
-                    <div class="lib-content">
-                        <div class="lib-title"><a href="https://www.bib.uni-mannheim.de/standortuebersicht/" target="_blank"><?=$this->transEsc('ubma_menu_seats')?></a></div>
-                    </div>
-                </div>
-                <div class="lib-oeffnung">
-                    <div class="lib-img"><img src="/vufind/themes/ubma/images/icon-clock-o.png" alt=""></div>
-                    <div class="lib-content">
-                        <div class="lib-title"><a href="https://www.bib.uni-mannheim.de/oeffnungszeiten/" target="_blank"><?=$this->transEsc('ubma_menu_opening')?></a></div>
-                    </div>
-                </div>
-                <div class="lib-auskunft">
-                    <div class="lib-img"><img src="/vufind/themes/ubma/images/icon-info-circle.png" alt=""></div>
-                    <div class="lib-content">
-                        <div class="lib-title"><a href="https://www.bib.uni-mannheim.de/linkes-menue/auskunft-beratung/" target="_blank"><?=$this->transEsc('ubma_menu_information')?></a></div>
-                    </div>
-                </div>
-                <div class="lib-chat">
-                    <div class="lib-img"><img src="/vufind/themes/ubma/images/icon-comments-o.png" alt=""></div>
-                    <div class="lib-content">
-                        <div class="lib-title"><a href="https://www2.bib.uni-mannheim.de/mibew/index.php/chat?locale=de" target="_blank"><?=$this->transEsc('ubma_menu_chat')?></a></div>
-                    </div>
-                </div>
-  <br>
-  <div>
-    <a href="https://www.uni-mannheim.de/datenschutzerklaerung/datenschutzinformationen-der-universitaetsbibliothek/"><?=$this->transEsc('data_protection_declaration')?></a> |
-    <a href="https://www.uni-mannheim.de/impressum/"><?=$this->transEsc('Imprint')?></a>
-  </div>
+        <div class="lib-konto">
+            <div class="lib-img"><img src="/vufind/themes/ubma/images/icon-sign-in.png" alt=""></div>
+            <div class="lib-content">
+                <div class="lib-title"><a href="https://disco.bib.uni-mannheim.de/vufind/MyResearch" id="ma-login-link"><?=$this->transEsc('ubma_menu_account')?></a></div>
+            </div>
+        </div>
+        <ma-prm-main-page-library-account-after></ma-prm-main-page-library-account-after>
+        <div class="lib-sitz">
+            <div class="lib-img"><img src="/vufind/themes/ubma/images/icon-ampel.png" alt=""></div>
+            <div class="lib-content">
+                <div class="lib-title"><a href="https://www.bib.uni-mannheim.de/standortuebersicht/" target="_blank"><?=$this->transEsc('ubma_menu_seats')?></a></div>
+            </div>
+        </div>
+        <div class="lib-oeffnung">
+            <div class="lib-img"><img src="/vufind/themes/ubma/images/icon-clock-o.png" alt=""></div>
+            <div class="lib-content">
+                <div class="lib-title"><a href="https://www.bib.uni-mannheim.de/oeffnungszeiten/" target="_blank"><?=$this->transEsc('ubma_menu_opening')?></a></div>
+            </div>
+        </div>
+        <div class="lib-auskunft">
+            <div class="lib-img"><img src="/vufind/themes/ubma/images/icon-info-circle.png" alt=""></div>
+            <div class="lib-content">
+                <div class="lib-title"><a href="https://www.bib.uni-mannheim.de/linkes-menue/auskunft-beratung/" target="_blank"><?=$this->transEsc('ubma_menu_information')?></a></div>
+            </div>
+        </div>
+        <div class="lib-chat">
+            <div class="lib-img"><img src="/vufind/themes/ubma/images/icon-comments-o.png" alt=""></div>
+            <div class="lib-content">
+                <div class="lib-title"><a href="https://www2.bib.uni-mannheim.de/mibew/index.php/chat?locale=de" target="_blank"><?=$this->transEsc('ubma_menu_chat')?></a></div>
+            </div>
+        </div>
+        <br>
+        <div>
+          <a href="https://www.uni-mannheim.de/datenschutzerklaerung/datenschutzinformationen-der-universitaetsbibliothek/"><?=$this->transEsc('data_protection_declaration')?></a> |
+          <a href="https://www.uni-mannheim.de/impressum/"><?=$this->transEsc('Imprint')?></a>
+        </div>
       <?=$this->slot('footer-right')->end(); ?>
     </div>
   </div>

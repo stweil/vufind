@@ -1,5 +1,5 @@
 /**
- * Command-line tool to create language translation filess using the
+ * Command-line tool to create language translation files using the
  * all-iso-language-codes NPM package.
  *
  * Javascript

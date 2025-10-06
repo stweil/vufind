@@ -32,7 +32,8 @@
         </ul>
         <?php
         // Simple RSS fetch function
-        function getLatestNewsFromRSS($rssUrl, $limit = 5) {
+        function getLatestNewsFromRSS($rssUrl, $limit = 5)
+        {
             $cacheFile = '/tmp/vufind_rss_cache_' . md5($rssUrl) . '.txt';
             $cacheTime = 300; // 5 minutes
 
@@ -48,8 +49,8 @@
                 $rssContent = @file_get_contents($rssUrl, false, stream_context_create([
                     'http' => [
                         'timeout' => 10,
-                        'user_agent' => 'VuFind Footer News Bot 1.0'
-                    ]
+                        'user_agent' => 'VuFind Footer News Bot 1.0',
+                    ],
                 ]));
 
                 if ($rssContent) {
@@ -58,7 +59,9 @@
                     if ($rss && isset($rss->channel->item)) {
                         $count = 0;
                         foreach ($rss->channel->item as $item) {
-                            if ($count >= $limit) break;
+                            if ($count >= $limit) {
+                                 break;
+                            }
 
                             $description = (string)$item->description;
                             $cleanDesc = strip_tags($description);
@@ -72,7 +75,7 @@
                                 'link' => (string)$item->link,
                                 'description' => $cleanDesc,
                                 'pubDate' => (string)$item->pubDate,
-                                'formattedDate' => date('d.m.Y', strtotime((string)$item->pubDate))
+                                'formattedDate' => date('d.m.Y', strtotime((string)$item->pubDate)),
                             ];
                             $count++;
                         }

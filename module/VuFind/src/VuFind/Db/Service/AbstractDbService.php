@@ -133,6 +133,7 @@ abstract class AbstractDbService implements DbServiceInterface
             }
             $id = $objectOrId->getId();
         }
+        // TODO: look in $aliases for $desired Class (VuFind\Db\Entity\User).
         return $this->entityManager->getReference($desiredClass, $id);
     }
 

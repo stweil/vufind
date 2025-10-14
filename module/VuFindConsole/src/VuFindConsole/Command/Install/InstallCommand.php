@@ -169,7 +169,7 @@ class InstallCommand extends Command
                 null,
                 InputOption::VALUE_REQUIRED,
                 'What base path should be used in VuFind®\'s URL?'
-                . " (defaults to {$this->baseDir} when --non-interactive is set)"
+                . " (defaults to {$this->basePath} when --non-interactive is set)"
             )->addOption(
                 'multisite',
                 null,

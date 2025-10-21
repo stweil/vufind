@@ -101,7 +101,7 @@ class Loader
         foreach ($providers as $provider) {
             $parts = explode(':', trim($provider));
             $provider = $parts[0];
-            if (!empty($provider)) {
+            if (!empty($provider) && $provider !== 'Booksite') {
                 $key = $parts[1] ?? '';
                 try {
                     $plugin = $this->loader->get($provider);

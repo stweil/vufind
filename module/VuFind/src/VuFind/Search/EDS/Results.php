@@ -81,7 +81,7 @@ class Results extends \VuFind\Search\Base\Results
     {
         $query  = $this->getParams()->getQuery();
         $allTerms = $query->getAllTerms();
-        if ($allTerms === '') {
+        if (trim($allTerms) === '') {
             $this->storeErrorResponse('empty_search_disallowed');
             return;
         }

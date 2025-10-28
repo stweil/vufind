@@ -106,7 +106,7 @@
         $shelfMark = urlencode($marc->getSubfield($marcLocation, 'h'));
         // $url3D = 'https://www2.bib.uni-mannheim.de/cgi-bin/dreidplan/index.pl?signatur=2004+A+4551&library_code=WEST&almastandort=WEST_UG&action=zeigeALMA&location_name=Westfl%C3%BCgel+Untergeschoss';
         $url3D = "https://www2.bib.uni-mannheim.de/cgi-bin/dreidplan/index.pl?action=zeigeALMA&almastandort=$shelfLocation&library_code=$shelfSublocation&signatur=$shelfMark";
-        error_log("vufind url3D=$url3D");
+        //error_log("vufind url3D=$url3D");
       }
     }
     ?> 

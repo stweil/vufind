@@ -533,6 +533,25 @@ class Alma extends AbstractBase implements
      */
     public function getNewItems($page, $limit, $daysOld, $fundId = null)
     {
+        $dateThreshold = (new \DateTime("-$daysOld days"))->format('Y-m-d');
+
+        $params = [
+            'created_from' => $dateThreshold,
+            'limit' => $limit,
+            'offset' => ($page - 1) * $limit,
+        ];
+
+        if ($fundId !== null) {
+            $params['fund_code'] = $fundId;
+        }
+
+        // Make the request using VuFind's built-in Alma helper
+        $response = $this->makeRequest('/bibs', $params);
+
+        if (empty($response['bib'])) {
+            return [];
+        }
+
         $results = $this->config['Records']['new_items'] ?? [];
         $retVal = ['count' => count($results), 'results' => []];
         foreach ($results as $result) {

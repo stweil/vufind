@@ -274,7 +274,7 @@
     handleSelect=true will use consistent error handling for /select and /update
     handleSelect=false will use solr1.1 style error formatting
     -->
-  <requestDispatcher handleSelect="true" >
+  <requestDispatcher>
     <!-- Set HTTP caching related parameters (for proxy caches and clients).
 
          To get the behaviour of Solr 1.2 (ie: no caching related headers)

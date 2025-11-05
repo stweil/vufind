@@ -269,7 +269,7 @@
     handleSelect=true will use consistent error handling for /select and /update
     handleSelect=false will use solr1.1 style error formatting
     -->
-  <requestDispatcher handleSelect="true" >
+  <requestDispatcher>
     <requestParsers multipartUploadLimitInKB="2048"
                     formdataUploadLimitInKB="2048"/>
 

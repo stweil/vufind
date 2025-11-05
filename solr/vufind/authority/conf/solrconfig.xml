@@ -264,53 +264,6 @@
 
   </query>
 
-  <!--
-    Let the dispatch filter handler /select?qt=XXX
-    handleSelect=true will use consistent error handling for /select and /update
-    handleSelect=false will use solr1.1 style error formatting
-    -->
-  <requestDispatcher>
-    <requestParsers multipartUploadLimitInKB="2048"
-                    formdataUploadLimitInKB="2048"/>
-
-    <!-- Set HTTP caching related parameters (for proxy caches and clients).
-
-         To get the behaviour of Solr 1.2 (ie: no caching related headers)
-         use the never304="true" option and do not specify a value for
-         <cacheControl>
-    -->
-    <!-- <httpCaching never304="true"> -->
-    <httpCaching lastModifiedFrom="openTime"
-                 etagSeed="Solr">
-       <!-- lastModFrom="openTime" is the default, the Last-Modified value
-            (and validation against If-Modified-Since requests) will all be
-            relative to when the current Searcher was opened.
-            You can change it to lastModFrom="dirLastMod" if you want the
-            value to exactly correspond to when the physical index was last
-            modified.
-
-            etagSeed="..." is an option you can change to force the ETag
-            header (and validation against If-None-Match requests) to be
-            different even if the index has not changed (ie: when making
-            significant changes to your config file)
-
-            lastModifiedFrom and etagSeed are both ignored if you use the
-            never304="true" option.
-       -->
-       <!-- If you include a <cacheControl> directive, it will be used to
-            generate a Cache-Control header, as well as an Expires header
-            if the value contains "max-age="
-
-            By default, no Cache-Control header is generated.
-
-            You can use the <cacheControl> option even if you have set
-            never304="true"
-       -->
-       <!-- <cacheControl>max-age=30, public</cacheControl> -->
-    </httpCaching>
-  </requestDispatcher>
-
-
   <!-- requestHandler plugins... incoming queries will be dispatched to the
      correct handler based on the path or the qt (query type) param.
      Names starting with a '/' are accessed with a path equal to the
@@ -319,6 +272,13 @@
      If no qt is defined, the requestHandler that declares default="true"
      will be used.
   -->
+  <requestHandler name="/select" class="solr.SearchHandler">
+    <lst name="defaults">
+      <str name="echoParams">explicit</str>
+      <str name="df">text</str>
+    </lst>
+  </requestHandler>
+
   <requestHandler name="standard" class="solr.SearchHandler" default="true">
     <!-- default values for query parameters may optionally be defined here
      <lst name="defaults">

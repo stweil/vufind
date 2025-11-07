@@ -448,6 +448,100 @@ class Alma extends AbstractBase implements
     }
 
     /**
+     * Get Departments
+     *
+     * Obtain a list of departments for use in limiting the reserves list.
+     *
+     * @return array An associative array with key = dept. ID, value = dept. name.
+     */
+    public function getDepartments()
+    {
+        // https://developers.exlibrisgroup.com/alma/apis/courses
+        // GET /almaws/v1/courses
+        $xml = $this->makeRequest('/courses');
+        $result = [];
+        foreach ($xml->course ?? [] as $course) {
+            $departmentId = (string)$course->academic_department;
+            $departmentName = (string)$course->academic_department['desc'];
+            $result[$departmentId] = $departmentName;
+        }
+        return $result;
+    }
+
+    /**
+     * Get Instructors
+     *
+     * Obtain a list of instructors for use in limiting the reserves list.
+     *
+     * @return array An associative array with key = ID, value = name.
+     */
+    public function getInstructors()
+    {
+        // https://developers.exlibrisgroup.com/alma/apis/courses
+        // GET /almaws/v1/courses
+        $xml = $this->makeRequest('/courses');
+        $result = [];
+        foreach ($xml->course ?? [] as $course) {
+            foreach ($course->instructors->instructor ?? [] as $instructor) {
+                $primary_id = (string)$instructor->primary_id;
+                $first_name = (string)$instructor->first_name;
+                $last_name = (string)$instructor->last_name;
+                $full_name = trim("$first_name $last_name");
+                $result[$primary_id] = $full_name;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Get New Items
+     *
+     * Retrieve the IDs of items recently added to the catalog.
+     *
+     * @param int $page    Page number of results to retrieve (counting starts at 1)
+     * @param int $limit   The size of each page of results to retrieve
+     * @param int $daysOld The maximum age of records to retrieve in days (max. 30)
+     * @param int $fundId  optional fund ID to use for limiting results (use a value
+     * returned by getFunds, or exclude for no limit); note that "fund" may be a
+     * misnomer - if funds are not an appropriate way to limit your new item
+     * results, you can return a different set of values from getFunds. The
+     * important thing is that this parameter supports an ID returned by getFunds,
+     * whatever that may mean.
+     *
+     * @return array       Associative array with 'count' and 'results' keys
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    public function getNewItems($page, $limit, $daysOld, $fundId = null)
+    {
+        $dateThreshold = (new \DateTime("-$daysOld days"))->format('Y-m-d');
+
+        $params = [
+            'created_from' => $dateThreshold,
+            'limit' => $limit,
+            'offset' => ($page - 1) * $limit,
+        ];
+
+        if ($fundId !== null) {
+            $params['fund_code'] = $fundId;
+        }
+
+        // Make the request using VuFind's built-in Alma helper
+        $response = $this->makeRequest('/bibs', $params);
+
+        if (empty($response['bib'])) {
+            return [];
+        }
+
+        $results = $this->config['Records']['new_items'] ?? [];
+        $retVal = ['count' => count($results), 'results' => []];
+        foreach ($results as $result) {
+            $retVal['results'][] = ['id' => $result];
+        }
+        return $retVal;
+    }
+
+    /**
      * Check if request is valid
      *
      * This is responsible for determining if an item is requestable
@@ -1637,7 +1731,14 @@ class Alma extends AbstractBase implements
                 $listsBase . '/' . rawurlencode($listId) . '/citations'
             );
             foreach ($listXML->citation as $citation) {
-                $reserves[(string)$citation->id] = trim((string)$citation->metadata);
+                $reserves[] = [
+                    'BIB_ID' => (string)$citation->id,
+                    'DISPLAY_CALL_NO' => (string)$citation->metadata->mms_id,
+                    'AUTHOR' => (string)$citation->metadata->author,
+                    'TITLE' => (string)$citation->metadata->title,
+                    'PUBLISHER' => (string)$citation->metadata->publisher,
+                    'PUBLISHER_DATE' => (string)$citation->metadata->publication_date,
+                ];
             }
         }
         return $reserves;

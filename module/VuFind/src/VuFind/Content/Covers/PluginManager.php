@@ -65,6 +65,7 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
         'obalkyknih' => ObalkyKnih::class,
         'openlibrary' => OpenLibrary::class,
         'orb' => Orb::class,
+        'recorddata' => RecordData::class,
         'summon' => Summon::class,
         'syndetics' => Syndetics::class,
     ];
@@ -76,6 +77,7 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      */
     protected $factories = [
         ObalkyKnih::class => ObalkyKnihContentFactory::class,
+        RecordData::class => RecordDataFactory::class,
     ];
 
     /**

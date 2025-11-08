@@ -689,7 +689,9 @@ class Loader extends \VuFind\ImageLoader
             $finalFile = $cache ? $this->localFile : $tempFile . '.jpg';
 
             // Make sure that the cache directory exists.
-            @mkdir(dirname($tempFile), 0o755, true);
+            if (!is_dir($directory = dirname($tempFile))) {
+                mkdir($directory, 0o755, true);
+            }
 
             // Write image data to disk:
             if (!@file_put_contents($tempFile, $image)) {

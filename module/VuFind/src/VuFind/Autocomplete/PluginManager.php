@@ -50,6 +50,8 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
     protected $aliases = [
         'none' => None::class,
         'eds' => Eds::class,
+        'gvi' => Gvi::class,
+        'gvicn' => GviCN::class,
         'oclcidentities' => None::class,
         'search2' => Search2::class,
         'search2cn' => Search2CN::class,
@@ -77,6 +79,8 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
     protected $factories = [
         None::class => InvokableFactory::class,
         Eds::class => EdsFactory::class,
+        Gvi::class => SolrFactory::class,
+        GviCN::class => SolrFactory::class,
         Search2::class => SolrFactory::class,
         Search2CN::class => SolrFactory::class,
         Solr::class => SolrFactory::class,

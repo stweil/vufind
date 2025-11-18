@@ -32,3 +32,6 @@ local/DirLocations.ini
 local/config/vufind.bak
 local/config/vufind/*
 !local/config/vufind/README.txt
+
+# Ignore compiled files.
+compiled.css

@@ -46,8 +46,7 @@ namespace VuFind\RecordDriver;
  *
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
-//class Search2Default extends SolrDefault
-class Search2Default extends SolrMarc
+class Search2Default extends SolrDefault
 {
     /**
      * Used for identifying search backends

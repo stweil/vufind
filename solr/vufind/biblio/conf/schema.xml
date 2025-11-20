@@ -117,7 +117,7 @@
     <!-- Required by Solr -->
     <field name="_version_" type="long" indexed="false" stored="false"/>
     <!-- Core Fields  -->
-    <field name="id" type="string" indexed="true" stored="true"/>
+    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" docValues="true"/>
     <field name="fullrecord" type="string" indexed="false" stored="true" docValues="false"/>
     <field name="marc_error" type="string" indexed="true" stored="true" multiValued="true"/>
     <field name="allfields" type="text" indexed="true" stored="false" multiValued="true"/>

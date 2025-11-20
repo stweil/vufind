@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright 2020 (C) Bibliotheksservice-Zentrum Baden-
  * Württemberg, Konstanz, Germany
@@ -19,9 +20,9 @@
  *
  */
 
-namespace Bsz\RecordDriver;
+namespace VuFind\RecordDriver;
 
-use Bsz\Exception;
+//use Bsz\Exception;
 use VuFind\RecordDriver\Feature\IlsAwareTrait;
 use VuFind\RecordDriver\Feature\MarcReaderTrait;
 
@@ -46,6 +47,7 @@ class SolrGviMarc extends SolrMarc implements Constants
      * Get all subject headings associated with this record.  Each heading is
      * returned as an array of chunks, increasing from least specific to most
      * specific.
+     *
      * @return array
      */
     public function getAllSubjectHeadings($extended = false): array
@@ -60,6 +62,7 @@ class SolrGviMarc extends SolrMarc implements Constants
      * Get subject headings associated with this record.  Each heading is
      * returned as an array of chunks, increasing from least specific to most
      * specific.
+     *
      * @return array
      */
     public function getSubjectHeadings(array $fields): array
@@ -79,12 +82,12 @@ class SolrGviMarc extends SolrMarc implements Constants
 
             // If we got here, we found results -- let's loop through them.
             foreach ($results as $result) {
-                if(!is_array($result)) {
+                if (!is_array($result)) {
                     continue;
                 }
 
                 // Get all the chunks and collect them together:
-                $subfields =$result['subfields'];
+                $subfields = $result['subfields'];
                 foreach ($subfields as $subfield) {
                     // Numeric subfields are for control purposes and should not
                     // be displayed:
@@ -106,6 +109,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Get all subjects associated with this item. They are unique.
+     *
      * @return array
      */
     public function getRVKSubjectHeadings()
@@ -123,6 +127,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Get all subjects associated with this item. They are unique.
+     *
      * @return array
      */
     public function getGNDSubjectHeadings()
@@ -138,12 +143,12 @@ class SolrGviMarc extends SolrMarc implements Constants
                     $sfData = $subfield['data'] ?? '';
                     if (preg_match('/[a-z]/', $sfCode)) {
                         $tmp[$sfCode] = $sfData;
-                    } elseif ($sfCode == 0
+                    } elseif (
+                        $sfCode == 0
                         && preg_match('/\(DE-588\)/', $sfData)
                     ) {
-                        $id = preg_replace('/\(.*\)/','',  $sfData);
+                        $id = preg_replace('/\(.*\)/', '', $sfData);
                     }
-
                 }
                 $gnd[$id] = [
                     'type' => 'gnd',
@@ -154,7 +159,8 @@ class SolrGviMarc extends SolrMarc implements Constants
         return $gnd;
     }
 
-    /** Get all STandardtheaurus Wirtschaft keywords
+    /**
+     * Get all STandardtheaurus Wirtschaft keywords
      *
      * @return array
      */
@@ -173,6 +179,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Get an array with RVK shortcut as key and description as value (array)
+     *
      * @returns array
      */
     public function getRVKNotations()
@@ -182,13 +189,13 @@ class SolrGviMarc extends SolrMarc implements Constants
             '"' => "'",
         ];
         foreach ($this->getFields('084') as $field) {
-            if(!is_array($field)) {
+            if (!is_array($field)) {
                 continue;
             }
 
             //Keys for arrays should not be empty
             $sfa = $this->getSubfield($field, 'a');
-            if(empty($sfa)) {
+            if (empty($sfa)) {
                 continue;
             }
 
@@ -201,7 +208,7 @@ class SolrGviMarc extends SolrMarc implements Constants
             }
         }
         foreach ($this->getFields('936') as $field) {
-            if(!is_array($field)) {
+            if (!is_array($field)) {
                 continue;
             }
             $sfa = $this->getSubfield($field, 'a');
@@ -223,7 +230,6 @@ class SolrGviMarc extends SolrMarc implements Constants
      * @param string $type all, main_topic, partial_aspect
      *
      * @return array
-     *
      */
     public function getFivSubjects(string $type = 'all')
     {
@@ -238,9 +244,10 @@ class SolrGviMarc extends SolrMarc implements Constants
 
         foreach ($this->getFields('938') as $field) {
             $sf2 = $this->getSubfield($field, '2');
-            if ($field['i1'] == 1
+            if (
+                $field['i1'] == 1
                 && (empty($sf2) || $sf2 != 'gnd')
-                && ((isset($ind2) && $field['i2']== $ind2) || !isset($ind2))
+                && ((isset($ind2) && $field['i2'] == $ind2) || !isset($ind2))
             ) {
                 $sfa = $this->getSubfield($field, 'a');
                 $data = preg_replace('/!.*!|:/i', '', $sfa);
@@ -254,6 +261,7 @@ class SolrGviMarc extends SolrMarc implements Constants
      * Get the date coverage for a record which spans a period of time (i.e. a
      * journal).  Use getPublicationDates for publication dates of particular
      * monographic items.
+     *
      * @return array
      */
     public function getDateSpan(): array
@@ -263,6 +271,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Get an array of all ISBNs associated with the record (may be empty).
+     *
      * @return array
      */
     public function getISBNs(): array
@@ -277,6 +286,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Get an array of all ISSNs associated with the record (may be empty).
+     *
      * @return array
      */
     public function getISSNs(): array
@@ -298,6 +308,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Get a LCCN, normalised according to info:lccn
+     *
      * @return string
      */
     public function getLCCN()
@@ -308,6 +319,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Get a note about languages and text
+     *
      * @return string
      */
     public function getNote()
@@ -317,6 +329,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Get an array of notes "Enthaltene Werke" for the Notes-Tab.
+     *
      * @return array
      */
     public function getNotes()
@@ -332,6 +345,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Get an array of notes "Enthaltene Werke" for the Notes-Tab.
+     *
      * @return array
      */
     public function getMusicalCast()
@@ -347,6 +361,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Get an array of newer titles for the record.
+     *
      * @return array
      */
     public function getNewerTitles()
@@ -357,6 +372,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Get the OCLC number of the record.
+     *
      * @return array
      */
     public function getOCLC()
@@ -373,6 +389,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Get an array of physical descriptions of the item.
+     *
      * @return array
      */
     public function getPhysicalDescriptions()
@@ -382,6 +399,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Get an array of previous titles for the record.
+     *
      * @return array
      */
     public function getPreviousTitles()
@@ -392,6 +410,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Get the publication dates of the record.  See also getDateSpan().
+     *
      * @return array
      */
     public function getPublicationDates()
@@ -431,6 +450,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Get an array of summary strings for the record.
+     *
      * @return array
      */
     public function getSummary()
@@ -479,6 +499,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * return GTIN Code
+     *
      * @return string
      */
     public function getGTIN()
@@ -489,6 +510,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Get the text of the part/section portion of the title.
+     *
      * @return string
      */
     public function getTitleSection()
@@ -499,6 +521,7 @@ class SolrGviMarc extends SolrMarc implements Constants
     /**
      * Get the statement of responsibility that goes with the title (i.e. "by John
      * Smith").
+     *
      * @return string
      */
     public function getTitleStatement()
@@ -508,6 +531,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Get an array of lines from the table of contents.
+     *
      * @return array
      */
     public function getTOC()
@@ -525,6 +549,7 @@ class SolrGviMarc extends SolrMarc implements Constants
      *   <ul>routeParams: Parameters for route (optional)</ul>
      *   <ul>queryString: Query params to append after building route (optional)</ul>
      * </li>
+     *
      * @return array
      */
     public function getURLs(): array
@@ -542,7 +567,7 @@ class SolrGviMarc extends SolrMarc implements Constants
         $is950 = in_array('DE-950', $isils);
 
         foreach ($urlFields as $field) {
-            if(!is_array($field)) {
+            if (!is_array($field)) {
                 continue;
             }
 
@@ -563,7 +588,7 @@ class SolrGviMarc extends SolrMarc implements Constants
             //  special case: DE-950 Proquest links are shown
             if (!$is950 && $ind1 == 4 && $ind2 == 0) {
                 $sfz = $this->getSubfield($field, 'z');
-                if(!str_contains(strtolower($sfz), 'kostenfrei')) {
+                if (!str_contains(strtolower($sfz), 'kostenfrei')) {
                     continue;
                 }
                 //TODO: Can this be deleted?
@@ -580,7 +605,8 @@ class SolrGviMarc extends SolrMarc implements Constants
             $url['url'] = $this->getSubfield($field, 'u');
 
             // add urn:nbn Resolver baseurl if missing
-            if (str_contains($url['url'], 'urn:nbn')
+            if (
+                str_contains($url['url'], 'urn:nbn')
                 && !str_contains($url['url'], 'http')
             ) {
                 $url['desc'] = $url['url'];
@@ -599,10 +625,10 @@ class SolrGviMarc extends SolrMarc implements Constants
                 $url['desc'] = $sfu;
             } elseif ($sfu = $this->getSubfield($field, 'y')) {
                 $url['desc'] = $sfu;
-            } elseif (($sfu = $this->getSubField($field,'z')) && strpos('Kostenfrei', $sfu) !== false) {
+            } elseif (($sfu = $this->getSubField($field, 'z')) && strpos('Kostenfrei', $sfu) !== false) {
                 // x is marked as nonpublic!
                 $url['desc'] = 'Full Text';
-            } elseif (($sfu = $this->getSubField($field,'n'))) {
+            } elseif (($sfu = $this->getSubField($field, 'n'))) {
                 $url['desc'] = $sfu;
             } elseif ($ind1 == 4 && ($ind2 == 1 || $ind2 == 0)) {
                 $url['desc'] = 'Online Access';
@@ -643,6 +669,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Get a sortable title for the record (i.e. no leading articles).
+     *
      * @return string
      */
     public function getSortTitle()
@@ -652,6 +679,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Get longitude/latitude text (or false if not available).
+     *
      * @return string|bool
      */
     public function getLongLat()
@@ -683,6 +711,7 @@ class SolrGviMarc extends SolrMarc implements Constants
     /**
      * Get an array of information about record holdings, obtained in real-time
      * from the ILS.
+     *
      * @return array
      */
     public function getRealTimeHoldings()
@@ -700,6 +729,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * On electronic Articles, we do not need to query DAIA.
+     *
      * @return boolean
      */
     public function supportsAjaxStatus()
@@ -711,7 +741,8 @@ class SolrGviMarc extends SolrMarc implements Constants
             return false;
         }
 
-        if ($this->isArticle() ||
+        if (
+            $this->isArticle() ||
             $this->isElectronicBook() ||
             $this->isSerial() ||
             $this->isCollection()
@@ -728,6 +759,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Pulling isils from field 924
+     *
      * @return array
      */
     public function getIsils()
@@ -737,6 +769,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Get the institutions holding the record.
+     *
      * @return array
      */
     public function getInstitutions()
@@ -746,6 +779,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * For Journals: Returns the holdings by date
+     *
      * @return array
      */
     public function getHoldingsDate()
@@ -777,6 +811,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Returns either Isil or Library name
+     *
      * @return array
      * @throws Exception
      */
@@ -796,6 +831,7 @@ class SolrGviMarc extends SolrMarc implements Constants
     /**
      * Returns an array of related items for multipart results, including
      * its own id
+     *
      * @return array
      */
     public function getIdsRelated()
@@ -806,7 +842,7 @@ class SolrGviMarc extends SolrMarc implements Constants
     public function getRelatedEditions()
     {
         $related = [];
-        # 775 is RAK and 776 RDA *confused*
+        // 775 is RAK and 776 RDA *confused*
         $f77x = array_merge(
             $this->getFields('775'),
             $this->getFields('776')
@@ -847,6 +883,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Returns Volume number
+     *
      * @return String
      */
     public function getVolumeNumber()
@@ -865,6 +902,7 @@ class SolrGviMarc extends SolrMarc implements Constants
      * - |k is repeatable, |l aswell
      * - we can have more than one isil ?is this true? maybe allways the first isil
      * - different Urls from one instition may have different issues (is this true?)
+     *
      * @return array
      */
     public function getLocalUrls()
@@ -903,7 +941,8 @@ class SolrGviMarc extends SolrMarc implements Constants
             );
 
             // Prevent adding the same url multiple times
-            if (!in_array($link, $addedUrls) && !empty($link)
+            if (
+                !in_array($link, $addedUrls) && !empty($link)
                 && in_array($isil, $isils)
             ) {
                 $tmp = [
@@ -934,6 +973,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * This method supports wildcard operators in ISILs.
+     *
      * @return array
      */
     public function getLocalHoldings()
@@ -968,6 +1008,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Returns url  from 856|u
+     *
      * @return String
      */
     public function getPDALink()
@@ -982,6 +1023,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Has this record holdings in field 924
+     *
      * @return boolean
      */
     public function hasLocalHoldings()
@@ -992,6 +1034,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Get an array of remarks for the Details-Tab.
+     *
      * @return array
      */
     public function getRemarks()
@@ -1019,6 +1062,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * get 830|w if it exists with (DE-627)-Prefix
+     *
      * @return array
      */
     public function getSeriesIds()
@@ -1041,20 +1085,20 @@ class SolrGviMarc extends SolrMarc implements Constants
     /**
      * This method is basically a duplicate of getAllRecordLinks but
      * much easier designer and works well with German library links
+     *
      * @return array
      */
     public function getParallelEditions()
     {
         $retval = [];
         foreach ($this->getFields(776) as $field) {
-            if(!is_array($field)) {
+            if (!is_array($field)) {
                 continue;
             }
             $tmp = [];
             if ($field['i1'] == 0) {
-
                 $sfw = $this->getSubfield($field, 'w');
-                if(!empty($sfw)) {
+                if (!empty($sfw)) {
                     $tmp['ppn'] = $sfw;
                 }
 
@@ -1064,12 +1108,12 @@ class SolrGviMarc extends SolrMarc implements Constants
                 }
 
                 $sft = $this->getSubfield($field, 't');
-                if(!empty($sft)) {
+                if (!empty($sft)) {
                     $tmp['label'] = $sft;
                 }
 
                 $sfn = $this->getSubfield($field, 'n');
-                if(!empty($sfn)) {
+                if (!empty($sfn)) {
                     $tmp['postfix'] = $sfn;
                 }
             }
@@ -1082,6 +1126,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Get an array of bibliographic relations for the record.
+     *
      * @return array
      */
     public function getBiblioRelations()
@@ -1091,6 +1136,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * get 787|w if it exists with (DE-627)-Prefix
+     *
      * @return array
      */
     public function getBiblioRelatonsIds()
@@ -1150,6 +1196,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * returns all authors from 100 or 700 without life data
+     *
      * @return array
      */
     public function getAllAuthorsShort()
@@ -1163,6 +1210,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Returns Volume title
+     *
      * @return String
      */
     public function getVolume()
@@ -1176,6 +1224,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Get the edition of the current record.
+     *
      * @return string
      */
     public function getEdition()
@@ -1185,6 +1234,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Get OpenURL parameters for an article.
+     *
      * @return array
      */
     protected function getArticleOpenUrlParams()
@@ -1224,6 +1274,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Get OpenURL parameters for a journal.
+     *
      * @return array
      */
     protected function getJournalOpenURLParams()
@@ -1247,6 +1298,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Get the item's place of publication.
+     *
      * @return array
      */
     public function getPlacesOfPublication()
@@ -1284,6 +1336,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
     /**
      * Get ZDB ID if available
+     *
      * @return string
      */
     public function getZdbId()
@@ -1301,7 +1354,7 @@ class SolrGviMarc extends SolrMarc implements Constants
 
         // Pull ZDB ID out of recurring field 016
         foreach ($this->getFields('016') as $field) {
-            if(!is_array($field)) {
+            if (!is_array($field)) {
                 continue;
             }
 
@@ -1324,7 +1377,7 @@ class SolrGviMarc extends SolrMarc implements Constants
     /**
      * @return bool
      */
-    public function isEPflicht() : bool
+    public function isEPflicht(): bool
     {
         $fields = $this->getFieldArray('912', ['a']);
         return in_array('EPF-BW-GESAMT', $fields, true) && !$this->isBLB();
@@ -1337,7 +1390,7 @@ class SolrGviMarc extends SolrMarc implements Constants
         foreach ($f583 as $field) {
             $sff = $this->getSubfield($field, 'f');
             $sf5 = $this->getSubfield($field, '5');
-            if(($sff === 'PEBW') && ($sf5 === 'DE-31')) {
+            if (($sff === 'PEBW') && ($sf5 === 'DE-31')) {
                 return true;
             }
         }
@@ -1348,7 +1401,7 @@ class SolrGviMarc extends SolrMarc implements Constants
     /**
      * @return bool
      */
-    public function isLFER() : bool
+    public function isLFER(): bool
     {
         $fields = $this->getField924();
         foreach ($fields as $field) {
@@ -1360,7 +1413,8 @@ class SolrGviMarc extends SolrMarc implements Constants
         return false;
     }
 
-    public function canOrderAnyways(): bool {
+    public function canOrderAnyways(): bool
+    {
         $isils = $this->mainConfig->Site->order_ill ?? '';
         $isilList = array_map('trim', explode(',', $isils));
         $localIsils = $this->getHoldingIsils();
@@ -1371,6 +1425,4 @@ class SolrGviMarc extends SolrMarc implements Constants
         }
         return false;
     }
-
-
 }

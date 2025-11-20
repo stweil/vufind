@@ -24,7 +24,7 @@
     <!-- Required by Solr -->
     <field name="_version_" type="long" indexed="false" stored="false"/>
     <!-- Core Fields  -->
-    <field name="id" type="string" indexed="true" stored="true"/>
+    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" docValues="true"/>
     <field name="bib_id" type="string" indexed="true" stored="true" multiValued="true"/>
     <field name="course" type="text" indexed="true" stored="true"/>
     <field name="course_id" type="string" indexed="true" stored="true"/>

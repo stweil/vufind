@@ -49,7 +49,6 @@ class BackendRegistry extends \VuFind\ServiceManager\AbstractPluginManager
         // Allow Solr core names to be used as aliases for services:
         'authority' => 'SolrAuth',
         'biblio' => 'Solr',
-        'gvi' => 'GVI',
         'reserves' => 'SolrReserves',
         // Legacy:
         'VuFind' => 'Solr',
@@ -67,7 +66,6 @@ class BackendRegistry extends \VuFind\ServiceManager\AbstractPluginManager
         'EDS' => Factory\EdsBackendFactory::class,
         'EIT' => Factory\EITBackendFactory::class,
         'EPF' => Factory\EPFBackendFactory::class,
-        'GVI' => Factory\SolrDefaultBackendFactory::class,
         'LibGuides' => Factory\LibGuidesBackendFactory::class,
         'LibGuidesAZ' => Factory\LibGuidesAZBackendFactory::class,
         'Pazpar2' => Factory\Pazpar2BackendFactory::class,

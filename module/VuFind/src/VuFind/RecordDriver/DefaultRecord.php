@@ -434,6 +434,18 @@ class DefaultRecord extends AbstractBase
     }
 
     /**
+     * Get URL of cover image.
+     * This method should be overridden by record driver implementations which
+     * can provide information about cover images.
+     *
+     * @return string|bool URL of the image, or false if no valid image is found
+     */
+    public function getCoverUrl()
+    {
+        return false;
+    }
+
+    /**
      * Get the date coverage for a record which spans a period of time (i.e. a
      * journal). Use getPublicationDates for publication dates of particular
      * monographic items.

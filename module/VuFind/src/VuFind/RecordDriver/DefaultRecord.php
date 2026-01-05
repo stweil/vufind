@@ -33,6 +33,7 @@ use VuFind\String\PropertyString;
 use VuFind\View\Helper\Root\RecordLinker;
 use VuFindCode\ISBN;
 
+use function array_slice;
 use function count;
 use function in_array;
 use function is_array;
@@ -442,7 +443,18 @@ class DefaultRecord extends AbstractBase
      */
     public function getCoverUrl()
     {
-        return false;
+        // EPrints has these thumbnail sizes by default: small, medium, preview, lightbox.
+        // https://madoc.bib.uni-mannheim.de/71240/1.hassmallThumbnailVersion/Kitodo_Praxistreffen_2025_Weil_Zeitungen_AI.pdf
+        // https://madoc.bib.uni-mannheim.de/71267/1.hassmallThumbnailVersion/Paradigmenwechsel_im_Straenverkehrsrecht__Jedenfalls_noch_nicht_in_der_StVO.pdf
+        // https://madoc.bib.uni-mannheim.de/71267/1.haspreviewThumbnailVersion/Paradigmenwechsel_im_Straenverkehrsrecht__Jedenfalls_noch_nicht_in_der_StVO.pdf
+        $urls = $this->getURLs();
+        $url = $urls[0]['url'] ?? false;
+        if ($url) {
+            $parts = explode('/', $url);
+            $url = implode('/', array_slice($parts, 0, 5));
+            $url = $url . '.haslightboxThumbnailVersion/' . end($parts);
+        }
+        return $url;
     }
 
     /**

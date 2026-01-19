@@ -105,12 +105,12 @@ header {
   }
 
   .navbar-ub {
-    width: 200px;
+    width: 120px;
     height: 100%;
     line-height: 60px;
     margin-top: 5px;
+    margin-bottom: 5px;
     @include background-image('../../ubma/images/logo-ub-de.svg');
-    background-position: center center;
     background-repeat: no-repeat;
     background-size: contain;
     &,
@@ -127,7 +127,6 @@ header {
     margin-right: 16px;
     margin-top: 5px;
     @include background-image('../../ubma/images/logo-uni-de.svg');
-    background-position: center center;
     background-repeat: no-repeat;
     background-size: contain;
     &,

@@ -48,11 +48,9 @@ class IpAddressUtils
      * Normalize an IP address or a beginning of it to an IPv6 address
      *
      * @param string $ip  IP Address
-     * @param bool   $end Whether to make a partial address  an "end of range"
-     * address
+     * @param bool   $end Whether to make a partial address an "end of range" address
      *
-     * @return string|false Packed in_addr representation if successful, false
-     * for invalid IP address
+     * @return string|false Packed in_addr representation if successful, false for invalid IP address
      */
     public function normalizeIp($ip, $end = false)
     {
@@ -75,25 +73,33 @@ class IpAddressUtils
             $ip = "::$ip";
         } else {
             // IPv6 address
+            $ip = rtrim($ip, '::');
 
             // Expand :: with '0:' as many times as necessary for a complete address
-            $count = substr_count($ip, ':');
-            if ($count < 8) {
+            if (strpos($ip, '::') !== false) {
+                $parts = explode(':', $ip);
+                $missing = 8 - count($parts) + (strpos($ip, '::') !== false ? 1 : 0);
                 $ip = str_replace(
                     '::',
-                    ':' . str_repeat('0:', 8 - $count),
+                    ':' . str_repeat('0:', $missing),
                     $ip
                 );
             }
+
             if ($ip[0] == ':') {
                 $ip = "0$ip";
             }
+
             // Append ':0' or ':ffff' to complete the address
-            $count = substr_count($ip, ':');
-            if ($count < 7) {
-                $ip .= str_repeat($end ? ':ffff' : ':0', 7 - $count);
+            $components = explode(':', $ip);
+            $remaining = 8 - count($components);
+
+            if ($remaining > 0) {
+                $ip .= str_repeat($end ? ':ffff' : ':0', $remaining);
             }
         }
+
+        // Validate and convert IP to packed in_addr representation
         return inet_pton($ip);
     }
 

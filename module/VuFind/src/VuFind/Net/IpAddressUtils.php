@@ -107,21 +107,54 @@ class IpAddressUtils
      *
      * @return bool
      */
-    public function isInRange($ip, $ranges)
+    public function isInRange(string $ip, array $ranges): bool
     {
         $ip = $this->normalizeIp($ip);
+        if ($ip === false) {
+            // Invalid IP address
+            return false;
+        }
+
         foreach ($ranges as $range) {
-            $ips = explode('-', $range, 2);
-            if (!isset($ips[1])) {
-                $ips[1] = $ips[0];
-            }
-            $ips[0] = $this->normalizeIp($ips[0]);
-            $ips[1] = $this->normalizeIp($ips[1], true);
-            if ($ips[0] === false || $ips[1] === false) {
-                continue;
-            }
-            if ($ip >= $ips[0] && $ip <= $ips[1]) {
-                return true;
+            if (str_contains($range, '/')) {
+                // CIDR notation
+                [$subnet, $prefixLength] = explode('/', $range, 2);
+
+                // Validate CIDR notation
+                if (!is_numeric($prefixLength) || $prefixLength < 0) {
+                    continue;
+                }
+
+                $subnet = $this->normalizeIp(trim($subnet));
+                if ($subnet === false) {
+                    continue;
+                }
+                $prefixLength = (int) $prefixLength;
+
+                // Calculate the network mask
+                $networkMask = str_repeat('f', $prefixLength >> 2)  // Full hex nibbles
+                    . str_repeat(dechex((0xf0 >> ($prefixLength % 4)) & 0xf), ($prefixLength % 4 !== 0) ? 1 : 0)  // Partial nibble
+                    . str_repeat('0', (128 - $prefixLength) >> 2); // Remaining bits as zero
+
+                $networkMask = pack('H*', $networkMask);
+
+                // Compare masked subnet and masked input IP
+                if (($ip & $networkMask) === ($subnet & $networkMask)) {
+                    return true;
+                }
+            } else {
+                $ips = explode('-', $range, 2);
+                if (!isset($ips[1])) {
+                    $ips[1] = $ips[0];
+                }
+                $ips[0] = $this->normalizeIp($ips[0]);
+                $ips[1] = $this->normalizeIp($ips[1], true);
+                if ($ips[0] === false || $ips[1] === false) {
+                    continue;
+                }
+                if ($ip >= $ips[0] && $ip <= $ips[1]) {
+                    return true;
+                }
             }
         }
         return false;

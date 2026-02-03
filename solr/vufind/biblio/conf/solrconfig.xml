@@ -271,11 +271,6 @@
 
   </query>
 
-  <!--
-    Let the dispatch filter handler /select?qt=XXX
-    handleSelect=true will use consistent error handling for /select and /update
-    handleSelect=false will use solr1.1 style error formatting
-    -->
   <requestDispatcher>
     <!-- Set HTTP caching related parameters (for proxy caches and clients).
 

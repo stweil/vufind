@@ -129,11 +129,14 @@ class IpAddressUtils
                 if ($subnet === false) {
                     continue;
                 }
-                $prefixLength = (int) $prefixLength;
+                $prefixLength = (int)$prefixLength;
 
                 // Calculate the network mask
                 $networkMask = str_repeat('f', $prefixLength >> 2)  // Full hex nibbles
-                    . str_repeat(dechex((0xf0 >> ($prefixLength % 4)) & 0xf), ($prefixLength % 4 !== 0) ? 1 : 0)  // Partial nibble
+                    . str_repeat(
+                        dechex((0xf0 >> ($prefixLength % 4)) & 0xf),
+                        ($prefixLength % 4 !== 0) ? 1 : 0
+                    )  // Partial nibble
                     . str_repeat('0', (128 - $prefixLength) >> 2); // Remaining bits as zero
 
                 $networkMask = pack('H*', $networkMask);

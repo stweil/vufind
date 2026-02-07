@@ -96,6 +96,7 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
         EDS::class => NameBasedConfigFactory::class,
         EIT::class => NameBasedConfigFactory::class,
         EPF::class => NameBasedConfigFactory::class,
+        GVIDefault::class => GVIDefaultFactory::class,
         LibGuides::class => InvokableFactory::class,
         LibGuidesAZ::class => InvokableFactory::class,
         Missing::class => AbstractBaseFactory::class,
@@ -162,6 +163,19 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
     protected function getExpectedInterface()
     {
         return AbstractBase::class;
+    }
+
+    /**
+     * Convenience method to retrieve a populated Search2 record driver.
+     *
+     * @param array  $data             Raw Solr data
+     * @param string $defaultKeySuffix Default key suffix
+     *
+     * @return AbstractBase
+     */
+    public function getGVIRecord($data, $defaultKeySuffix = 'Default')
+    {
+        return $this->getSolrRecord($data, 'GVI', $defaultKeySuffix);
     }
 
     /**

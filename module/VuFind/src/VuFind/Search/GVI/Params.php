@@ -46,7 +46,7 @@ class Params extends \VuFind\Search\Solr\Params
      *
      * @var array
      */
-    protected array $defaultFacetLabelSections = [
+    protected $defaultFacetLabelSections = [
         'Advanced_Facets', 'HomePage_Facets', 'ResultsTop', 'Results',
         'ExtraFacetLabels',
     ];

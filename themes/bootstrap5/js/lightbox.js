@@ -241,7 +241,7 @@ VuFind.register('lightbox', function Lightbox() {
     _xhr = $.ajax(obj);
     _xhr.always(function lbAjaxAlways() { _xhr = false; })
       .done(function lbAjaxDone(content, status, jq_xhr) {
-        var errorMsgs = [];
+        var errorMsgs;
         var flashMessages = [];
         if (jq_xhr.status === 204) {
           // No content, close lightbox

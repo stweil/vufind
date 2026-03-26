@@ -534,7 +534,14 @@ VuFind.register('lightbox', function Lightbox() {
             jq_xhr.status === 200 &&
             jq_xhr.getResponseHeader("content-type").startsWith("image")
           ) {
-            render('<div class="lightbox-image"><img src="' + url + '"/></div>');
+            // Safely build the image lightbox contents without concatenating HTML
+            _modalBody.empty();
+            var $container = $('<div/>').addClass('lightbox-image');
+            var $img = $('<img/>').attr('src', url);
+            $container.append($img);
+            _modalBody.append($container);
+            VuFind.modal('show');
+            VuFind.emit('lightbox.rendered', {container: _modal});
           } else {
             location.href = url;
           }

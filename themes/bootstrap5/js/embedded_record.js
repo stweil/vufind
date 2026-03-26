@@ -6,6 +6,39 @@ VuFind.register('embedded', function embedded() {
   var _STATUS = {};
 
   /**
+   * Safely navigate to a URL derived from the DOM by validating its scheme.
+   * Only http, https and relative URLs are allowed.
+   *
+   * @param {string} url The URL to navigate to.
+   */
+  function safeNavigate(url) {
+    if (!url) {
+      return;
+    }
+    url = String(url).trim();
+    if (url === '') {
+      return;
+    }
+
+    // Allow relative URLs (path, query or hash only).
+    if (url.charAt(0) === '/' || url.charAt(0) === '?' || url.charAt(0) === '#') {
+      window.location.href = url;
+      return;
+    }
+
+    // For absolute URLs, only allow http and https schemes.
+    try {
+      var parsed = new URL(url, window.location.href);
+      var scheme = parsed.protocol;
+      if (scheme === 'http:' || scheme === 'https:') {
+        window.location.href = parsed.href;
+      }
+    } catch (e) {
+      // If URL parsing fails, do not navigate.
+    }
+  }
+
+  /**
    * Synchronize the current status information to session storage for persistence.
    */
   function saveStatusToStorage() {
@@ -58,9 +91,10 @@ VuFind.register('embedded', function embedded() {
     var id = $result.find('.hiddenId')[0].value;
     var source = $result.find('.hiddenSource')[0].value;
     if ($tab.parent().hasClass('noajax')) {
-      window.location.href = $tab.is('a')
+      var targetUrl = $tab.is('a')
         ? $tab.attr('href') // tab case
         : $tab.find('a').attr('data-href'); // accordion case
+      safeNavigate(targetUrl);
       return false;
     }
     var urlroot;

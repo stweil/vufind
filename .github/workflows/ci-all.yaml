@@ -172,4 +172,4 @@ jobs:
           pwd
           ls -la
           export
-          vendor/bin/phing -Dmysqlrootuser=admin -Dmysqlrootpass=vufind -Dapachectl=/usr/sbin/apachectl main
+          vendor/bin/phing -Dmysqlrootuser=admin -Dmysqlrootpass=vufind -Dapacheconfdir=/etc/apache2/conf-enabled -Dapachectl=/usr/sbin/apachectl main

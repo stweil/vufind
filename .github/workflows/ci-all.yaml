@@ -29,11 +29,12 @@ jobs:
       VUFIND_LOCAL_DIR: $GITHUB_WORKSPACE/local
     strategy:
       matrix:
-        php-version: ${{ 
-          github.event_name == 'push' && fromJSON('["8.4"]')
-          || inputs.php-version == 'all' && fromJSON('["8.2", "8.3", "8.4"]') 
-          || fromJSON(format('["{0}"]', inputs.php-version))
-        }}
+        php-version: '8.3'
+        #php-version: ${{ 
+        #  (github.event_name == 'push') && fromJSON('["8.4"]') || 
+        #  (inputs.php-version == 'all') && fromJSON('["8.2", "8.3", "8.4"]') || 
+        #  fromJSON(format('["{0}"]', inputs.php-version))
+        #}}
 
     steps:
       - name: Setup PHP

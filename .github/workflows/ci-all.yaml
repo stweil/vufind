@@ -19,17 +19,24 @@ on:
 
 jobs:
   run-tests:
-    name: Tests with PHP ${{ github.event.inputs.php-version }}
+    name: Tests with PHP ${{ matrix.php-version }}
     runs-on: ubuntu-latest
     env:
       VUFIND_HOME: $GITHUB_WORKSPACE
       VUFIND_LOCAL_DIR: $GITHUB_WORKSPACE/local
+    strategy:
+      matrix:
+        php-version: ${{ 
+          matrix.php-version == 'all' 
+          && fromJSON('["8.2", "8.3", "8.4"]') 
+          || fromJSON(format('["{0}"]', matrix.php-version))
+        }}
 
     steps:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ github.event.inputs.php-version }}
+          php-version: ${{ matrix.php-version }}
           extensions: intl, xsl
           tools: composer:2.8.1
           ini-values: error_reporting=E_ALL
@@ -79,34 +86,34 @@ jobs:
         uses: actions/cache@v5
         with:
           path: .php_cs_cache
-          key: "php-${{ github.event.inputs.php-version }}-php-cs-fixer-${{ github.sha }}"
-          restore-keys: "php-${{ github.event.inputs.php-version }}-php-cs-fixer-"
+          key: "php-${{ matrix.php-version }}-php-cs-fixer-${{ github.sha }}"
+          restore-keys: "php-${{ matrix.php-version }}-php-cs-fixer-"
 
       - name: Cache phpstan data
         uses: actions/cache@v5
         with:
           path: .phpstan_cache
-          key: "php-${{ github.event.inputs.php-version }}-phpstan-${{ github.sha }}"
-          restore-keys: "php-${{ github.event.inputs.php-version }}-phpstan-"
+          key: "php-${{ matrix.php-version }}-phpstan-${{ github.sha }}"
+          restore-keys: "php-${{ matrix.php-version }}-phpstan-"
 
       - name: Cache PHP_CodeSniffer data
         uses: actions/cache@v5
         with:
           path: tests/phpcs.cache.json
-          key: "php-${{ github.event.inputs.php-version }}-phpcs-${{ github.sha }}"
-          restore-keys: "php-${{ github.event.inputs.php-version }}-phpcs-"
+          key: "php-${{ matrix.php-version }}-phpcs-${{ github.sha }}"
+          restore-keys: "php-${{ matrix.php-version }}-phpcs-"
 
       - name: Cache rector data
         uses: actions/cache@v5
         with:
           path: .rector
-          key: "php-${{ github.event.inputs.php-version }}-rector-${{ github.sha }}"
+          key: "php-${{ matrix.php-version }}-rector-${{ github.sha }}"
           restore-keys: "php-${{ matrix.php-version }}-rector-"
 
       - name: Restore cached Solr download
         uses: actions/cache/restore@v5
         with:
-          key: "solr-${{ hashFiles('downloads/solr-*.tgz') }}
+          key: "solr-${{ hashFiles('downloads/solr-*.tgz') }}"
           path: downloads/solr-*.tgz
           restore-keys: "solr-"
 
@@ -116,7 +123,7 @@ jobs:
       - name: Save cached Solr download
         uses: actions/cache/save@v5
         with:
-          key: "solr-${{ hashFiles('downloads/solr-*.tgz') }}
+          key: "solr-${{ hashFiles('downloads/solr-*.tgz') }}"
           path: downloads/solr-*.tgz
 
       - name: Disable Solr installation

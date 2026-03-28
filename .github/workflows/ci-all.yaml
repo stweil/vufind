@@ -52,7 +52,7 @@ jobs:
         run: |
           echo "USER='$USER'"
           sudo apt-get update
-          sudo apt-get install -y mariadb-server apache2 chromium-headless-shell
+          sudo apt-get install -y mariadb-server apache2 chromium-browser
 
       - name: Configure Apache for PHP ${{ matrix.php-version }}
         run: |
@@ -160,7 +160,7 @@ jobs:
 
       - name: Start Chromium
         run: |
-          nohup chromium-headless-shell --disable-gpu --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222 --window-size="1600,1200" --disable-extensions --user-data-dir=$PWD/chromium-test-user-dir > chromium.log &
+          nohup chromium-browser --headless=new --disable-gpu --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222 --window-size=1600,1200 --disable-extensions --user-data-dir=$PWD/chromium-test-user-dir > chromium.log &
 
       - name: Run tests
         run: |

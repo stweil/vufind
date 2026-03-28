@@ -54,6 +54,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y mariadb-server apache2 chromium-browser
 
+      - name: Install Chromium snap package
+        run: snap install chromium
+
       - name: Configure Apache for PHP ${{ matrix.php-version }}
         run: |
           # Enable required Apache modules
@@ -160,7 +163,8 @@ jobs:
 
       - name: Start Chromium
         run: |
-          nohup chromium-browser --headless=new --disable-gpu --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222 --window-size=1600,1200 --disable-extensions --user-data-dir=$PWD/chromium-test-user-dir > chromium.log &
+          nohup chromium --headless=new --disable-gpu --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222 --window-size=1600,1200 --disable-extensions --user-data-dir=$PWD/chromium-test-user-dir > chromium.log &
+          tail -f chromium.log &
 
       - name: Run tests
         run: |

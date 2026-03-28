@@ -50,9 +50,9 @@ jobs:
 
       - name: Install Debian packages
         run: |
-          apt-get update
-          apt-get install -y mariadb-server
           echo "USER='$USER'"
+          sudo apt-get update
+          sudo apt-get install -y mariadb-server
 
       - name: Setup node
         if: ${{ matrix.phing_tasks == 'qa-console' }}

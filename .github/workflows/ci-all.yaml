@@ -66,12 +66,11 @@ jobs:
           restore-keys: solr-
 
       - name: Download Solr (unless in cache)
+        if: steps.cache-solr.outputs.cache-hit != 'true'
         run: |
-          if [ ! -f downloads/solr-${{ steps.solr-version.outputs.version }}.tgz ]; then
-            mkdir -pv downloads
-            curl -L -o downloads/solr-${{ steps.solr-version.outputs.version }}.tgz \
-              https://archive.apache.org/dist/solr/solr/${{ steps.solr-version.outputs.version }}/solr-${{ steps.solr-version.outputs.version }}.tgz
-          fi
+          mkdir -pv downloads
+          curl -L -o downloads/solr-${{ steps.solr-version.outputs.version }}.tgz \
+            https://archive.apache.org/dist/solr/solr/${{ steps.solr-version.outputs.version }}/solr-${{ steps.solr-version.outputs.version }}.tgz
 
       - name: Save Solr download cache
         if: always() && steps.cache-solr.outputs.cache-hit != 'true'
@@ -179,7 +178,30 @@ jobs:
 
       - name: Start Chromium
         run: |
-          nohup chromium-browser --headless=new --disable-gpu --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222 --window-size=1600,1200 --disable-extensions --user-data-dir=$PWD/chromium-test-user-dir > chromium.log &
+          nohup chromium-browser \
+            --headless=new \
+            --no-sandbox \
+            --disable-client-side-phishing-detection \
+            --disable-component-update \
+            --disable-dev-shm-usage \
+            --disable-domain-reliability \
+            --disable-gpu \
+            --disable-software-rasterizer \
+            --disable-extensions \
+            --disable-background-networking \
+            --disable-sync \
+            --disable-translate \
+            --metrics-recording-only \
+            --disable-default-apps \
+            --mute-audio \
+            --no-first-run \
+            --no-pings \
+            --password-store=basic \
+            --remote-debugging-address=0.0.0.0 \
+            --remote-debugging-port=9222 \
+            --use-mock-keychain \
+            --window-size=1600,1200 \
+            --disable-extensions --user-data-dir=$PWD/chromium-test-user-dir > chromium.log &
           tail -f chromium.log &
 
       - name: Run tests

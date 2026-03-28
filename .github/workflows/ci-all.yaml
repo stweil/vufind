@@ -3,6 +3,9 @@
 name: CI (all)
 
 on:
+  push:  # Add this temporarily
+    branches:
+      - dev
   # Trigger workflow in GitHub web frontend or from API.
   workflow_dispatch:
     inputs:

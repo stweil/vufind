@@ -24,6 +24,15 @@ jobs:
   run-tests:
     name: Tests with PHP ${{ matrix.php-version }}
     runs-on: ubuntu-latest
+
+    services:
+      selenium:
+        image: selenium/standalone-chrome:latest
+        ports:
+          - 4444:4444
+        options: >-
+          --shm-size=2g
+
     env:
       VUFIND_HOME: ${{ github.workspace }}
       VUFIND_LOCAL_DIR: ${{ github.workspace }}/local
@@ -52,7 +61,21 @@ jobs:
         run: |
           echo "USER='$USER'"
           sudo apt-get update
-          sudo apt-get install -y mariadb-server
+          sudo apt-get install -y mariadb-server apache2
+
+      - name: Configure Apache for PHP ${{ matrix.php-version }}
+        run: |
+          # Enable required Apache modules
+          sudo a2enmod rewrite proxy_fcgi setenvif
+
+          # Configure Apache to use the PHP-FPM from setup-php action
+          sudo a2enconf php${{ matrix.php-version }}-fpm
+
+          # Start PHP-FPM service (installed by setup-php action)
+          sudo systemctl start php${{ matrix.php-version }}-fpm
+
+          # Restart Apache to apply changes
+          sudo systemctl restart apache2
 
       - name: Setup node
         if: ${{ matrix.phing_tasks == 'qa-console' }}
@@ -149,4 +172,4 @@ jobs:
           pwd
           ls -la
           export
-          vendor/bin/phing -Dmysqlrootuser=admin -Dmysqlrootpass=vufind main
+          vendor/bin/phing -Dmysqlrootuser=admin -Dmysqlrootpass=vufind -Dapachectl=/usr/sbin/apachectl main

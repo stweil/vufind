@@ -674,7 +674,9 @@
           </then>
         </if>
         <!-- Copy the file and restart Apache -->
-        <copy file="${localdir}/httpd-vufind.conf" tofile="${apacheconfdir}/vufindtest.conf" />
+        <exec executable="sudo" checkreturn="true">
+          <arg line="cp ${localdir}/httpd-vufind.conf ${apacheconfdir}/vufindtest.conf" />
+        </exec>
         <exec executable="${sh}" passthru="true">
           <arg line="-c &apos;${apachectl} restart&apos;" />
         </exec>

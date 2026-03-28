@@ -30,8 +30,8 @@ jobs:
     strategy:
       matrix:
         php-version: ${{ 
-          inputs.php-version == 'all' 
-          && fromJSON('["8.2", "8.3", "8.4"]') 
+          github.event_name == 'push' && fromJSON('["8.4"]')
+          || inputs.php-version == 'all' && fromJSON('["8.2", "8.3", "8.4"]') 
           || fromJSON(format('["{0}"]', inputs.php-version))
         }}
 

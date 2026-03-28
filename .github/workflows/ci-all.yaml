@@ -1,0 +1,104 @@
+# GitHub action - Run extended CI test for VuFind
+
+name: CI (all)
+
+on:
+  # Trigger workflow in GitHub web frontend or from API.
+  workflow_dispatch:
+    inputs:
+      php-version:
+        description: 'PHP version'
+        required: true
+        default: '8.4'
+        type: choice
+        options:
+          - '8.2'
+          - '8.3'
+          - '8.4'
+          - 'all'
+
+jobs:
+  run-tests:
+    name: Tests with PHP ${{ github.event.inputs.php-version }}
+    runs-on: ubuntu-latest
+    env:
+      VUFIND_HOME: $GITHUB_WORKSPACE
+      VUFIND_LOCAL_DIR: $GITHUB_WORKSPACE/local
+
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ github.event.inputs.php-version }}
+          extensions: intl, xsl
+          tools: composer:2.8.1
+          ini-values: error_reporting=E_ALL
+
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Cache NPM dependencies
+        if: ${{ matrix.phing_tasks == 'qa-console' }}
+        uses: actions/cache@v5
+        with:
+          path: ~/.npm
+          key: npm-${{ hashFiles('**/package.json') }}
+          restore-keys: npm-
+
+      - name: Install node dependencies
+        if: ${{ matrix.phing_tasks == 'qa-console' }}
+        # Use --ignore-scripts to prevent pre/post install scripts from running
+        # (a security precaution).
+        run: npm install --ignore-scripts
+
+      - name: Rebuild node-sass dependency
+        if: ${{ matrix.phing_tasks == 'qa-console' }}
+        # The --ignore-scripts parameter to npm install prevents node-sass from
+        # fully building. We need to force it to build so the SCSS check in the
+        # qa-console task runs successfully.
+        run: npm rebuild node-sass
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v5
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Cache php-cs-fixer data
+        uses: actions/cache@v5
+        with:
+          path: .php_cs_cache
+          key: "php-${{ github.event.inputs.php-version }}-php-cs-fixer-${{ github.sha }}"
+          restore-keys: "php-${{ github.event.inputs.php-version }}-php-cs-fixer-"
+
+      - name: Cache phpstan data
+        uses: actions/cache@v5
+        with:
+          path: .phpstan_cache
+          key: "php-${{ github.event.inputs.php-version }}-phpstan-${{ github.sha }}"
+          restore-keys: "php-${{ github.event.inputs.php-version }}-phpstan-"
+
+      - name: Cache PHP_CodeSniffer data
+        uses: actions/cache@v5
+        with:
+          path: tests/phpcs.cache.json
+          key: "php-${{ github.event.inputs.php-version }}-phpcs-${{ github.sha }}"
+          restore-keys: "php-${{ github.event.inputs.php-version }}-phpcs-"
+
+      - name: Cache rector data
+        uses: actions/cache@v5
+        with:
+          path: .rector
+          key: "php-${{ github.event.inputs.php-version }}-rector-${{ github.sha }}"
+          restore-keys: "php-${{ matrix.php-version }}-rector-"
+
+      - name: Install composer dependencies
+        run: composer install
+
+      - name: Run tests
+        run: vendor/bin/phing main

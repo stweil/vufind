@@ -139,5 +139,10 @@ jobs:
       - name: Disable Solr installation
         run: touch solr/.disableAutomaticInstall
 
+      - name: Create admin user for MariaDB
+        run: |
+          sudo mariadb --execute="CREATE USER admin@localhost IDENTIFIED BY 'vufind';"
+          sudo mariadb --execute="GRANT ALL ON *.* TO admin@localhost WITH GRANT OPTION;"
+
       - name: Run tests
-        run: vendor/bin/phing main
+        run: vendor/bin/phing -Dmysqlrootuser=admin -Dmysqlrootpass=vufind main

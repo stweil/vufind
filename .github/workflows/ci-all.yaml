@@ -48,14 +48,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Restore Solr download cache
-        id: cache-solr
-        uses: actions/cache/restore@v5
-        with:
-          path: ${{ env.VUFIND_HOME }}/downloads
-          key: solr-${{ steps.solr-version.outputs.version }}
-          restore-keys: solr-
-
       - name: Extract Solr version from build.xml
         id: solr-version
         run: |

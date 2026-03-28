@@ -172,9 +172,6 @@ jobs:
       - name: Install composer dependencies
         run: composer install
 
-      - name: Disable Solr installation
-        run: touch solr/.disableAutomaticInstall
-
       - name: Create admin user for MariaDB
         run: |
           sudo mariadb --execute="CREATE USER admin@localhost IDENTIFIED BY 'vufind';"

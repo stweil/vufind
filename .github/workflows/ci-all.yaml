@@ -53,6 +53,9 @@ jobs:
         run: |
           SOLR_VERSION=$(grep -oP 'property name="solr_version" value="\K[^"]+' build.xml)
           echo "version=$SOLR_VERSION" >> $GITHUB_OUTPUT
+          pwd
+          ls -la
+          export
 
       - name: Cache Solr download
         uses: actions/cache@v5

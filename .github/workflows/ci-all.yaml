@@ -27,9 +27,9 @@ jobs:
     strategy:
       matrix:
         php-version: ${{ 
-          matrix.php-version == 'all' 
+          inputs.php-version == 'all' 
           && fromJSON('["8.2", "8.3", "8.4"]') 
-          || fromJSON(format('["{0}"]', matrix.php-version))
+          || fromJSON(format('["{0}"]', inputs.php-version))
         }}
 
     steps:

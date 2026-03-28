@@ -57,14 +57,14 @@ jobs:
       - name: Cache Solr download
         uses: actions/cache@v5
         with:
-          path: downloads
+          path: ${{ env.VUFIND_HOME }}/downloads
           key: solr-${{ steps.solr-version.outputs.version }}
           restore-keys: solr-
 
       - name: Download Solr (unless in cache)
         run: |
-          if [ ! -f downloads/solr-${{ steps.solr-version.outputs.version }}.tgz ]; then
-            curl -L -o downloads/solr-${{ steps.solr-version.outputs.version }}.tgz \
+          if [ ! -f ${{ env.VUFIND_HOME }}/downloads/solr-${{ steps.solr-version.outputs.version }}.tgz ]; then
+            curl -L -o ${{ env.VUFIND_HOME }}/downloads/solr-${{ steps.solr-version.outputs.version }}.tgz \
               https://archive.apache.org/dist/solr/solr/${{ steps.solr-version.outputs.version }}/solr-${{ steps.solr-version.outputs.version }}.tgz
           fi
 

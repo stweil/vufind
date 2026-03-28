@@ -145,4 +145,8 @@ jobs:
           sudo mariadb --execute="GRANT ALL ON *.* TO admin@localhost WITH GRANT OPTION;"
 
       - name: Run tests
-        run: vendor/bin/phing -Dmysqlrootuser=admin -Dmysqlrootpass=vufind main
+        run: |
+          pwd
+          ls -la
+          export
+          vendor/bin/phing -Dmysqlrootuser=admin -Dmysqlrootpass=vufind main

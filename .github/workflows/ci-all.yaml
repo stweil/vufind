@@ -24,15 +24,6 @@ jobs:
   run-tests:
     name: Tests with PHP ${{ matrix.php-version }}
     runs-on: ubuntu-latest
-
-    services:
-      selenium:
-        image: selenium/standalone-chrome:latest
-        ports:
-          - 4444:4444
-        options: >-
-          --shm-size=2g
-
     env:
       VUFIND_HOME: ${{ github.workspace }}
       VUFIND_LOCAL_DIR: ${{ github.workspace }}/local
@@ -61,7 +52,7 @@ jobs:
         run: |
           echo "USER='$USER'"
           sudo apt-get update
-          sudo apt-get install -y mariadb-server apache2
+          sudo apt-get install -y mariadb-server apache2 chromium-headless-shell
 
       - name: Configure Apache for PHP ${{ matrix.php-version }}
         run: |
@@ -167,9 +158,13 @@ jobs:
           sudo mariadb --execute="CREATE USER admin@localhost IDENTIFIED BY 'vufind';"
           sudo mariadb --execute="GRANT ALL ON *.* TO admin@localhost WITH GRANT OPTION;"
 
+      - name: Start Chromium
+        run: |
+          nohup chromium-headless-shell --disable-gpu --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222 --window-size="1600,1200" --disable-extensions --user-data-dir=$PWD/chromium-test-user-dir > chromium.log &
+
       - name: Run tests
         run: |
           pwd
-          ls -la
+          # ls -la
           export
-          vendor/bin/phing -Dmysqlrootuser=admin -Dmysqlrootpass=vufind -Dapacheconfdir=/etc/apache2/conf-enabled -Dapachectl=/usr/sbin/apachectl main
+          vendor/bin/phing -Dmysqlrootuser=admin -Dmysqlrootpass=vufind -Dmink_driver="chrome" -Dextra_shutdown_cleanup="sudo chown -R $USER: $VUFIND_LOCAL_DIR/cache" -Dapacheconfdir=/etc/apache2/conf-enabled -Dapachectl=/usr/sbin/apachectl -Dvufindurl=http://localhost/vufind_test main

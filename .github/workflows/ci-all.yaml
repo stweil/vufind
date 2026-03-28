@@ -37,6 +37,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Setup node
+        if: ${{ matrix.phing_tasks == 'qa-console' }}
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+
       - name: Cache NPM dependencies
         if: ${{ matrix.phing_tasks == 'qa-console' }}
         uses: actions/cache@v5
@@ -96,6 +102,13 @@ jobs:
           path: .rector
           key: "php-${{ github.event.inputs.php-version }}-rector-${{ github.sha }}"
           restore-keys: "php-${{ matrix.php-version }}-rector-"
+
+      - name: Cache Solr download
+        uses: actions/cache@v5
+        with:
+          path: downloads/solr-*.tgz
+          key: "solr-${{ github.sha }}"
+          restore-keys: "solr-"
 
       - name: Install composer dependencies
         run: composer install

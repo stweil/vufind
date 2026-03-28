@@ -103,15 +103,24 @@ jobs:
           key: "php-${{ github.event.inputs.php-version }}-rector-${{ github.sha }}"
           restore-keys: "php-${{ matrix.php-version }}-rector-"
 
-      - name: Cache Solr download
-        uses: actions/cache@v5
+      - name: Restore cached Solr download
+        uses: actions/cache/restore@v5
         with:
+          key: "solr-${{ hashFiles('downloads/solr-*.tgz') }}
           path: downloads/solr-*.tgz
-          key: "solr-${{ github.sha }}"
           restore-keys: "solr-"
 
       - name: Install composer dependencies
         run: composer install
+
+      - name: Save cached Solr download
+        uses: actions/cache/save@v5
+        with:
+          key: "solr-${{ hashFiles('downloads/solr-*.tgz') }}
+          path: downloads/solr-*.tgz
+
+      - name: Disable Solr installation
+        run: touch solr/.disableAutomaticInstall
 
       - name: Run tests
         run: vendor/bin/phing main

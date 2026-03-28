@@ -55,7 +55,7 @@ jobs:
           sudo apt-get install -y mariadb-server apache2 chromium-browser
 
       - name: Install Chromium snap package
-        run: snap install chromium
+        run: sudo snap install chromium
 
       - name: Configure Apache for PHP ${{ matrix.php-version }}
         run: |

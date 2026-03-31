@@ -686,7 +686,11 @@
           </then>
         </if>
         <!-- Copy the file and restart Apache -->
-        <copy file="${localdir}/httpd-vufind.conf" tofile="${apacheconfdir}/vufindtest.conf" />
+        <exec executable="sudo" checkreturn="true">
+          <arg value="cp" />
+          <arg value="${localdir}/httpd-vufind.conf" />
+          <arg value="${apacheconfdir}/vufindtest.conf" />
+        </exec>
         <exec executable="${sh}" passthru="true">
           <arg line="-c &apos;${apachectl} restart&apos;" />
         </exec>
@@ -1048,7 +1052,10 @@ ${git_status}
         <available file="${apacheconfdir}/vufindtest.conf" />
       </and>
       <then>
-        <delete file="${apacheconfdir}/vufindtest.conf" />
+        <exec executable="sudo" checkreturn="true">
+          <arg value="rm" />
+          <arg value="${apacheconfdir}/vufindtest.conf" />
+        </exec>
         <exec executable="${sh}" passthru="true">
           <arg line="-c &apos;${apachectl} restart&apos;" />
         </exec>

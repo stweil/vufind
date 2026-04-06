@@ -83,10 +83,7 @@ jobs:
         run: |
           echo "USER='$USER'"
           sudo apt-get update
-          sudo apt-get install -y mariadb-server apache2 chromium-browser
-
-      #- name: Install Chromium snap package
-      #  run: sudo snap install chromium
+          sudo apt-get install -y mariadb-server apache2
 
       - name: Configure Apache for PHP ${{ matrix.php-version }}
         run: |
@@ -176,9 +173,12 @@ jobs:
           sudo mariadb --execute="CREATE USER admin@localhost IDENTIFIED BY 'vufind';"
           sudo mariadb --execute="GRANT ALL ON *.* TO admin@localhost WITH GRANT OPTION;"
 
-      - name: Start Chromium
+      - name: Install Chrome
+        uses: browser-actions/setup-chrome@v2
+
+      - name: Start Chrome
         run: |
-          nohup chromium-browser \
+          nohup chrome \
             --headless=new \
             --no-sandbox \
             --disable-client-side-phishing-detection \

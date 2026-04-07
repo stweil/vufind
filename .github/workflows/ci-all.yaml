@@ -80,6 +80,7 @@ jobs:
           key: solr-${{ steps.solr-version.outputs.version }}
 
       - name: Install Debian packages
+        if: 'true' != 'true'
         run: |
           echo "USER='$USER'"
           sudo apt-get update
@@ -169,6 +170,7 @@ jobs:
         run: composer install
 
       - name: Create admin user for MariaDB
+        if: 'true' != 'true'
         run: |
           sudo mariadb --execute="CREATE USER admin@localhost IDENTIFIED BY 'vufind';"
           sudo mariadb --execute="GRANT ALL ON *.* TO admin@localhost WITH GRANT OPTION;"
@@ -194,7 +196,7 @@ jobs:
             --no-first-run \
             --no-pings \
             --password-store=basic \
-            --remote-debugging-address=0.0.0.0 \
+            --remote-debugging-address=127.0.0.1 \
             --remote-debugging-port=9222 \
             --use-mock-keychain \
             --window-size=1600,1200 \
@@ -211,9 +213,9 @@ jobs:
 
       - name: Run phing startup
         run: |
-          vendor/bin/phing -Dmysqlrootuser=admin -Dmysqlrootpass=vufind -Dmink_driver="chrome" -Dextra_shutdown_cleanup="sudo chown -R $USER: $VUFIND_LOCAL_DIR/cache" -Dapacheconfdir=/etc/apache2/conf-enabled -Dapachectl=/usr/sbin/apachectl -Dvufindurl=http://localhost/vufind_test startup
+          vendor/bin/phing -Dmysqlrootuser=root -Dmysqlrootpass=root -Dmink_driver="chrome" -Dextra_shutdown_cleanup="sudo chown -R $USER: $VUFIND_LOCAL_DIR/cache" -Dapacheconfdir=/etc/apache2/conf-enabled -Dapachectl=/usr/sbin/apachectl -Dvufindurl=http://localhost/vufind_test startup
 
       - name: Run tests
         run: |
-          vendor/bin/phing -Dmysqlrootuser=admin -Dmysqlrootpass=vufind -Dmink_driver="chrome" -Dextra_shutdown_cleanup="sudo chown -R $USER: $VUFIND_LOCAL_DIR/cache" -Dapacheconfdir=/etc/apache2/conf-enabled -Dapachectl=/usr/sbin/apachectl -Dvufindurl=http://localhost/vufind_test phpunit
+          vendor/bin/phing -Dmysqlrootuser=root -Dmysqlrootpass=root -Dmink_driver="chrome" -Dextra_shutdown_cleanup="sudo chown -R $USER: $VUFIND_LOCAL_DIR/cache" -Dapacheconfdir=/etc/apache2/conf-enabled -Dapachectl=/usr/sbin/apachectl -Dvufindurl=http://localhost/vufind_test phpunit
           # vendor/bin/phing -Dmysqlrootuser=admin -Dmysqlrootpass=vufind -Dmink_driver="chrome" -Dextra_shutdown_cleanup="sudo chown -R $USER: $VUFIND_LOCAL_DIR/cache" -Dapacheconfdir=/etc/apache2/conf-enabled -Dapachectl=/usr/sbin/apachectl -Dvufindurl=http://localhost/vufind_test main

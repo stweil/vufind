@@ -170,10 +170,10 @@ jobs:
         run: composer install
 
       - name: Create admin user for MariaDB
-        if: ${{ matrix.phing_tasks == 'never' }}
         run: |
-          sudo mariadb --execute="CREATE USER admin@localhost IDENTIFIED BY 'vufind';"
-          sudo mariadb --execute="GRANT ALL ON *.* TO admin@localhost WITH GRANT OPTION;"
+          #sudo mariadb --execute="CREATE USER admin@localhost IDENTIFIED BY 'vufind';"
+          #sudo mariadb --execute="GRANT ALL ON *.* TO admin@localhost WITH GRANT OPTION;"
+          sudo systemctl start mysql.service
 
       - name: Start Chrome
         run: |

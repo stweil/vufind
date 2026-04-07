@@ -218,6 +218,10 @@ jobs:
       - name: Run curl
         run: |
           curl http://localhost/vufind_test/MyResearch/Profile
+          ls -l /etc/apache2/conf-enabled/
+          sudo cp local/httpd-vufind.conf /etc/apache2/conf-enabled/
+          sudo systemctl restart apache2
+          curl http://localhost/vufind_test/MyResearch/Profile
 
       - name: Run tests
         run: |

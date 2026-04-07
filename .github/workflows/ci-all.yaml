@@ -173,9 +173,6 @@ jobs:
           sudo mariadb --execute="CREATE USER admin@localhost IDENTIFIED BY 'vufind';"
           sudo mariadb --execute="GRANT ALL ON *.* TO admin@localhost WITH GRANT OPTION;"
 
-      - name: Install Chrome
-        uses: browser-actions/setup-chrome@v2
-
       - name: Start Chrome
         run: |
           nohup chrome \
@@ -202,11 +199,21 @@ jobs:
             --use-mock-keychain \
             --window-size=1600,1200 \
             --disable-extensions --user-data-dir=$PWD/chromium-test-user-dir > chromium.log &
+          sleep 10
           tail -f chromium.log &
+
+      - name: Debug GitHub action
+        run: |
+          ps axf
+          pwd
+          ls -la
+          export
+
+      - name: Run phing startup
+        run: |
+          vendor/bin/phing -Dmysqlrootuser=admin -Dmysqlrootpass=vufind -Dmink_driver="chrome" -Dextra_shutdown_cleanup="sudo chown -R $USER: $VUFIND_LOCAL_DIR/cache" -Dapacheconfdir=/etc/apache2/conf-enabled -Dapachectl=/usr/sbin/apachectl -Dvufindurl=http://localhost/vufind_test startup
 
       - name: Run tests
         run: |
-          pwd
-          # ls -la
-          export
-          vendor/bin/phing -Dmysqlrootuser=admin -Dmysqlrootpass=vufind -Dmink_driver="chrome" -Dextra_shutdown_cleanup="sudo chown -R $USER: $VUFIND_LOCAL_DIR/cache" -Dapacheconfdir=/etc/apache2/conf-enabled -Dapachectl=/usr/sbin/apachectl -Dvufindurl=http://localhost/vufind_test main
+          vendor/bin/phing -Dmysqlrootuser=admin -Dmysqlrootpass=vufind -Dmink_driver="chrome" -Dextra_shutdown_cleanup="sudo chown -R $USER: $VUFIND_LOCAL_DIR/cache" -Dapacheconfdir=/etc/apache2/conf-enabled -Dapachectl=/usr/sbin/apachectl -Dvufindurl=http://localhost/vufind_test phpunit
+          # vendor/bin/phing -Dmysqlrootuser=admin -Dmysqlrootpass=vufind -Dmink_driver="chrome" -Dextra_shutdown_cleanup="sudo chown -R $USER: $VUFIND_LOCAL_DIR/cache" -Dapacheconfdir=/etc/apache2/conf-enabled -Dapachectl=/usr/sbin/apachectl -Dvufindurl=http://localhost/vufind_test main

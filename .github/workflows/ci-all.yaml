@@ -85,7 +85,8 @@ jobs:
         run: |
           echo "USER='$USER'"
           sudo apt-get update
-          sudo apt-get install -y mariadb-server apache2
+          # sudo apt-get -y install mariadb-server apache2
+          sudo apt-get -y install php-mbstring php-pear php php-dev php-gd php-intl php-json php-ldap php-mysql php-xml php-soap php-curl
 
       - name: Configure Apache for PHP ${{ matrix.php-version }}
         run: |
@@ -219,9 +220,13 @@ jobs:
       - name: Run curl
         run: |
           curl http://localhost/vufind_test/MyResearch/Profile
-          ls -l /etc/apache2/*/
           sudo cp local/httpd-vufind.conf /etc/apache2/conf-enabled/
+          ls -l /etc/apache2/*/
           sudo systemctl restart apache2
+          curl http://localhost/
+          curl http://localhost/vufind
+          curl http://localhost/vufind_test
+          curl http://localhost/vufind_test/
           curl http://localhost/vufind_test/MyResearch/Profile
 
       - name: Run tests

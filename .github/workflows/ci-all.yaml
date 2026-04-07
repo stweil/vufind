@@ -215,6 +215,10 @@ jobs:
         run: |
           vendor/bin/phing -Dmysqlrootuser=root -Dmysqlrootpass=root -Dmink_driver="chrome" -Dextra_shutdown_cleanup="sudo chown -R $USER: $VUFIND_LOCAL_DIR/cache" -Dapacheconfdir=/etc/apache2/conf-enabled -Dapachectl=/usr/sbin/apachectl -Dvufindurl=http://localhost/vufind_test startup
 
+      - name: Run curl
+        run: |
+          curl http://localhost/vufind_test/MyResearch/Profile
+
       - name: Run tests
         run: |
           vendor/bin/phing -Dmysqlrootuser=root -Dmysqlrootpass=root -Dmink_driver="chrome" -Dextra_shutdown_cleanup="sudo chown -R $USER: $VUFIND_LOCAL_DIR/cache" -Dapacheconfdir=/etc/apache2/conf-enabled -Dapachectl=/usr/sbin/apachectl -Dvufindurl=http://localhost/vufind_test phpunit

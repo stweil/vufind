@@ -80,9 +80,12 @@ jobs:
           path: downloads/solr-${{ steps.solr-version.outputs.version }}.tgz
           key: solr-${{ steps.solr-version.outputs.version }}
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+
       - name: Install Debian packages
-        if: ${{ matrix.phing_tasks == 'never' }}
         run: |
+          sleep 100000
           echo "USER='$USER'"
           sudo apt-get update
           # sudo apt-get -y install mariadb-server apache2

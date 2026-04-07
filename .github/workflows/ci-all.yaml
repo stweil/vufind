@@ -175,7 +175,7 @@ jobs:
 
       - name: Start Chrome
         run: |
-          nohup chrome \
+          nohup $CHROME_BIN \
             --headless=new \
             --no-sandbox \
             --disable-client-side-phishing-detection \
@@ -198,9 +198,9 @@ jobs:
             --remote-debugging-port=9222 \
             --use-mock-keychain \
             --window-size=1600,1200 \
-            --disable-extensions --user-data-dir=$PWD/chromium-test-user-dir > chromium.log &
+            --disable-extensions --user-data-dir=$PWD/chromium-test-user-dir > chrome.log &
           sleep 10
-          tail -f chromium.log &
+          tail -f chrome.log &
 
       - name: Debug GitHub action
         run: |

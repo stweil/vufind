@@ -80,7 +80,7 @@ jobs:
           key: solr-${{ steps.solr-version.outputs.version }}
 
       - name: Install Debian packages
-        if: 'true' != 'true'
+        if: ${{ matrix.phing_tasks == 'never' }}
         run: |
           echo "USER='$USER'"
           sudo apt-get update
@@ -170,7 +170,7 @@ jobs:
         run: composer install
 
       - name: Create admin user for MariaDB
-        if: 'true' != 'true'
+        if: ${{ matrix.phing_tasks == 'never' }}
         run: |
           sudo mariadb --execute="CREATE USER admin@localhost IDENTIFIED BY 'vufind';"
           sudo mariadb --execute="GRANT ALL ON *.* TO admin@localhost WITH GRANT OPTION;"

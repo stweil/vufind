@@ -56,6 +56,7 @@ jobs:
           pwd
           ls -la
           export
+          ls -l /etc/apache2/*/
 
       - name: Restore Solr download cache
         id: cache-solr
@@ -218,7 +219,7 @@ jobs:
       - name: Run curl
         run: |
           curl http://localhost/vufind_test/MyResearch/Profile
-          ls -l /etc/apache2/conf-enabled/
+          ls -l /etc/apache2/*/
           sudo cp local/httpd-vufind.conf /etc/apache2/conf-enabled/
           sudo systemctl restart apache2
           curl http://localhost/vufind_test/MyResearch/Profile

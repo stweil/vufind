@@ -80,16 +80,15 @@ jobs:
           path: downloads/solr-${{ steps.solr-version.outputs.version }}.tgz
           key: solr-${{ steps.solr-version.outputs.version }}
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
+      #- name: Setup tmate session
+      #  uses: mxschmitt/action-tmate@v3
 
       - name: Install Debian packages
         run: |
-          sleep 100000
-          echo "USER='$USER'"
-          sudo apt-get update
+          sleep 1
+          #sudo apt-get update
           # sudo apt-get -y install mariadb-server apache2
-          sudo apt-get -y install php-mbstring php-pear php php-dev php-gd php-intl php-json php-ldap php-mysql php-xml php-soap php-curl
+          #sudo apt-get -y install php-mbstring php-pear php php-dev php-gd php-intl php-json php-ldap php-mysql php-xml php-soap php-curl
 
       - name: Configure Apache for PHP ${{ matrix.php-version }}
         run: |
@@ -222,6 +221,7 @@ jobs:
 
       - name: Run curl
         run: |
+          chmod +rx /home/runner/
           curl http://localhost/vufind_test/MyResearch/Profile
           sudo cp local/httpd-vufind.conf /etc/apache2/conf-enabled/
           ls -l /etc/apache2/*/

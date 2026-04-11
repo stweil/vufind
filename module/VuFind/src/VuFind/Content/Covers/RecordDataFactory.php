@@ -1,7 +1,7 @@
 <?php
 
 /**
- * RecordData cover loader factory
+ * RecordData cover loader factory.
  *
  * PHP version 8
  *
@@ -35,7 +35,7 @@ use Psr\Container\ContainerExceptionInterface as ContainerException;
 use Psr\Container\ContainerInterface;
 
 /**
- * RecordData cover loader factory
+ * RecordData cover loader factory.
  *
  * @category VuFind
  * @package  Content
@@ -46,7 +46,7 @@ use Psr\Container\ContainerInterface;
 class RecordDataFactory implements \Laminas\ServiceManager\Factory\FactoryInterface
 {
     /**
-     * Create an object
+     * Create an object.
      *
      * @param ContainerInterface $container     Service manager
      * @param string             $requestedName Service being created

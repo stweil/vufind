@@ -43,7 +43,7 @@ use VuFind\Record\Loader as RecordLoader;
 class RecordData extends \VuFind\Content\AbstractCover
 {
     /**
-     * Constructor
+     * Constructor.
      *
      * @param RecordLoader $recordLoader Record loader
      */

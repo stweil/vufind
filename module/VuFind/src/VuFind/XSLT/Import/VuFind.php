@@ -284,6 +284,42 @@ class VuFind
         return static::stripBadChars($final);
     }
 
+    private static function extractText(string $filePath, string $arg, string $serverUrl = 'http://localhost:9998'): string
+    {
+        $fileContent = file_get_contents($filePath);
+        if ($fileContent === false) {
+            throw new RuntimeException("Could not read file: $filePath");
+        }
+
+        $serverUrl = $serverUrl . '/tika';
+        if ($arg == '--text') {
+            $serverUrl = $serverUrl . '/main';
+        }
+
+        $client = new \Laminas\Http\Client($serverUrl, [
+            'timeout' => 30,
+        ]);
+
+        $client->setMethod(\Laminas\Http\Request::METHOD_PUT);
+        $client->setRawBody($fileContent);
+        $client->setHeaders([
+            'Content-Type'   => 'application/octet-stream',
+            'Accept'         => $arg == '--jsonRecursive --text' ? 'application/json' : ($arg == '--xml' ? 'text/html' : 'text/plain'),
+            'Accept-Charset' => 'UTF-8',
+        ]);
+
+        $response = $client->send();
+
+        if (!$response->isSuccess()) {
+            print('Tika server returned HTTP ' . $response->getStatusCode() . "\n");
+            throw new RuntimeException(
+                'Tika server returned HTTP ' . $response->getStatusCode()
+            );
+        }
+
+        return $response->getBody();
+    }
+
     /**
      * Generic method for building Tika command.
      *
@@ -325,21 +361,26 @@ class VuFind
      */
     public static function harvestWithTika($url, $arg = '--text')
     {
-        // Build a filename for temporary XML storage:
-        $outputFile = tempnam('/tmp', 'tika');
+        $settings = static::getConfig('fulltext');
+        if (isset($settings->Tika->path)) {
+            // Build a filename for temporary XML storage:
+            $outputFile = tempnam('/tmp', 'tika');
 
-        // Determine the base Tika command and execute
-        $tikaCommand = static::getTikaCommand($url, $outputFile, $arg);
-        proc_close(proc_open($tikaCommand[0], $tikaCommand[1], $tikaCommand[2]));
+            // Determine the base Tika command and execute
+            $tikaCommand = static::getTikaCommand($url, $outputFile, $arg);
+            proc_close(proc_open($tikaCommand[0], $tikaCommand[1], $tikaCommand[2]));
 
-        // If we failed to process the file, give up now:
-        if (!file_exists($outputFile)) {
-            return '';
+            // If we failed to process the file, give up now:
+            if (!file_exists($outputFile)) {
+                return '';
+            }
+
+            // Extract and decode the full text from the XML:
+            $txt = file_get_contents($outputFile);
+            @unlink($outputFile);
+        } else {
+            $txt = static::extractText($url, $arg);
         }
-
-        // Extract and decode the full text from the XML:
-        $txt = file_get_contents($outputFile);
-        @unlink($outputFile);
 
         return $txt;
     }

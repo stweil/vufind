@@ -93,6 +93,11 @@ class WebCrawlCommand extends Command
         $this
             ->setHelp('Crawls websites to populate VuFind\'s web index.')
             ->addOption(
+                'sitemap',
+                null,
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED,
+                'URL of sitemap'
+            )->addOption(
                 'test-only',
                 null,
                 InputOption::VALUE_NONE,
@@ -385,6 +390,11 @@ class WebCrawlCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // Get command line parameters:
+        $sitemaps = $input->getOption('sitemap');
+        if (empty($sitemaps)) {
+            // No sitemap URLs from command line, so get them from config file.
+            $sitemaps = $this->config->Sitemaps->url;
+        }
         $testMode = (bool)$input->getOption('test-only');
         $this->bypassCacheExpiration = (bool)$input->getOption('use-expired-cache');
         $index = $input->getOption('index');
@@ -400,7 +410,7 @@ class WebCrawlCommand extends Command
 
         // Loop through sitemap URLs in the config file.
         $error = false;
-        foreach ($this->config->Sitemaps->url as $current) {
+        foreach ($sitemaps as $current) {
             $error = $error || !$this->harvestSitemap(
                 $output,
                 $current,

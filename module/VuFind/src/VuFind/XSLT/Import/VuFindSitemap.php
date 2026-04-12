@@ -100,13 +100,51 @@ class VuFindSitemap extends VuFind
     }
 
     /**
+     * Extract key metadata from HTML.
+     *
+     * NOTE: This method uses some non-standard meta tags; it is intended as an
+     * example that can be overridden/extended to support local practices.
+     *
+     * @param array $doc content.
+     *
+     * @return array
+     */
+    protected static function getExtraFields(array $doc): array
+    {
+        // Extract the subjects from the HTML:
+        $subjects = [];
+        if (isset($doc['subject'])) {
+            foreach ($doc['subject'] as $current) {
+                $subjects[] = html_entity_decode($current, ENT_QUOTES, 'UTF-8');
+            }
+        }
+
+        // Extract the link types from the HTML:
+        $categories = [];
+        if (isset($doc['category'])) {
+            foreach ($doc['category'] as $current) {
+                $categories[] = html_entity_decode($current, ENT_QUOTES, 'UTF-8');
+            }
+        }
+
+        // Extract the use count from the HTML:
+        $useCount = $doc['useCount'] ?? 1;
+
+        return [
+            'category' => $categories,
+            'subject' => $subjects,
+            'use_count' => $useCount,
+        ];
+    }
+
+    /**
      * Load JSON data about an HTML document using Tika.
      *
      * @param string $url URL or local file containing HTML.
      *
      * @return array
      */
-    protected static function getTikaData($url)
+    protected static function getTikaData(string $url): array
     {
         // Extract and decode the full text from the XML:
         $json = json_decode(static::harvestWithTika($url, '--jsonRecursive --text'), true);
@@ -126,15 +164,17 @@ class VuFindSitemap extends VuFind
             }
         }
 
-        //print("doc  = "); var_dump($doc);
-
-        // Send back the extracted fields:
-        return [
+        $fields = [
             'title' => $title,
             'keywords' => $keywords,
             'description' => $description,
             'fulltext' => $title . ' ' . $fulltext,
         ];
+
+        $fields += static::getExtraFields($doc);
+
+        // Send back the extracted fields:
+        return $fields;
     }
 
     /**

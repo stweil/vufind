@@ -82,6 +82,23 @@ class VuFindSitemapTest extends \PHPUnit\Framework\TestCase
                     'fulltext' => 'fake full text ' . md5(file_get_contents($htmlFile)),
                 ];
             }
+
+            /**
+             * Simulate loading metadata about an HTML document using Tika.
+             *
+             * @param string $url URL of document.
+             *
+             * @return array
+             */
+            protected static function getTikaData($url)
+            {
+                return [
+                    'title' => 'The Fake Title',
+                    'keywords' => 'fake keywords',
+                    'description' => 'fake description',
+                    'fulltext' => 'fake full text ' . md5(file_get_contents($url)),
+                ];
+            }
         };
         $url = $this->getFixturePath('web/test.html');
         $xml = $class::getDocument($url);

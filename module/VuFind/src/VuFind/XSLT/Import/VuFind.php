@@ -30,6 +30,7 @@
 namespace VuFind\XSLT\Import;
 
 use DOMDocument;
+use RuntimeException;
 
 use function count;
 use function in_array;
@@ -193,6 +194,10 @@ class VuFind
             case 'aperture':
                 return static::harvestWithAperture($url);
             case 'tika':
+                $settings = static::getConfig('fulltext');
+                if (isset($settings->Tika->url)) {
+                    return static::harvestWithTikaServer($url, '--text', $settings->Tika->url);
+                }
                 return static::harvestWithTika($url);
             default:
                 // Ignore unrecognized parser option:
@@ -284,16 +289,28 @@ class VuFind
         return static::stripBadChars($final);
     }
 
-    private static function extractText(string $filePath, string $arg, string $serverUrl = 'http://localhost:9998'): string
+    /**
+     * Harvest the contents of a document file (PDF, Word, etc.) using Tika server.
+     * This method will only work if a Tika server is running and properly configured
+     * in the fulltext.ini file.
+     * Without proper configuration, this will simply return an empty string.
+     *
+     * @param string $url       URL of file to retrieve.
+     * @param string $arg       argument(s) for Tika
+     * @param string $serverUrl URL of Tika server
+     *
+     * @return string     text contents of file.
+     */
+    private static function harvestWithTikaServer(string $url, string $arg, string $serverUrl): string
     {
-        $fileContent = file_get_contents($filePath);
+        $fileContent = file_get_contents($url);
         if ($fileContent === false) {
-            throw new RuntimeException("Could not read file: $filePath");
+            throw new RuntimeException("Could not read file: $url");
         }
 
-        $serverUrl = $serverUrl . '/tika';
+        $serverUrl .= '/tika';
         if ($arg == '--text') {
-            $serverUrl = $serverUrl . '/main';
+            $serverUrl .= '/main';
         }
 
         $client = new \Laminas\Http\Client($serverUrl, [
@@ -302,16 +319,22 @@ class VuFind
 
         $client->setMethod(\Laminas\Http\Request::METHOD_PUT);
         $client->setRawBody($fileContent);
+        if ($arg == '--jsonRecursive --text') {
+            $accept = 'application/json';
+        } elseif ($arg == '--xml') {
+            $accept = 'text/html';
+        } else {
+            $accept = 'text/plain';
+        }
         $client->setHeaders([
             'Content-Type'   => 'application/octet-stream',
-            'Accept'         => $arg == '--jsonRecursive --text' ? 'application/json' : ($arg == '--xml' ? 'text/html' : 'text/plain'),
+            'Accept'         => $accept,
             'Accept-Charset' => 'UTF-8',
         ]);
 
         $response = $client->send();
 
         if (!$response->isSuccess()) {
-            print('Tika server returned HTTP ' . $response->getStatusCode() . "\n");
             throw new RuntimeException(
                 'Tika server returned HTTP ' . $response->getStatusCode()
             );
@@ -361,26 +384,21 @@ class VuFind
      */
     public static function harvestWithTika($url, $arg = '--text')
     {
-        $settings = static::getConfig('fulltext');
-        if (isset($settings->Tika->path)) {
-            // Build a filename for temporary XML storage:
-            $outputFile = tempnam('/tmp', 'tika');
+        // Build a filename for temporary XML storage:
+        $outputFile = tempnam('/tmp', 'tika');
 
-            // Determine the base Tika command and execute
-            $tikaCommand = static::getTikaCommand($url, $outputFile, $arg);
-            proc_close(proc_open($tikaCommand[0], $tikaCommand[1], $tikaCommand[2]));
+        // Determine the base Tika command and execute
+        $tikaCommand = static::getTikaCommand($url, $outputFile, $arg);
+        proc_close(proc_open($tikaCommand[0], $tikaCommand[1], $tikaCommand[2]));
 
-            // If we failed to process the file, give up now:
-            if (!file_exists($outputFile)) {
-                return '';
-            }
-
-            // Extract and decode the full text from the XML:
-            $txt = file_get_contents($outputFile);
-            @unlink($outputFile);
-        } else {
-            $txt = static::extractText($url, $arg);
+        // If we failed to process the file, give up now:
+        if (!file_exists($outputFile)) {
+            return '';
         }
+
+        // Extract and decode the full text from the XML:
+        $txt = file_get_contents($outputFile);
+        @unlink($outputFile);
 
         return $txt;
     }

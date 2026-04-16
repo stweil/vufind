@@ -342,7 +342,23 @@ class VuFindSitemap extends VuFind
                 @unlink($htmlFile);
                 break;
             case 'Tika':
-                $fields = static::getTikaData($url);
+                $settings = static::getConfig('fulltext');
+                if (isset($settings->Tika->url)) {
+                    $fields = static::getTikaData($url);
+                } else {
+                    // Grab the HTML and write it to disk:
+                    $htmlFile = tempnam('/tmp', 'htm');
+                    $html = file_get_contents($url);
+                    file_put_contents($htmlFile, $html);
+
+                    $fields = static::getTikaFields($htmlFile);
+
+                    // Add data loaded directly from HTML:
+                    $fields += static::getHtmlFields($html);
+
+                    // Clean up HTML file:
+                    @unlink($htmlFile);
+                }
                 break;
             default:
                 throw new \Exception('Unexpected parser: ' . $parser);

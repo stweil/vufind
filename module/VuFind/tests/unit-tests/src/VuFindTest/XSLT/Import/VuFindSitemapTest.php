@@ -57,13 +57,18 @@ class VuFindSitemapTest extends \PHPUnit\Framework\TestCase
          */
         $class = new class () extends VuFindSitemap {
             /**
-             * Simulate reading parser method from fulltext.ini.
+             * Simulate getting configuration file fulltext.ini.
              *
-             * @return string Name of parser to use (i.e. Aperture or Tika)
+             * @param string $config Configuration name
+             *
+             * @return \VuFind\Config\Config
              */
-            public static function getParser()
+            public static function getConfig($config = 'config')
             {
-                return 'Tika';
+                $settings = new \stdClass();
+                $settings->General = new \stdClass();
+                $settings->General->parser = 'Tika';
+                return $settings;
             }
 
             /**
@@ -90,7 +95,7 @@ class VuFindSitemapTest extends \PHPUnit\Framework\TestCase
              *
              * @return array
              */
-            protected static function getTikaData($url)
+            protected static function getTikaData(string $url): array
             {
                 return [
                     'title' => 'The Fake Title',

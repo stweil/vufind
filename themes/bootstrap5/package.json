@@ -13,6 +13,7 @@
     "@popperjs/core": "2.11.8",
     "autocomplete.js": "vufind-org/autocomplete.js#v2.1.10",
     "bootstrap": "5.3.8",
+    "bootstrap-icons": "^1.13.1",
     "chart.js": "^4.4.0",
     "jquery": "^3.7.1",
     "js-cookie": "^3.0.7",

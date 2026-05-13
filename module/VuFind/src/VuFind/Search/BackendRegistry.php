@@ -68,6 +68,7 @@ class BackendRegistry extends \VuFind\ServiceManager\AbstractPluginManager
         'EIT' => Factory\EITBackendFactory::class,
         'EPF' => Factory\EPFBackendFactory::class,
         'GVI' => Factory\GVIBackendFactory::class,
+        'KXPZ' => Factory\KXPZBackendFactory::class,
         'LibGuides' => Factory\LibGuidesBackendFactory::class,
         'LibGuidesAZ' => Factory\LibGuidesAZBackendFactory::class,
         'Pazpar2' => Factory\Pazpar2BackendFactory::class,

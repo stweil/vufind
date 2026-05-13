@@ -56,6 +56,7 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
         'emptyset' => \VuFind\Search\EmptySet\Params::class,
         'favorites' => \VuFind\Search\Favorites\Params::class,
         'gvi' => \VuFind\Search\GVI\Params::class,
+        'kxpz' => \VuFind\Search\KXPZ\Params::class,
         'libguides' => \VuFind\Search\LibGuides\Params::class,
         'libguidesaz' => \VuFind\Search\LibGuidesAZ\Params::class,
         'mixedlist' => \VuFind\Search\MixedList\Params::class,

@@ -33,6 +33,7 @@ use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
 use Laminas\ServiceManager\Exception\ServiceNotFoundException;
 use Psr\Container\ContainerExceptionInterface as ContainerException;
 use Psr\Container\ContainerInterface;
+use VuFind\View\Renderer\TemplateRendererInterface;
 
 /**
  * Factory for GetItemStatus AJAX handler.
@@ -46,7 +47,7 @@ use Psr\Container\ContainerInterface;
 class GetItemStatusesFactory implements \Laminas\ServiceManager\Factory\FactoryInterface
 {
     /**
-     * Create an object
+     * Create an object.
      *
      * @param ContainerInterface $container     Service manager
      * @param string             $requestedName Service being created
@@ -73,7 +74,7 @@ class GetItemStatusesFactory implements \Laminas\ServiceManager\Factory\FactoryI
             $container->get(\VuFind\Session\Settings::class),
             $container->get(\VuFind\Config\ConfigManagerInterface::class)->getConfigObject('config'),
             $container->get(\VuFind\ILS\Connection::class),
-            $container->get('ViewRenderer'),
+            $container->get(TemplateRendererInterface::class),
             $container->get(\VuFind\ILS\Logic\Holds::class),
             $container->get(\VuFind\ILS\Logic\AvailabilityStatusManager::class)
         );

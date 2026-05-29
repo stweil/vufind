@@ -29,8 +29,8 @@
 
 namespace VuFindTest\AjaxHandler;
 
-use Laminas\Mvc\Controller\Plugin\Params;
 use VuFind\AjaxHandler\SystemStatus;
+use VuFindTest\Unit\AjaxHandlerTestCase;
 
 /**
  * SystemStatus test class.
@@ -41,10 +41,10 @@ use VuFind\AjaxHandler\SystemStatus;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
-class SystemStatusTest extends \PHPUnit\Framework\TestCase
+class SystemStatusTest extends AjaxHandlerTestCase
 {
     /**
-     * Test the AJAX handler's "health check file" response
+     * Test the AJAX handler's "health check file" response.
      *
      * @return void
      */
@@ -55,12 +55,12 @@ class SystemStatusTest extends \PHPUnit\Framework\TestCase
         $config = new \VuFind\Config\Config(['System' => ['healthCheckFile' => __FILE__]]);
         $sessionService = $this->createMock(\VuFind\Db\Service\SessionServiceInterface::class);
         $handler = new SystemStatus($sessionManager, $resultsManager, $config, $sessionService);
-        $response = $handler->handleRequest($this->getMockRequestParams());
-        $this->assertEquals(['Health check file exists', 503], $response);
+        $response = $handler->handleRequest($this->getRequest());
+        $this->assertSame(['Health check file exists', 503], $response);
     }
 
     /**
-     * Test the AJAX handler's Solr failure response
+     * Test the AJAX handler's Solr failure response.
      *
      * @return void
      */
@@ -71,21 +71,21 @@ class SystemStatusTest extends \PHPUnit\Framework\TestCase
         $results = $this->createMock(\VuFind\Search\Solr\Results::class);
         $e = new \Exception('kaboom');
         $results->expects($this->once())->method('performAndProcessSearch')->willThrowException($e);
-        $resultsManager->expects($this->once())->method('get')->with($this->equalTo('Solr'))->willReturn($results);
+        $resultsManager->expects($this->once())->method('get')->with('Solr')->willReturn($results);
         $params = $this->createMock(\VuFind\Search\Solr\Params::class);
         $results->expects($this->once())->method('getParams')->willReturn($params);
         $config = new \VuFind\Config\Config([]);
         $sessionService = $this->createMock(\VuFind\Db\Service\SessionServiceInterface::class);
         $handler = new SystemStatus($sessionManager, $resultsManager, $config, $sessionService);
-        $response = $handler->handleRequest($this->getMockRequestParams());
-        $this->assertEquals(['Search index error: kaboom', 500], $response);
+        $response = $handler->handleRequest($this->getRequest());
+        $this->assertSame(['Search index error: kaboom', 500], $response);
         // Disable index check:
-        $response = $handler->handleRequest($this->getMockRequestParams(['index' => '0']));
-        $this->assertEquals([''], $response);
+        $response = $handler->handleRequest($this->getRequest(['index' => '0']));
+        $this->assertSame([''], $response);
     }
 
     /**
-     * Test the AJAX handler's database failure response
+     * Test the AJAX handler's database failure response.
      *
      * @return void
      */
@@ -95,7 +95,7 @@ class SystemStatusTest extends \PHPUnit\Framework\TestCase
         $resultsManager = $this->createMock(\VuFind\Search\Results\PluginManager::class);
         $results = $this->createMock(\VuFind\Search\Solr\Results::class);
         $results->expects($this->exactly(2))->method('performAndProcessSearch');
-        $resultsManager->expects($this->exactly(2))->method('get')->with($this->equalTo('Solr'))->willReturn($results);
+        $resultsManager->expects($this->exactly(2))->method('get')->with('Solr')->willReturn($results);
         $params = $this->createMock(\VuFind\Search\Solr\Params::class);
         $results->expects($this->exactly(2))->method('getParams')->willReturn($params);
         $config = new \VuFind\Config\Config([]);
@@ -103,15 +103,15 @@ class SystemStatusTest extends \PHPUnit\Framework\TestCase
         $e = new \Exception('kaboom');
         $sessionService->expects($this->once())->method('getSessionById')->willThrowException($e);
         $handler = new SystemStatus($sessionManager, $resultsManager, $config, $sessionService);
-        $response = $handler->handleRequest($this->getMockRequestParams());
-        $this->assertEquals(['Database error: kaboom', 500], $response);
+        $response = $handler->handleRequest($this->getRequest());
+        $this->assertSame(['Database error: kaboom', 500], $response);
         // Disable database check:
-        $response = $handler->handleRequest($this->getMockRequestParams(['database' => '0']));
-        $this->assertEquals([''], $response);
+        $response = $handler->handleRequest($this->getRequest(['database' => '0']));
+        $this->assertSame([''], $response);
     }
 
     /**
-     * Test the AJAX handler's successful response
+     * Test the AJAX handler's successful response.
      *
      * @return void
      */
@@ -122,34 +122,14 @@ class SystemStatusTest extends \PHPUnit\Framework\TestCase
         $resultsManager = $this->createMock(\VuFind\Search\Results\PluginManager::class);
         $results = $this->createMock(\VuFind\Search\Solr\Results::class);
         $results->expects($this->once())->method('performAndProcessSearch');
-        $resultsManager->expects($this->once())->method('get')->with($this->equalTo('Solr'))->willReturn($results);
+        $resultsManager->expects($this->once())->method('get')->with('Solr')->willReturn($results);
         $params = $this->createMock(\VuFind\Search\Solr\Params::class);
         $results->expects($this->once())->method('getParams')->willReturn($params);
         $config = new \VuFind\Config\Config([]);
         $sessionService = $this->createMock(\VuFind\Db\Service\SessionServiceInterface::class);
         $sessionService->expects($this->once())->method('getSessionById');
         $handler = new SystemStatus($sessionManager, $resultsManager, $config, $sessionService);
-        $response = $handler->handleRequest($this->getMockRequestParams());
-        $this->assertEquals([''], $response);
-    }
-
-    /**
-     * Get mock Params class for request params
-     *
-     * @param array $requestParams Parameters to return
-     *
-     * @return MockObject&Params
-     */
-    protected function getMockRequestParams(array $requestParams = []): Params
-    {
-        $params = $this->getMockBuilder(Params::class)->getMock();
-        $params->expects($this->any())
-            ->method('fromQuery')
-            ->willReturnCallback(
-                function ($param, $default = null) use ($requestParams) {
-                    return $requestParams[$param] ?? $default;
-                }
-            );
-        return $params;
+        $response = $handler->handleRequest($this->getRequest());
+        $this->assertSame([''], $response);
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Database service plugin manager
+ * Database service plugin manager.
  *
  * PHP version 8
  *
@@ -32,7 +32,7 @@ namespace VuFind\Db\Service;
 use VuFind\Auth\UserSessionPersistenceInterface;
 
 /**
- * Database service plugin manager
+ * Database service plugin manager.
  *
  * @category VuFind
  * @package  Database
@@ -57,6 +57,7 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
         ExternalSessionServiceInterface::class => ExternalSessionService::class,
         FeedbackServiceInterface::class => FeedbackService::class,
         LoginTokenServiceInterface::class => LoginTokenService::class,
+        NoticeServiceInterface::class => NoticeService::class,
         OaiResumptionServiceInterface::class => OaiResumptionService::class,
         PaymentServiceInterface::class => PaymentService::class,
         PaymentFeeServiceInterface::class => PaymentFeeService::class,
@@ -90,6 +91,7 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
         ExternalSessionService::class => AbstractDbServiceFactory::class,
         FeedbackService::class => AbstractDbServiceFactory::class,
         LoginTokenService::class => AbstractDbServiceFactory::class,
+        NoticeService::class => AbstractDbServiceFactory::class,
         OaiResumptionService::class => AbstractDbServiceFactory::class,
         PaymentService::class => AbstractDbServiceFactory::class,
         PaymentFeeService::class => AbstractDbServiceFactory::class,

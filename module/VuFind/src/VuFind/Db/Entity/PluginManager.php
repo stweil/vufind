@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Database entity plugin manager
+ * Database entity plugin manager.
  *
  * PHP version 8
  *
@@ -32,7 +32,7 @@ namespace VuFind\Db\Entity;
 use Laminas\ServiceManager\Factory\InvokableFactory;
 
 /**
- * Database entity plugin manager
+ * Database entity plugin manager.
  *
  * @category VuFind
  * @package  Database
@@ -57,6 +57,8 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
         ExternalSessionEntityInterface::class => ExternalSession::class,
         FeedbackEntityInterface::class => Feedback::class,
         LoginTokenEntityInterface::class => LoginToken::class,
+        NoticeEntityInterface::class => Notice::class,
+        NoticeTranslationEntityInterface::class => NoticeTranslation::class,
         OaiResumptionEntityInterface::class => OaiResumption::class,
         PaymentEntityInterface::class => Payment::class,
         PaymentFeeEntityInterface::class => PaymentFee::class,
@@ -89,6 +91,8 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
         ExternalSession::class => InvokableFactory::class,
         Feedback::class => InvokableFactory::class,
         LoginToken::class => InvokableFactory::class,
+        Notice::class => InvokableFactory::class,
+        NoticeTranslation::class => InvokableFactory::class,
         OaiResumption::class => InvokableFactory::class,
         Payment::class => InvokableFactory::class,
         PaymentFee::class => InvokableFactory::class,

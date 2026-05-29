@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VF Configuration Upgrade Tool
+ * VF Configuration Upgrade Tool.
  *
  * PHP version 8
  *
@@ -42,7 +42,7 @@ use function in_array;
 use function is_array;
 
 /**
- * Class to upgrade previous VuFind configurations to the current version
+ * Class to upgrade previous VuFind configurations to the current version.
  *
  * @category VuFind
  * @package  Config
@@ -67,21 +67,21 @@ class Upgrade implements LoggerAwareInterface
     ];
 
     /**
-     * Parsed old configurations
+     * Parsed old configurations.
      *
      * @var array
      */
     protected array $oldConfigs = [];
 
     /**
-     * Processed new configurations
+     * Processed new configurations.
      *
      * @var array
      */
     protected array $newConfigs = [];
 
     /**
-     * Warnings generated during upgrade process
+     * Warnings generated during upgrade process.
      *
      * @var array
      */
@@ -107,7 +107,7 @@ class Upgrade implements LoggerAwareInterface
     protected array $writtenConfig = [];
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param PathResolver           $pathResolver  Path Resolver
      * @param ConfigManagerInterface $configManager Config Manager
@@ -119,7 +119,7 @@ class Upgrade implements LoggerAwareInterface
     }
 
     /**
-     * Set write mode
+     * Set write mode.
      *
      * @param bool $writeMode Write mode (true for enabling and false for disabling writing)
      *
@@ -494,17 +494,6 @@ class Upgrade implements LoggerAwareInterface
                 . ' please review your config.ini.'
             );
         }
-        if (isset($newConfig['GoogleAnalytics']['apiKey'])) {
-            if (
-                !isset($newConfig['GoogleAnalytics']['universal'])
-                || !$newConfig['GoogleAnalytics']['universal']
-            ) {
-                $this->addWarning(
-                    'The [GoogleAnalytics] universal setting is off. See config.ini '
-                    . 'for important information on how to upgrade your Analytics.'
-                );
-            }
-        }
 
         // Upgrade CAPTCHA Options
         $legacySettingsMap = [
@@ -561,8 +550,15 @@ class Upgrade implements LoggerAwareInterface
                 = ['link' => $newConfig['Content']['GoogleOptions']];
         }
 
-        // Disable unused, obsolete setting:
+        // Disable unused, obsolete settings:
         unset($newConfig['Index']['local']);
+        if (isset($newConfig['Cache']['umask'])) {
+            unset($newConfig['Cache']['umask']);
+            $this->addWarning(
+                'The Cache umask setting never worked as intended and is no longer supported; '
+                . 'if you need a custom umask, please configure it at the operating system level.'
+            );
+        }
 
         // Warn the user if they are using an unsupported theme:
         $this->checkTheme('theme', 'sandal5');
@@ -643,6 +639,24 @@ class Upgrade implements LoggerAwareInterface
                 $newConfig['CacheConfigName_searchspecs']['disabled'] = true;
             }
             unset($this->newConfigs['searches']['Cache']);
+        }
+
+        // Update LDAP settings (replace deprecated host/port with uri):
+        $ldapHost = $newConfig['LDAP']['host'] ?? null;
+        $ldapPort = $newConfig['LDAP']['port'] ?? null;
+        if ($ldapHost || $ldapPort) {
+            if (!isset($newConfig['LDAP']['uri'])) {
+                if ($ldapHost && (str_starts_with($ldapHost, 'ldap://') || str_starts_with($ldapHost, 'ldaps://'))) {
+                    // Note that ldap_connect ignores the port setting when the first argument is a URI, so it is
+                    // intentional that we ignore the port setting this case.
+                    $newConfig['LDAP']['uri'] = $ldapHost;
+                } else {
+                    // If the host setting is not a URI, convert it into one:
+                    $newConfig['LDAP']['uri'] = 'ldap://' . ($ldapHost ?? 'localhost') . ':' . ($ldapPort ?? '389');
+                }
+            }
+            unset($newConfig['LDAP']['host']);
+            unset($newConfig['LDAP']['port']);
         }
 
         // Translate obsolete permission settings:
@@ -791,6 +805,15 @@ class Upgrade implements LoggerAwareInterface
                 }
             }
         }
+        if (($newConfig['NewItem']['method'] ?? null) === 'ils') {
+            $newConfig['NewItem']['method'] = 'disabled';
+            $this->addWarning(
+                'The searches.ini [NewItem] method setting of "ils" has been removed; '
+                . 'you should enable change tracking (if not already done) and switch to "solr". For now,'
+                . ' new item search has been disabled.'
+            );
+        }
+        unset($newConfig['NewItem']['result_pages']); // obsolete setting
 
         // save the configuration
         $this->saveModifiedConfig('searches');
@@ -831,7 +854,7 @@ class Upgrade implements LoggerAwareInterface
     }
 
     /**
-     * Upgrade EDS or EPF
+     * Upgrade EDS or EPF.
      *
      * @param string $configName Config name
      *

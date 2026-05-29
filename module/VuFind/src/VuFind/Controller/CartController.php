@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Book Bag / Bulk Action Controller
+ * Book Bag / Bulk Action Controller.
  *
  * PHP version 8
  *
@@ -36,13 +36,14 @@ use VuFind\Db\Service\UserListServiceInterface;
 use VuFind\Exception\Forbidden as ForbiddenException;
 use VuFind\Exception\Mail as MailException;
 use VuFind\Favorites\FavoritesService;
+use VuFind\Session\Helper\FollowupHelper;
 
 use function count;
 use function is_array;
 use function strlen;
 
 /**
- * Book Bag / Bulk Action Controller
+ * Book Bag / Bulk Action Controller.
  *
  * @category VuFind
  * @package  Controller
@@ -56,7 +57,7 @@ class CartController extends AbstractBase
     use ListItemSelectionTrait;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param ServiceLocatorInterface               $sm            Service manager
      * @param Container                             $session       Session container
@@ -102,7 +103,7 @@ class CartController extends AbstractBase
         }
         // Check if the user is in the midst of a login process; if not,
         // use the provided default.
-        return $this->followup()->retrieveAndClear('cartAction', $default);
+        return $this->getService(FollowupHelper::class)->retrieveAndClear('cartAction', $default);
     }
 
     /**
@@ -156,8 +157,9 @@ class CartController extends AbstractBase
         // If a user is coming directly to the cart, we should clear out any
         // existing context information to prevent weird, unexpected workflows
         // caused by unusual user behavior.
-        $this->followup()->retrieveAndClear('cartAction');
-        $this->followup()->retrieveAndClear('cartIds');
+        $followupHelper = $this->getService(FollowupHelper::class);
+        $followupHelper->retrieveAndClear('cartAction');
+        $followupHelper->retrieveAndClear('cartIds');
 
         $ids = $this->getSelectedIds();
 
@@ -179,7 +181,7 @@ class CartController extends AbstractBase
                     $msg = $this->translate('bookbag_full_msg') . '. '
                         . $addItems['notAdded'] . ' '
                         . $this->translate('items_already_in_bookbag') . '.';
-                    $this->flashMessenger()->addMessage($msg, 'info');
+                    $this->getFlashMessenger()->addInfoMessage($msg);
                 }
             }
         }
@@ -221,7 +223,7 @@ class CartController extends AbstractBase
         } elseif (strlen($this->params()->fromPost('export', '')) > 0) {
             $action = 'Export';
         } else {
-            $action = $this->followup()->retrieveAndClear('cartAction', null);
+            $action = $this->getService(FollowupHelper::class)->retrieveAndClear('cartAction', null);
             if (empty($action)) {
                 throw new \Exception('Unrecognized bulk action.');
             }
@@ -241,7 +243,7 @@ class CartController extends AbstractBase
 
         // Retrieve follow-up information if necessary:
         if (!is_array($ids) || empty($ids)) {
-            $ids = $this->followup()->retrieveAndClear('cartIds') ?? [];
+            $ids = $this->getService(FollowupHelper::class)->retrieveAndClear('cartIds') ?? [];
         }
         $actionLimit = $this->getBulkActionLimit('email');
         if (!is_array($ids) || empty($ids)) {
@@ -281,7 +283,7 @@ class CartController extends AbstractBase
         );
         $view->records = $this->getRecordLoader()->loadBatch($ids);
         // Set up Captcha
-        $view->useCaptcha = $this->captcha()->active('email');
+        $view->useCaptcha = $this->getCaptcha()->active('email');
 
         // Process form submission:
         if (!($submitDisabled ?? false) && $this->formWasSubmitted(useCaptcha: $view->useCaptcha)) {
@@ -310,7 +312,7 @@ class CartController extends AbstractBase
                 );
                 return $this->redirectToSource('success', 'bulk_email_success', true);
             } catch (MailException $e) {
-                $this->flashMessenger()->addMessage($e->getDisplayMessage(), 'error');
+                $this->getFlashMessenger()->addErrorMessage($e->getDisplayMessage());
             }
         }
 
@@ -421,8 +423,8 @@ class CartController extends AbstractBase
 
         // No legal export options?  Display a warning:
         if (empty($view->exportOptions)) {
-            $this->flashMessenger()
-                ->addMessage('bulk_export_not_supported', 'error');
+            $this->getFlashMessenger()
+                ->addErrorMessage('bulk_export_not_supported');
         }
         return $view;
     }
@@ -483,7 +485,7 @@ class CartController extends AbstractBase
         // need to display a "no records" error message):
         $ids = $this->getSelectedIds();
         if (!is_array($ids) || empty($ids)) {
-            $ids = $this->followup()->retrieveAndClear('cartIds') ?? [];
+            $ids = $this->getService(FollowupHelper::class)->retrieveAndClear('cartIds') ?? [];
         }
         $actionLimit = $this->getBulkActionLimit('saveCart');
         if (!is_array($ids) || empty($ids)) {
@@ -537,7 +539,7 @@ class CartController extends AbstractBase
                 . '<a href="' . $listUrl . '" class="gotolist">'
                 . $this->translate('go_to_list') . '</a>.',
             ];
-            $this->flashMessenger()->addMessage($message, 'success');
+            $this->getFlashMessenger()->addSuccessMessage($message);
             return $this->redirect()->toUrl($listUrl);
         }
 

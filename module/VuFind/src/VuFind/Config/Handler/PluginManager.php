@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Config handler plugin manager
+ * Config handler plugin manager.
  *
  * PHP version 8
  *
@@ -32,7 +32,7 @@ namespace VuFind\Config\Handler;
 use VuFind\Config\Location\ConfigLocationInterface;
 
 /**
- * Config handler plugin manager
+ * Config handler plugin manager.
  *
  * @category VuFind
  * @package  Config_Handlers
@@ -48,7 +48,10 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @var array
      */
     protected $aliases = [
+        'file' => GenericFile::class,
+        'env_var' => Env::class,
         'ini' => Ini::class,
+        'yaml' => Yaml::class,
     ];
 
     /**
@@ -58,8 +61,10 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      */
     protected $factories = [
         Dir::class => DirFactory::class,
+        Env::class => DefaultHandlerFactory::class,
         GenericFile::class => DefaultHandlerFactory::class,
         Ini::class => DefaultHandlerFactory::class,
+        Yaml::class => DefaultHandlerFactory::class,
     ];
 
     /**

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Configuration manager
+ * Configuration manager.
  *
  * PHP version 8
  *
@@ -42,7 +42,7 @@ use function is_array;
 use function strval;
 
 /**
- * Configuration manager
+ * Configuration manager.
  *
  * @category VuFind
  * @package  Config
@@ -61,7 +61,7 @@ class ConfigManager implements ConfigManagerInterface
     protected StorageInterface $cache;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param ConfigLoader         $configLoader         Config loader
      * @param HandlerPluginManager $configHandlerManager Config handler plugin manager
@@ -92,8 +92,11 @@ class ConfigManager implements ConfigManagerInterface
         if (!$configLocation) {
             return [];
         }
-        $config = $this->loadConfigFromLocation($configLocation, forceReload: $forceReload);
-        return $config;
+        return $this->loadConfigFromLocation(
+            $configLocation,
+            forceReload: $forceReload,
+            useLocalConfig: $useLocalConfig
+        );
     }
 
     /**
@@ -152,13 +155,15 @@ class ConfigManager implements ConfigManagerInterface
      * @param ConfigLocationInterface $configLocation     Config location
      * @param bool                    $handleParentConfig If parent configuration should be handled
      * @param bool                    $forceReload        If cache should be ignored
+     * @param bool                    $useLocalConfig     Use local configuration if available
      *
      * @return mixed
      */
     public function loadConfigFromLocation(
         ConfigLocationInterface $configLocation,
         bool $handleParentConfig = true,
-        bool $forceReload = false
+        bool $forceReload = false,
+        bool $useLocalConfig = true,
     ): mixed {
         $cacheConfig = $this->cacheManager->getConfig();
         $cacheOptions = array_merge(
@@ -190,7 +195,12 @@ class ConfigManager implements ConfigManagerInterface
 
         // load configuration if it was not cached yet.
         if ($config === null) {
-            $config = $this->configLoader->loadConfigFromLocation($configLocation, $handleParentConfig, $forceReload);
+            $config = $this->configLoader->loadConfigFromLocation(
+                $configLocation,
+                $handleParentConfig,
+                $forceReload,
+                $useLocalConfig
+            );
         }
 
         if ($useAdvancedCache) {

@@ -232,7 +232,7 @@ class HeaderBar extends AbstractMenu
      */
     public function checkColorSchemeOptions(): bool
     {
-        // // TODO actual lookup with something like 
+        // // TODO actual lookup with something like
         // return count($this->layout->colorSchemeOptions ?? []) > 1;
 
         $currentTheme = 'bootstrap5';

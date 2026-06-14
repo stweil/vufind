@@ -7,6 +7,17 @@
     color: $near-white;
   }
 
+  /* --- Form elements --- */
+  .form-select,
+  select {
+    color: $near-white;
+
+    option {
+      color: $near-white;
+      background-color: #263238;
+    }
+  }
+
   /* -- Layout --- */
   .main .container {
     background-color: var(--bs-body-bg);

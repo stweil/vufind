@@ -65,6 +65,6 @@ class ResultsAction extends AbstractGVISearchAndResultsAction
                 'Home'
             );
         }
-        return $this->renderSearchResults();
+        return $this->renderSearchResults($request, $response);
     }
 }

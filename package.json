@@ -37,7 +37,7 @@
     "all-iso-language-codes": "^1.0.13",
     "eslint": "^10.0.0",
     "eslint-plugin-jsdoc": "^62.0.0",
-    "eslint-plugin-no-jquery": "^3.0.0",
+    "eslint-plugin-no-jquery": "^5.0.0",
     "globals": "^17.7.0",
     "grunt-contrib-watch": "^1.1.0"
   }

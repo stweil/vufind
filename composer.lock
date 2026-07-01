@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c2ed028f55bb80c246c30e0218ae025c",
+    "content-hash": "4c066dfe0d6c4336ddca30c294968370",
     "packages": [
         {
             "name": "ahand/mobileesp",
@@ -4823,23 +4823,23 @@
         },
         {
             "name": "laminas/laminas-recaptcha",
-            "version": "3.8.0",
+            "version": "3.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laminas/laminas-recaptcha.git",
-                "reference": "ab4efc2768b1d9e90df9a49301158ec288cd48dd"
+                "reference": "d8c710d6ed90f245db5ee85bd024279b35476f3f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laminas/laminas-recaptcha/zipball/ab4efc2768b1d9e90df9a49301158ec288cd48dd",
-                "reference": "ab4efc2768b1d9e90df9a49301158ec288cd48dd",
+                "url": "https://api.github.com/repos/laminas/laminas-recaptcha/zipball/d8c710d6ed90f245db5ee85bd024279b35476f3f",
+                "reference": "d8c710d6ed90f245db5ee85bd024279b35476f3f",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "laminas/laminas-http": "^2.15",
                 "laminas/laminas-stdlib": "^3.10.1",
-                "php": "~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0"
+                "php": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0"
             },
             "conflict": {
                 "zendframework/zendservice-recaptcha": "*"
@@ -4848,9 +4848,9 @@
                 "laminas/laminas-coding-standard": "~2.5.0",
                 "laminas/laminas-config": "^3.9",
                 "laminas/laminas-validator": "^2.30.1",
-                "phpunit/phpunit": "^9.6.15",
+                "phpunit/phpunit": "^11.5",
                 "psalm/plugin-phpunit": "^0.19.0",
-                "vimeo/psalm": "^5.19"
+                "vimeo/psalm": "^6.13"
             },
             "suggest": {
                 "laminas/laminas-validator": "~2.0, if using ReCaptcha's Mailhide API"
@@ -4885,7 +4885,7 @@
                     "type": "community_bridge"
                 }
             ],
-            "time": "2024-10-24T08:57:20+00:00"
+            "time": "2025-12-05T10:07:10+00:00"
         },
         {
             "name": "laminas/laminas-router",

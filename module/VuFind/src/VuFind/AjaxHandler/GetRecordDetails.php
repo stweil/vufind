@@ -86,10 +86,12 @@ class GetRecordDetails extends AbstractBase
             trim(strtolower($this->getQueryParam($request, 'type')))
         );
 
+        $requestedDefaultTab = $this->config['Site']['defaultRecordTab'] ?? 'Holdings';
+
         $details = $this->tabManager->getTabDetailsForRecord(
             $driver,
             Psr7ServerRequest::toLaminas($request),
-            $this->config['Site']['defaultRecordTab'] ?? 'Information'
+            $requestedDefaultTab
         );
 
         $html = $this->renderer->renderTemplateAsString(
@@ -97,6 +99,7 @@ class GetRecordDetails extends AbstractBase
             'record/ajaxview-' . $viewtype . '.phtml',
             [
                 'defaultTab' => $details['default'],
+                'requestedDefaultTab' => $requestedDefaultTab,
                 'driver' => $driver,
                 'tabs' => $details['tabs'],
                 'backgroundTabs' => $this->tabManager

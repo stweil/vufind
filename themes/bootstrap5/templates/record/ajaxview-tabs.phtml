@@ -46,12 +46,19 @@
   }
   $filteredTabs = array_filter($this->tabs, fn ($obj) => $obj->supportsSearchResultEmbedding());
   $tabs = array_merge($tabs, $this->recordTabs()->getTabs($this->driver, $filteredTabs, $this->defaultTab));
+
+  $activeTab = (($this->requestedDefaultTab ?? '') === 'Information' && isset($tabs['information']))
+    ? 'information'
+    : $this->defaultTab;
+  if (!isset($tabs[$activeTab]) && isset($tabs['information'])) {
+    $activeTab = 'information';
+  }
 ?>
 <?=$this->component(
     'tabs',
     [
       'tabs' => $tabs,
-      'activeTab' => $this->defaultTab,
+      'activeTab' => $activeTab,
       'idSuffix' => $idSuffix,
       'tabNavClasses' => ['list-tabs'],
       'tabPaneClasses' => ['list-tab-content'],

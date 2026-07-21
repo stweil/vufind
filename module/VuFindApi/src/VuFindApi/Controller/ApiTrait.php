@@ -34,6 +34,7 @@ use Laminas\Http\Exception\InvalidArgumentException;
 use Laminas\Http\Header\ContentType;
 use Laminas\Mvc\Exception\DomainException;
 use VuFind\DeveloperSettings\DeveloperSettingsService;
+use VuFind\DeveloperSettings\DeveloperSettingsStatus;
 
 /**
  * Additional functionality for API controllers.
@@ -231,6 +232,43 @@ trait ApiTrait
         if ($field = $settings['header_field'] ?? null) {
             $this->apiKeyHeaderField = $field;
         }
+    }
+
+    /**
+     * Check API access: a valid API key grants access from any IP, otherwise
+     * fall back to the permission check.
+     *
+     * @param string $permission Permission to check when no API key is provided
+     *
+     * @return \Laminas\Http\Response|false False if access is granted, response if denied
+     * @throws \Exception
+     */
+    protected function checkApiAccess(string $permission): \Laminas\Http\Response|false
+    {
+        if (!$this->developerSettingsService) {
+            throw new \Exception('ApiTrait: Developer settings service not initialized');
+        }
+
+        $token = $this->getHeader($this->apiKeyHeaderField);
+        $apiKeyMode = $this->developerSettingsService->getApiKeyMode();
+
+        // Determine if API key is required:
+        // - Enforced mode: always required
+        // - Optional mode: required only if a token is provided
+        $apiKeyRequired = ($apiKeyMode === DeveloperSettingsStatus::ENFORCED)
+            || ($apiKeyMode === DeveloperSettingsStatus::OPTIONAL && $token !== null);
+
+        if ($apiKeyRequired) {
+            // API key is required; validate it
+            if (!$this->checkRequestForApiKey()) {
+                return $this->outputMissingAPIKey();
+            }
+            // Valid API key grants access, skip permission check
+            return false;
+        }
+
+        // No API key required; check permissions normally
+        return $this->isAccessDenied($permission);
     }
 
     /**

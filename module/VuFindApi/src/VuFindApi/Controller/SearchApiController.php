@@ -267,15 +267,11 @@ class SearchApiController extends \VuFind\Controller\AbstractSearch implements
 
         $this->determineOutputMode();
 
-        if ($result = $this->isAccessDenied($this->recordAccessPermission)) {
+        if ($result = $this->checkApiAccess($this->recordAccessPermission)) {
             return $result;
         }
 
         $request = $this->getAllRequestParams();
-
-        if (!$this->checkRequestForApiKey()) {
-            return $this->outputMissingAPIKey();
-        }
         if (!isset($request['id'])) {
             return $this->output([], self::STATUS_ERROR, 400, 'Missing id');
         }
@@ -326,11 +322,8 @@ class SearchApiController extends \VuFind\Controller\AbstractSearch implements
 
         $this->determineOutputMode();
 
-        if ($result = $this->isAccessDenied($this->searchAccessPermission)) {
+        if ($result = $this->checkApiAccess($this->searchAccessPermission)) {
             return $result;
-        }
-        if (!$this->checkRequestForApiKey()) {
-            return $this->outputMissingAPIKey();
         }
         // Send both GET and POST variables to search class:
         $request = $this->getAllRequestParams();

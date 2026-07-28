@@ -1268,7 +1268,7 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
         $status = $this->__call('getStatus', [$id]);
 
         // parse availability and status to AvailabilityStatus object
-        return array_map($this->getStatusParser(), $status);
+        return is_array($status) ? array_map($this->getStatusParser(), $status) : [];
     }
 
     /**
@@ -1284,10 +1284,12 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
     {
         $statuses = $this->__call('getStatuses', [$ids]);
 
-        return array_map(function ($status) {
-            // parse availability and status to AvailabilityStatus object
-            return array_map($this->getStatusParser(), $status);
-        }, $statuses);
+        return is_array($statuses)
+            ? array_map(function ($status) {
+                // parse availability and status to AvailabilityStatus object
+                return array_map($this->getStatusParser(), $status);
+            }, $statuses)
+            : [];
     }
 
     /**

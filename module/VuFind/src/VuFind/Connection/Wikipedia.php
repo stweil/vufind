@@ -114,7 +114,11 @@ class Wikipedia implements TranslatorAwareInterface
 
         $response = $this->client->setUri($uri)->setMethod('GET')->send();
         if ($response->isSuccess()) {
-            return $this->parseWikipedia(unserialize($response->getBody()));
+            $body = unserialize($response->getBody());
+            if (!is_array($body)) {
+                return null;
+            }
+            return $this->parseWikipedia($body);
         }
         return null;
     }
@@ -195,6 +199,9 @@ class Wikipedia implements TranslatorAwareInterface
      */
     protected function extractInfoBox($body)
     {
+        if (!isset($body['*'])) {
+            return null;
+        }
         // We are looking for the infobox inside "{{...}}"
         //   It may contain nested blocks too, thus the recursion
         preg_match_all('/\{([^{}]++|(?R))*\}/s', $body['*'], $matches);
@@ -225,6 +232,9 @@ class Wikipedia implements TranslatorAwareInterface
     protected function extractImageFromBody($body)
     {
         $imageName = $imageCaption = null;
+        if (!isset($body['*'])) {
+            return [$imageName, $imageCaption];
+        }
         // The tag marking image files will vary depending on API language:
         $tags = [
             'Archivo', 'Bestand', 'Datei', 'Ficheiro', 'Fichier', 'File', 'Image',
@@ -362,6 +372,10 @@ class Wikipedia implements TranslatorAwareInterface
     {
         $name = $redirectTo = $page = null;
 
+        if (!isset($body['query']['pages']) || !is_array($body['query']['pages'])) {
+            return [$name, $redirectTo, $page];
+        }
+
         // Loop through the pages and find the first that isn't a redirect:
         foreach ($body['query']['pages'] as $page) {
             $name = $page['title'];
@@ -397,6 +411,9 @@ class Wikipedia implements TranslatorAwareInterface
      */
     protected function extractBodyText($body, $infoboxStr)
     {
+        if (!isset($body['*'])) {
+            return '';
+        }
         if ($infoboxStr) {
             // Start of the infobox
             $start  = strpos($body['*'], $infoboxStr);

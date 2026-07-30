@@ -46,6 +46,6 @@
     "eslint": "^10.7.0",
     "eslint-plugin-jsdoc": "^63.0.13",
     "eslint-plugin-no-jquery": "^6.0.0",
-    "globals": "^17.7.0"
+    "globals": "^17.8.0"
   }
 }

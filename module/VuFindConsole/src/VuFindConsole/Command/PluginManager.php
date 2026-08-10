@@ -73,6 +73,7 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
         'scheduledsearch/notify' => ScheduledSearch\NotifyCommand::class,
         'upgrade/config' => Upgrade\ConfigCommand::class,
         'upgrade/database' => Upgrade\DatabaseCommand::class,
+        'util/alma_collections' => Util\AlmaCollectionsCommand::class,
         'util/browscap' => Util\BrowscapCommand::class,
         'util/cleanuprecordcache' => Util\CleanUpRecordCacheCommand::class,
         'util/cleanup_record_cache' => Util\CleanUpRecordCacheCommand::class,

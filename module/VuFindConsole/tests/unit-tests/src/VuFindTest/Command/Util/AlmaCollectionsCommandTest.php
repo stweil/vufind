@@ -126,6 +126,12 @@ class AlmaCollectionsCommandTest extends TestCase
         );
         $this->assertArrayNotHasKey('c', $parent);
 
+        // The collection description is also stored in a MARC 520 summary field.
+        $this->assertSame(
+            ['a' => 'Test collection'],
+            $this->getSummaryField(file_get_contents($parentFile))
+        );
+
         // Sub-collection: parent and top IDs point to the parent collection.
         $child = $this->getHierarchyField(file_get_contents($childFile));
         $this->assertSame(
@@ -133,6 +139,10 @@ class AlmaCollectionsCommandTest extends TestCase
              'd' => '9919814834502561', 'e' => 'Sub-Collection{{{_ID_}}}9919814836202561',
              'f' => 'Child collection'],
             $child
+        );
+        $this->assertSame(
+            ['a' => 'Child collection'],
+            $this->getSummaryField(file_get_contents($childFile))
         );
     }
 
@@ -165,7 +175,8 @@ class AlmaCollectionsCommandTest extends TestCase
     }
 
     /**
-     * Test that a collection without a description gets no 996f subfield.
+     * Test that a collection without a description gets no 996f subfield
+     * and no 520 field.
      *
      * @return void
      */
@@ -185,10 +196,10 @@ class AlmaCollectionsCommandTest extends TestCase
         $commandTester = new CommandTester($this->getCommand($httpService));
         $commandTester->execute(['--output' => $this->outputDir]);
         $this->assertSame(0, $commandTester->getStatusCode());
-        $field = $this->getHierarchyField(
-            file_get_contents($this->outputDir . '/collection-9919814834502561.xml')
-        );
+        $record = file_get_contents($this->outputDir . '/collection-9919814834502561.xml');
+        $field = $this->getHierarchyField($record);
         $this->assertArrayNotHasKey('f', $field);
+        $this->assertSame([], $this->getSummaryField($record));
     }
 
     /**
@@ -271,6 +282,30 @@ class AlmaCollectionsCommandTest extends TestCase
             ],
             $httpService
         );
+    }
+
+    /**
+     * Extract the summary values of the MARC 520 field from a record.
+     *
+     * @param string $xml MARCXML record
+     *
+     * @return array
+     */
+    protected function getSummaryField(string $xml): array
+    {
+        $dom = new DOMDocument();
+        $this->assertTrue($dom->loadXML($xml));
+        $xpath = new DOMXPath($dom);
+        $nodes = $xpath->query('//datafield[@tag="520"]');
+        $this->assertNotFalse($nodes);
+        if (0 === $nodes->length) {
+            return [];
+        }
+        $result = [];
+        foreach ($nodes->item(0)->getElementsByTagName('subfield') as $subfield) {
+            $result[$subfield->getAttribute('code')] = $subfield->textContent;
+        }
+        return $result;
     }
 
     /**

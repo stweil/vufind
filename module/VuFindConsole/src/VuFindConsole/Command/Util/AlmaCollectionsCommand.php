@@ -124,8 +124,9 @@ class AlmaCollectionsCommand extends Command
             '',
             'Each collection is written to a file collection-<mms_id>.xml together with the',
             'records of all member titles (GET /bibs/collections/{pid}/bibs). The records are',
-            'augmented with a local MARC 996 field containing the VuFind hierarchy fields and',
-            'the collection description; see the mappings in import/marc.properties.',
+            'augmented with a MARC 520 summary field containing the collection description and',
+            'a local MARC 996 field containing the VuFind hierarchy fields; see the mappings in',
+            'import/marc.properties.',
             '',
             'To display the member records on the collection page, enable the Collections',
             'module (collections = true in the [Collections] section of config.ini) and add',
@@ -153,8 +154,9 @@ class AlmaCollectionsCommand extends Command
                 InputOption::VALUE_REQUIRED,
                 'Write the MARCXML record of each collection to the given directory instead of '
                 . 'displaying the overview (default: local/harvest/Collections). The records are '
-                . 'augmented with a local MARC 996 field containing the VuFind hierarchy fields '
-                . 'and the collection description; see the mappings in import/marc.properties.'
+                . 'augmented with a MARC 520 summary field containing the collection description '
+                . 'and a local MARC 996 field containing the VuFind hierarchy fields; see the '
+                . 'mappings in import/marc.properties.'
             );
     }
 
@@ -444,6 +446,24 @@ class AlmaCollectionsCommand extends Command
     }
 
     /**
+     * Add a MARC 520 summary field with the collection description to a record.
+     *
+     * @param DOMNode $record      MARCXML record element
+     * @param string  $description Description of the collection
+     *
+     * @return void
+     */
+    protected function addSummaryField(DOMNode $record, string $description): void
+    {
+        $datafield = $record->ownerDocument->createElement('datafield');
+        $datafield->setAttribute('tag', '520');
+        $datafield->setAttribute('ind1', ' ');
+        $datafield->setAttribute('ind2', ' ');
+        $this->addSubfield($datafield, 'a', $description);
+        $record->appendChild($datafield);
+    }
+
+    /**
      * Add a MARC 996 data field with the VuFind hierarchy fields to a record.
      *
      * @param DOMNode $record      MARCXML record element
@@ -461,6 +481,10 @@ class AlmaCollectionsCommand extends Command
         string $description,
         array $ancestors
     ): void {
+        if ('' !== $description) {
+            $this->addSummaryField($record, $description);
+        }
+
         $isTop = empty($ancestors);
         $topId = $isTop ? $mmsId : $ancestors[0];
         $parentId = $isTop ? null : end($ancestors);

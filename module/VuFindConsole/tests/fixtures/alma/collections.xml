@@ -1,0 +1,17 @@
+<collections total_record_count="2">
+  <collection>
+    <pid>81368013690002561</pid>
+    <mms_id>9919814834502561</mms_id>
+    <name>Nachhaltigkeit 2023-2024</name>
+    <description>Test collection</description>
+    <collections>
+      <collection>
+        <pid>81368014540002561</pid>
+        <parent_pid link="https://api-eu.hosted.exlibrisgroup.com/almaws/v1/bibs/collections/81368013690002561">81368013690002561</parent_pid>
+        <mms_id>9919814836202561</mms_id>
+        <name>Sub-Collection</name>
+        <description>Child collection</description>
+      </collection>
+    </collections>
+  </collection>
+</collections>

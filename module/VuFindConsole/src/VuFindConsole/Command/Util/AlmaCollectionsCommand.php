@@ -29,6 +29,9 @@
 
 namespace VuFindConsole\Command\Util;
 
+use DOMDocument;
+use DOMNode;
+use DOMXPath;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
@@ -39,12 +42,16 @@ use VuFindHttp\HttpService;
 
 use function array_filter;
 use function count;
+use function end;
+use function file_put_contents;
 use function implode;
 use function is_array;
+use function is_dir;
 use function json_decode;
 use function json_encode;
 use function mb_strlen;
 use function mb_substr;
+use function mkdir;
 use function rtrim;
 use function simplexml_load_string;
 use function str_repeat;
@@ -116,6 +123,22 @@ class AlmaCollectionsCommand extends Command
                 InputOption::VALUE_REQUIRED,
                 'Number of collection tree levels to retrieve (default: 1, i.e. only top-level '
                 . 'collections; 2 includes immediate sub-collections)'
+            )
+            ->addOption(
+                'pid',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'PID of a single collection to display or download instead of all collections. '
+                . 'A selected sub-collection is treated as the top of its own hierarchy.'
+            )
+            ->addOption(
+                'output',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Write the MARCXML record of each collection to the given directory instead of '
+                . 'displaying the overview (default: local/harvest/Collections). The records are '
+                . 'augmented with a local MARC 996 field containing the VuFind hierarchy fields; '
+                . 'see the mappings in import/marc.properties.'
             );
     }
 
@@ -145,28 +168,8 @@ class AlmaCollectionsCommand extends Command
         }
         $timeout = (int)($this->almaConfig['Catalog']['http_timeout'] ?? 30);
 
-        $output->writeln(
-            'Fetching collections from Alma...',
-            OutputInterface::VERBOSITY_VERBOSE
-        );
-        try {
-            $response = $this->httpService
-                ->get(rtrim($apiBaseUrl, '/') . '/bibs/collections', $params, $timeout);
-        } catch (\VuFindHttp\Exception\RuntimeException $e) {
-            $output->writeln('Error accessing the Alma API: ' . $e->getMessage());
-            return self::FAILURE;
-        }
-        $body = (string)$response->getBody();
-        $output->writeln(
-            'Alma API response: ' . $body,
-            OutputInterface::VERBOSITY_DEBUG
-        );
-        if (!$response->isSuccess()) {
-            $errorMessage = $this->extractError($body);
-            $output->writeln(
-                'Error accessing the Alma API: HTTP ' . $response->getStatusCode()
-                . ($errorMessage ? ' (' . $errorMessage . ')' : '')
-            );
+        $body = $this->request('bibs/collections', $params, $timeout, $output);
+        if (null === $body) {
             return self::FAILURE;
         }
         $data = $this->parseResponse($body);
@@ -179,13 +182,301 @@ class AlmaCollectionsCommand extends Command
             return self::FAILURE;
         }
 
+        $items = $this->parseCollectionList($data)['items'];
+        if (null !== ($pid = $input->getOption('pid'))) {
+            $found = $this->findCollection($items, $pid);
+            if (null === $found) {
+                $output->writeln('No collection with PID ' . $pid . ' found.');
+                return self::FAILURE;
+            }
+            $items = [$found];
+        }
+
+        if (null !== ($outputDir = $input->getOption('output'))) {
+            return $this->downloadCollections(
+                $items,
+                [],
+                $outputDir,
+                $apiKey,
+                $timeout,
+                $output
+            );
+        }
+
         $rows = [];
-        foreach ($this->parseCollectionList($data)['items'] as $item) {
+        foreach ($items as $item) {
             $this->flattenCollection($item, 0, $rows);
         }
         $this->printOverview($rows, $output);
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Perform a GET request against the Alma API.
+     *
+     * @param string          $path    API path (relative to the base URL)
+     * @param array           $params  Query string parameters
+     * @param int             $timeout Timeout in seconds
+     * @param OutputInterface $output  Output object
+     *
+     * @return ?string Response body, or null on error
+     */
+    protected function request(
+        string $path,
+        array $params,
+        int $timeout,
+        OutputInterface $output
+    ): ?string {
+        $apiBaseUrl = $this->almaConfig['Catalog']['apiBaseUrl'] ?? null;
+        $output->writeln(
+            'Fetching ' . $path . ' from Alma...',
+            OutputInterface::VERBOSITY_VERBOSE
+        );
+        try {
+            $response = $this->httpService
+                ->get(rtrim($apiBaseUrl, '/') . '/' . $path, $params, $timeout);
+        } catch (\VuFindHttp\Exception\RuntimeException $e) {
+            $output->writeln('Error accessing the Alma API: ' . $e->getMessage());
+            return null;
+        }
+        $body = (string)$response->getBody();
+        $output->writeln(
+            'Alma API response: ' . $body,
+            OutputInterface::VERBOSITY_DEBUG
+        );
+        if (!$response->isSuccess()) {
+            $errorMessage = $this->extractError($body);
+            $output->writeln(
+                'Error accessing the Alma API: HTTP ' . $response->getStatusCode()
+                . ($errorMessage ? ' (' . $errorMessage . ')' : '')
+            );
+            return null;
+        }
+        return $body;
+    }
+
+    /**
+     * Find a collection by PID in a collection tree.
+     *
+     * @param array  $items Collection list
+     * @param string $pid   PID to search for
+     *
+     * @return ?array The collection, or null if not found
+     */
+    protected function findCollection(array $items, string $pid): ?array
+    {
+        foreach ($items as $item) {
+            if ($this->elementValue($item['pid'] ?? null) === $pid) {
+                return $item;
+            }
+            $found = $this->findCollection(
+                $this->getElementList($item['collections'] ?? [], 'collection'),
+                $pid
+            );
+            if (null !== $found) {
+                return $found;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Download the MARCXML records of the given collections.
+     *
+     * @param array           $items     Collection list
+     * @param array           $ancestors MMS IDs of the parent collections
+     * @param string          $outputDir Output directory
+     * @param string          $apiKey    Alma API key
+     * @param int             $timeout   Timeout in seconds
+     * @param OutputInterface $output    Output object
+     *
+     * @return int Command result code
+     */
+    protected function downloadCollections(
+        array $items,
+        array $ancestors,
+        string $outputDir,
+        string $apiKey,
+        int $timeout,
+        OutputInterface $output
+    ): int {
+        if (empty($items)) {
+            $output->writeln('No collections found.');
+            return self::SUCCESS;
+        }
+        if (!is_dir($outputDir) && !mkdir($outputDir, 0777, true) && !is_dir($outputDir)) {
+            $output->writeln('Error creating output directory: ' . $outputDir);
+            return self::FAILURE;
+        }
+        $written = 0;
+        $skipped = 0;
+        $failed = 0;
+        foreach ($items as $item) {
+            $result = $this->downloadCollection(
+                $item,
+                $ancestors,
+                $outputDir,
+                $apiKey,
+                $timeout,
+                $output
+            );
+            $written += $result['written'];
+            $skipped += $result['skipped'];
+            $failed += $result['failed'];
+        }
+        $message = $written . ' collection record(s) written to ' . $outputDir . '.';
+        if ($skipped > 0) {
+            $message .= ' ' . $skipped . ' skipped.';
+        }
+        if ($failed > 0) {
+            $message .= ' ' . $failed . ' failed.';
+        }
+        $output->writeln($message);
+        return $failed > 0 ? self::FAILURE : self::SUCCESS;
+    }
+
+    /**
+     * Download the MARCXML record of a single collection and its sub-collections.
+     *
+     * @param array           $collection Collection data
+     * @param array           $ancestors  MMS IDs of the parent collections
+     * @param string          $outputDir  Output directory
+     * @param string          $apiKey     Alma API key
+     * @param int             $timeout    Timeout in seconds
+     * @param OutputInterface $output     Output object
+     *
+     * @return array{written: int, skipped: int, failed: int} Counts
+     */
+    protected function downloadCollection(
+        array $collection,
+        array $ancestors,
+        string $outputDir,
+        string $apiKey,
+        int $timeout,
+        OutputInterface $output
+    ): array {
+        $result = ['written' => 0, 'skipped' => 0, 'failed' => 0];
+        $mmsId = $this->elementValue($collection['mms_id'] ?? null);
+        $name = $this->elementValue($collection['name'] ?? null);
+        if ('' === $mmsId) {
+            $output->writeln(
+                'Skipping collection without MMS ID (PID '
+                . $this->elementValue($collection['pid'] ?? null) . ').'
+            );
+            $result['skipped']++;
+        } else {
+            $body = $this->request(
+                'bibs/' . $mmsId,
+                ['apikey' => $apiKey, 'expand' => 'marcxml'],
+                $timeout,
+                $output
+            );
+            if (null === $body) {
+                $result['failed']++;
+            } elseif (null === ($record = $this->extractRecord($body))) {
+                $output->writeln('Error parsing the MARCXML record of MMS ID ' . $mmsId . '.');
+                $result['failed']++;
+            } else {
+                $this->addHierarchyField($record, $mmsId, $name, $ancestors);
+                $filename = $outputDir . '/collection-' . $mmsId . '.xml';
+                if (false === file_put_contents($filename, $record->ownerDocument->saveXML($record))) {
+                    $output->writeln('Error writing file: ' . $filename);
+                    $result['failed']++;
+                } else {
+                    $result['written']++;
+                }
+            }
+        }
+        $childAncestors = '' === $mmsId ? $ancestors : $ancestors + [$mmsId];
+        foreach ($this->getElementList($collection['collections'] ?? [], 'collection') as $child) {
+            $childResult = $this->downloadCollection(
+                $child,
+                $childAncestors,
+                $outputDir,
+                $apiKey,
+                $timeout,
+                $output
+            );
+            $result['written'] += $childResult['written'];
+            $result['skipped'] += $childResult['skipped'];
+            $result['failed'] += $childResult['failed'];
+        }
+        return $result;
+    }
+
+    /**
+     * Extract the MARCXML record element from a bib response.
+     *
+     * @param string $body Response body
+     *
+     * @return ?DOMNode The record element, or null if not found
+     */
+    protected function extractRecord(string $body): ?DOMNode
+    {
+        $dom = new DOMDocument();
+        if (!@$dom->loadXML($body)) {
+            return null;
+        }
+        $xpath = new DOMXPath($dom);
+        $nodes = $xpath->query('//*[local-name() = "record"]');
+        if (false === $nodes || 0 === $nodes->length) {
+            return null;
+        }
+        return $nodes->item(0);
+    }
+
+    /**
+     * Add a MARC 996 data field with the VuFind hierarchy fields to a record.
+     *
+     * @param DOMNode $record    MARCXML record element
+     * @param string  $mmsId     MMS ID of the collection
+     * @param string  $name      Name of the collection
+     * @param array   $ancestors MMS IDs of the parent collections
+     *
+     * @return void
+     */
+    protected function addHierarchyField(
+        DOMNode $record,
+        string $mmsId,
+        string $name,
+        array $ancestors
+    ): void {
+        $isTop = empty($ancestors);
+        $topId = $isTop ? $mmsId : $ancestors[0];
+        $parentId = $isTop ? null : end($ancestors);
+
+        $datafield = $record->ownerDocument->createElement('datafield');
+        $datafield->setAttribute('tag', '996');
+        $datafield->setAttribute('ind1', ' ');
+        $datafield->setAttribute('ind2', ' ');
+        $this->addSubfield($datafield, 'a', $mmsId);
+        $this->addSubfield($datafield, 'b', $name);
+        if (null !== $parentId) {
+            $this->addSubfield($datafield, 'c', $parentId);
+        }
+        $this->addSubfield($datafield, 'd', $topId);
+        $this->addSubfield($datafield, 'e', $name . '{{{_ID_}}}' . $mmsId);
+        $record->appendChild($datafield);
+    }
+
+    /**
+     * Add a subfield to a MARC data field.
+     *
+     * @param DOMNode $datafield Data field element
+     * @param string  $code      Subfield code
+     * @param string  $value     Subfield value
+     *
+     * @return void
+     */
+    protected function addSubfield(DOMNode $datafield, string $code, string $value): void
+    {
+        $subfield = $datafield->ownerDocument->createElement('subfield');
+        $subfield->setAttribute('code', $code);
+        $subfield->appendChild(
+            $datafield->ownerDocument->createTextNode($value)
+        );
+        $datafield->appendChild($subfield);
     }
 
     /**

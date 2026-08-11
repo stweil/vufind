@@ -657,7 +657,7 @@ class AlmaCollectionsCommand extends Command
      * @param string  $mmsId       MMS ID of the collection
      * @param string  $name        Name of the collection
      * @param string  $description Description of the collection
-     * @param array   $ancestors   MMS IDs of the parent collections
+     * @param array   $ancestors   Parent collections (arrays with mms_id and name)
      *
      * @return void
      */
@@ -673,8 +673,16 @@ class AlmaCollectionsCommand extends Command
         }
 
         $isTop = empty($ancestors);
-        $topId = $isTop ? $mmsId : $ancestors[0];
-        $parentId = $isTop ? null : end($ancestors);
+        $topCollection = $isTop ? null : $ancestors[0];
+        $parentCollection = $isTop ? null : end($ancestors);
+        $topId = $isTop ? $mmsId
+            : $this->elementValue($topCollection['mms_id'] ?? null);
+        $topTitle = $isTop ? $name
+            : $this->elementValue($topCollection['name'] ?? null);
+        $parentId = $isTop ? null
+            : $this->elementValue($parentCollection['mms_id'] ?? null);
+        $parentTitle = $isTop ? null
+            : $this->elementValue($parentCollection['name'] ?? null);
 
         $datafield = $record->ownerDocument->createElement('datafield');
         $datafield->setAttribute('tag', '996');
@@ -690,6 +698,39 @@ class AlmaCollectionsCommand extends Command
         if ('' !== $description) {
             $this->addSubfield($datafield, 'f', $description);
         }
+        if (null !== $parentId) {
+            $this->addSubfield($datafield, 'g', $parentTitle);
+        }
+        $this->addSubfield($datafield, 'h', $topTitle);
+        $record->appendChild($datafield);
+    }
+
+    /**
+     * Add a MARC 996 data field with the VuFind hierarchy fields to a member record.
+     *
+     * @param DOMNode $record        MARCXML record element
+     * @param string  $parentId      MMS ID of the containing collection
+     * @param string  $parentTitle   Title of the containing collection
+     * @param string  $topId         MMS ID of the top-level collection
+     * @param string  $topTitle      Title of the top-level collection
+     *
+     * @return void
+     */
+    protected function addMemberHierarchyField(
+        DOMNode $record,
+        string $parentId,
+        string $parentTitle,
+        string $topId,
+        string $topTitle
+    ): void {
+        $datafield = $record->ownerDocument->createElement('datafield');
+        $datafield->setAttribute('tag', '996');
+        $datafield->setAttribute('ind1', ' ');
+        $datafield->setAttribute('ind2', ' ');
+        $this->addSubfield($datafield, 'c', $parentId);
+        $this->addSubfield($datafield, 'd', $topId);
+        $this->addSubfield($datafield, 'g', $parentTitle);
+        $this->addSubfield($datafield, 'h', $topTitle);
         $record->appendChild($datafield);
     }
 

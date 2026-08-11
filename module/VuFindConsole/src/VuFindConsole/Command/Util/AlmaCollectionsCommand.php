@@ -41,6 +41,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use VuFindHttp\HttpService;
 
 use function array_filter;
+use function array_merge;
 use function count;
 use function end;
 use function file_put_contents;
@@ -122,11 +123,12 @@ class AlmaCollectionsCommand extends Command
             '  $VUFIND_HOME/import-marc.sh $VUFIND_LOCAL_DIR/harvest/Collections/collection-*.xml',
             '  php util/createHierarchyTrees.php',
             '',
-            'Each collection is written to a file collection-<mms_id>.xml together with the',
-            'records of all member titles (GET /bibs/collections/{pid}/bibs). The records are',
-            'augmented with a MARC 520 summary field containing the collection description and',
-            'a local MARC 996 field containing the VuFind hierarchy fields; see the mappings in',
-            'import/marc.properties.',
+            'Each collection is written to a file collection-<mms_id>.xml. In addition, the',
+            'records of all member titles are downloaded (GET /bibs/collections/{pid}/bibs)',
+            'and written to files collection-member-<mms_id>.xml. The collection records are',
+            'augmented with a MARC 520 summary field containing the collection description,',
+            'and both the collection and the member records get a local MARC 996 field with the',
+            'VuFind hierarchy fields; see the mappings in import/marc.properties.',
             '',
             'To display the member records on the collection page, enable the Collections',
             'module (collections = true in the [Collections] section of config.ini) and add',
@@ -152,11 +154,14 @@ class AlmaCollectionsCommand extends Command
                 'output',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Write the MARCXML record of each collection to the given directory instead of '
-                . 'displaying the overview (default: local/harvest/Collections). The records are '
-                . 'augmented with a MARC 520 summary field containing the collection description '
-                . 'and a local MARC 996 field containing the VuFind hierarchy fields; see the '
-                . 'mappings in import/marc.properties.'
+                'Write the MARCXML records of the collections and their member titles to the '
+                . 'given directory instead of displaying the overview (default: '
+                . 'local/harvest/Collections). Each collection is stored in a file '
+                . 'collection-<mms_id>.xml and each member title in a file '
+                . 'collection-member-<mms_id>.xml. The records are augmented with a MARC 520 '
+                . 'summary field containing the collection description and a local MARC 996 '
+                . 'field containing the VuFind hierarchy fields; see the mappings in '
+                . 'import/marc.properties.'
             );
     }
 
@@ -330,6 +335,8 @@ class AlmaCollectionsCommand extends Command
         $written = 0;
         $skipped = 0;
         $failed = 0;
+        $members = [];
+        $memberRecords = [];
         foreach ($items as $item) {
             $result = $this->downloadCollection(
                 $item,
@@ -337,13 +344,19 @@ class AlmaCollectionsCommand extends Command
                 $outputDir,
                 $apiKey,
                 $timeout,
-                $output
+                $output,
+                $members,
+                $memberRecords
             );
             $written += $result['written'];
             $skipped += $result['skipped'];
             $failed += $result['failed'];
         }
-        $message = $written . ' collection record(s) written to ' . $outputDir . '.';
+        $memberResult = $this->writeMembers($members, $memberRecords, $outputDir, $output);
+        $memberWritten = $memberResult['written'];
+        $failed += $memberResult['failed'];
+        $message = $written . ' collection record(s) and ' . $memberWritten
+            . ' member record(s) written to ' . $outputDir . '.';
         if ($skipped > 0) {
             $message .= ' ' . $skipped . ' skipped.';
         }
@@ -355,14 +368,17 @@ class AlmaCollectionsCommand extends Command
     }
 
     /**
-     * Download the MARCXML record of a single collection and its sub-collections.
+     * Download the MARCXML record of a single collection, its members and its sub-collections.
      *
-     * @param array           $collection Collection data
-     * @param array           $ancestors  MMS IDs of the parent collections
-     * @param string          $outputDir  Output directory
-     * @param string          $apiKey     Alma API key
-     * @param int             $timeout    Timeout in seconds
-     * @param OutputInterface $output     Output object
+     * @param array           $collection    Collection data
+     * @param array           $ancestors     Parent collections (arrays with mms_id and name)
+     * @param string          $outputDir     Output directory
+     * @param string          $apiKey        Alma API key
+     * @param int             $timeout       Timeout in seconds
+     * @param OutputInterface $output        Output object
+     * @param array           $members       Member slots by MMS ID (passed by reference)
+     * @param array           $memberRecords MARCXML of the member records by MMS ID
+     *                                       (passed by reference)
      *
      * @return array{written: int, skipped: int, failed: int} Counts
      */
@@ -372,7 +388,9 @@ class AlmaCollectionsCommand extends Command
         string $outputDir,
         string $apiKey,
         int $timeout,
-        OutputInterface $output
+        OutputInterface $output,
+        array &$members,
+        array &$memberRecords
     ): array {
         $result = ['written' => 0, 'skipped' => 0, 'failed' => 0];
         $mmsId = $this->elementValue($collection['mms_id'] ?? null);
@@ -405,9 +423,20 @@ class AlmaCollectionsCommand extends Command
                 } else {
                     $result['written']++;
                 }
+                $memberResult = $this->downloadMembers(
+                    $mmsId,
+                    $name,
+                    $ancestors,
+                    $apiKey,
+                    $timeout,
+                    $output,
+                    $members,
+                    $memberRecords
+                );
+                $result['failed'] += $memberResult['failed'];
             }
         }
-        $childAncestors = '' === $mmsId ? $ancestors : $ancestors + [$mmsId];
+        $childAncestors = '' === $mmsId ? $ancestors : array_merge($ancestors, [$collection]);
         foreach ($this->getElementList($collection['collections'] ?? [], 'collection') as $child) {
             $childResult = $this->downloadCollection(
                 $child,
@@ -415,11 +444,169 @@ class AlmaCollectionsCommand extends Command
                 $outputDir,
                 $apiKey,
                 $timeout,
-                $output
+                $output,
+                $members,
+                $memberRecords
             );
             $result['written'] += $childResult['written'];
             $result['skipped'] += $childResult['skipped'];
             $result['failed'] += $childResult['failed'];
+        }
+        return $result;
+    }
+
+    /**
+     * Download the records of all member titles of a collection.
+     *
+     * The member list is retrieved in pages of up to 100 entries via
+     * GET /bibs/collections/{pid}/bibs. Each member record is then fetched individually
+     * with expand=marcxml, since the member list does not contain the full MARCXML.
+     *
+     * @param string          $mmsId         MMS ID of the collection
+     * @param string          $name          Name of the collection
+     * @param array           $ancestors     Parent collections (arrays with mms_id and name)
+     * @param string          $apiKey        Alma API key
+     * @param int             $timeout       Timeout in seconds
+     * @param OutputInterface $output        Output object
+     * @param array           $members       Member slots by MMS ID (passed by reference)
+     * @param array           $memberRecords MARCXML of the member records by MMS ID
+     *                                       (passed by reference)
+     *
+     * @return array{failed: int} Counts
+     */
+    protected function downloadMembers(
+        string $mmsId,
+        string $name,
+        array $ancestors,
+        string $apiKey,
+        int $timeout,
+        OutputInterface $output,
+        array &$members,
+        array &$memberRecords
+    ): array {
+        $result = ['failed' => 0];
+        $topCollection = $ancestors[0] ?? null;
+        $topId = null === $topCollection
+            ? $mmsId : $this->elementValue($topCollection['mms_id'] ?? null);
+        $topTitle = null === $topCollection
+            ? $name : $this->elementValue($topCollection['name'] ?? null);
+
+        $limit = 100;
+        $offset = 0;
+        $total = 0;
+        do {
+            $body = $this->request(
+                'bibs/collections/' . $mmsId . '/bibs',
+                ['apikey' => $apiKey, 'limit' => $limit, 'offset' => $offset],
+                $timeout,
+                $output
+            );
+            if (null === $body) {
+                $result['failed']++;
+                break;
+            }
+            $data = $this->parseResponse($body);
+            if (null === $data) {
+                $output->writeln(
+                    'Error parsing the member list of collection MMS ID ' . $mmsId . '.'
+                );
+                $result['failed']++;
+                break;
+            }
+            $total = (int)(
+                $data['@attributes']['total_record_count']
+                ?? $data['total_record_count'] ?? 0
+            );
+            $count = 0;
+            foreach ($this->getElementList($data, 'bib') as $bib) {
+                $memberId = $this->elementValue($bib['mms_id'] ?? null);
+                if ('' === $memberId) {
+                    continue;
+                }
+                if (!isset($memberRecords[$memberId])) {
+                    $memberBody = $this->request(
+                        'bibs/' . $memberId,
+                        ['apikey' => $apiKey, 'expand' => 'marcxml'],
+                        $timeout,
+                        $output
+                    );
+                    if (null === $memberBody) {
+                        $result['failed']++;
+                        continue;
+                    }
+                    $memberRecord = $this->extractRecord($memberBody);
+                    if (null === $memberRecord) {
+                        $output->writeln(
+                            'Error parsing the MARCXML record of MMS ID ' . $memberId . '.'
+                        );
+                        $result['failed']++;
+                        continue;
+                    }
+                    $memberRecords[$memberId]
+                        = $memberRecord->ownerDocument->saveXML($memberRecord);
+                }
+                $members[$memberId][] = [
+                    'parentId' => $mmsId,
+                    'parentTitle' => $name,
+                    'topId' => $topId,
+                    'topTitle' => $topTitle,
+                ];
+                $count++;
+            }
+            $offset += $count;
+        } while ($count > 0 && ($offset < $total || (0 === $total && $count === $limit)));
+        return $result;
+    }
+
+    /**
+     * Write the member records with their hierarchy fields to files.
+     *
+     * Each member is written to a file collection-member-<mms_id>.xml and gets one
+     * MARC 996 data field per collection it belongs to, so that records which are
+     * members of several collections keep all their collection references.
+     *
+     * @param array           $members       Member slots by MMS ID
+     * @param array           $memberRecords MARCXML of the member records by MMS ID
+     * @param string          $outputDir     Output directory
+     * @param OutputInterface $output        Output object
+     *
+     * @return array{written: int, failed: int} Counts
+     */
+    protected function writeMembers(
+        array $members,
+        array $memberRecords,
+        string $outputDir,
+        OutputInterface $output
+    ): array {
+        $result = ['written' => 0, 'failed' => 0];
+        foreach ($members as $memberId => $slots) {
+            $xml = $memberRecords[$memberId] ?? null;
+            if (null === $xml) {
+                $result['failed']++;
+                continue;
+            }
+            $dom = new DOMDocument();
+            if (!@$dom->loadXML($xml)) {
+                $result['failed']++;
+                continue;
+            }
+            $record = $dom->documentElement;
+            foreach ($slots as $slot) {
+                $this->addMemberHierarchyField(
+                    $record,
+                    $slot['parentId'],
+                    $slot['parentTitle'],
+                    $slot['topId'],
+                    $slot['topTitle']
+                );
+            }
+            $filename = $outputDir . '/collection-member-' . $memberId . '.xml';
+            if (false === file_put_contents($filename, $dom->saveXML($record))) {
+                $output->writeln('Error writing file: ' . $filename);
+                $result['failed']++;
+            } else {
+                $result['written']++;
+            }
         }
         return $result;
     }

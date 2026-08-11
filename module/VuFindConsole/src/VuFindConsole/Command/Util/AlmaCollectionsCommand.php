@@ -423,16 +423,17 @@ class AlmaCollectionsCommand extends Command
                 } else {
                     $result['written']++;
                 }
-                $memberResult = $this->downloadMembers(
-                    $mmsId,
-                    $name,
-                    $ancestors,
-                    $apiKey,
-                    $timeout,
-                    $output,
-                    $members,
-                    $memberRecords
-                );
+             $memberResult = $this->downloadMembers(
+                 $this->elementValue($collection['pid'] ?? null),
+                 $name,
+                 $ancestors,
+                 $mmsId,
+                 $apiKey,
+                 $timeout,
+                 $output,
+                 $members,
+                 $memberRecords
+             );
                 $result['failed'] += $memberResult['failed'];
             }
         }
@@ -462,22 +463,25 @@ class AlmaCollectionsCommand extends Command
      * GET /bibs/collections/{pid}/bibs. Each member record is then fetched individually
      * with expand=marcxml, since the member list does not contain the full MARCXML.
      *
-     * @param string          $mmsId         MMS ID of the collection
-     * @param string          $name          Name of the collection
-     * @param array           $ancestors     Parent collections (arrays with mms_id and name)
-     * @param string          $apiKey        Alma API key
-     * @param int             $timeout       Timeout in seconds
-     * @param OutputInterface $output        Output object
-     * @param array           $members       Member slots by MMS ID (passed by reference)
-     * @param array           $memberRecords MARCXML of the member records by MMS ID
-     *                                       (passed by reference)
+     * @param string          $collectionPid   PID of the collection (for member list URL)
+     * @param string          $name            Name of the collection
+     * @param array           $ancestors       Parent collections (arrays with mms_id
+     *                                         and name)
+     * @param string          $apiKey          Alma API key
+     * @param int             $timeout         Timeout in seconds
+     * @param OutputInterface $output          Output object
+     * @param array           $members         Member slots by MMS ID (passed by
+     *                                         reference)
+     * @param array           $memberRecords   MARCXML of the member records by MMS ID
+     *                                         (passed by reference)
      *
      * @return array{failed: int} Counts
      */
     protected function downloadMembers(
-        string $mmsId,
+        string $collectionPid,
         string $name,
         array $ancestors,
+        string $mmsId,
         string $apiKey,
         int $timeout,
         OutputInterface $output,
@@ -496,7 +500,7 @@ class AlmaCollectionsCommand extends Command
         $total = 0;
         do {
             $body = $this->request(
-                'bibs/collections/' . $mmsId . '/bibs',
+                'bibs/collections/' . $collectionPid . '/bibs',
                 ['apikey' => $apiKey, 'limit' => $limit, 'offset' => $offset],
                 $timeout,
                 $output
@@ -508,7 +512,8 @@ class AlmaCollectionsCommand extends Command
             $data = $this->parseResponse($body);
             if (null === $data) {
                 $output->writeln(
-                    'Error parsing the member list of collection MMS ID ' . $mmsId . '.'
+                    'Error parsing the member list of collection PID '
+                    . $collectionPid . '.'
                 );
                 $result['failed']++;
                 break;
@@ -546,7 +551,7 @@ class AlmaCollectionsCommand extends Command
                         = $memberRecord->ownerDocument->saveXML($memberRecord);
                 }
                 $members[$memberId][] = [
-                    'parentId' => $mmsId,
+                    'parentId' => $collectionPid,
                     'parentTitle' => $name,
                     'topId' => $topId,
                     'topTitle' => $topTitle,

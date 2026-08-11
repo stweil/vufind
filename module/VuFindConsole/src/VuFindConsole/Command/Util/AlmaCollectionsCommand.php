@@ -111,12 +111,28 @@ class AlmaCollectionsCommand extends Command
      */
     protected function configure()
     {
+        $help = [
+            'Displays an overview of the collections defined in Alma, including the collection',
+            'hierarchy. The Alma API base URL and key are read from the [Catalog] section of',
+            'config/vufind/Alma.ini.',
+            '',
+            'Typical workflow to index the collections and their member records:',
+            '',
+            '  php util/alma_collections.php --output=$VUFIND_LOCAL_DIR/harvest/Collections --level=2',
+            '  $VUFIND_HOME/import-marc.sh $VUFIND_LOCAL_DIR/harvest/Collections/collection-*.xml',
+            '  php util/createHierarchyTrees.php',
+            '',
+            'Each collection is written to a file collection-<mms_id>.xml together with the',
+            'records of all member titles (GET /bibs/collections/{pid}/bibs). The records are',
+            'augmented with a local MARC 996 field containing the VuFind hierarchy fields;',
+            'see the mappings in import/marc.properties.',
+            '',
+            'To display the member records on the collection page, enable the Collections',
+            'module (collections = true in the [Collections] section of config.ini) and add',
+            'the CollectionList tab in RecordTabs.ini.',
+        ];
         $this
-            ->setHelp(
-                'Displays an overview of the collections defined in Alma, including the collection '
-                . 'hierarchy. The Alma API base URL and key are read from the [Catalog] section of '
-                . 'config/vufind/Alma.ini.'
-            )
+            ->setHelp(implode("\n", $help))
             ->addOption(
                 'level',
                 null,

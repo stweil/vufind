@@ -551,7 +551,7 @@ class AlmaCollectionsCommand extends Command
                         = $memberRecord->ownerDocument->saveXML($memberRecord);
                 }
                 $members[$memberId][] = [
-                    'parentId' => $collectionPid,
+                    'parentId' => $mmsId,
                     'parentTitle' => $name,
                     'topId' => $topId,
                     'topTitle' => $topTitle,

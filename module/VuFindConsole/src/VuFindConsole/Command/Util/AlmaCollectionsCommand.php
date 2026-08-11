@@ -124,8 +124,8 @@ class AlmaCollectionsCommand extends Command
             '',
             'Each collection is written to a file collection-<mms_id>.xml together with the',
             'records of all member titles (GET /bibs/collections/{pid}/bibs). The records are',
-            'augmented with a local MARC 996 field containing the VuFind hierarchy fields;',
-            'see the mappings in import/marc.properties.',
+            'augmented with a local MARC 996 field containing the VuFind hierarchy fields and',
+            'the collection description; see the mappings in import/marc.properties.',
             '',
             'To display the member records on the collection page, enable the Collections',
             'module (collections = true in the [Collections] section of config.ini) and add',
@@ -153,8 +153,8 @@ class AlmaCollectionsCommand extends Command
                 InputOption::VALUE_REQUIRED,
                 'Write the MARCXML record of each collection to the given directory instead of '
                 . 'displaying the overview (default: local/harvest/Collections). The records are '
-                . 'augmented with a local MARC 996 field containing the VuFind hierarchy fields; '
-                . 'see the mappings in import/marc.properties.'
+                . 'augmented with a local MARC 996 field containing the VuFind hierarchy fields '
+                . 'and the collection description; see the mappings in import/marc.properties.'
             );
     }
 
@@ -375,6 +375,7 @@ class AlmaCollectionsCommand extends Command
         $result = ['written' => 0, 'skipped' => 0, 'failed' => 0];
         $mmsId = $this->elementValue($collection['mms_id'] ?? null);
         $name = $this->elementValue($collection['name'] ?? null);
+        $description = $this->elementValue($collection['description'] ?? null);
         if ('' === $mmsId) {
             $output->writeln(
                 'Skipping collection without MMS ID (PID '
@@ -394,7 +395,7 @@ class AlmaCollectionsCommand extends Command
                 $output->writeln('Error parsing the MARCXML record of MMS ID ' . $mmsId . '.');
                 $result['failed']++;
             } else {
-                $this->addHierarchyField($record, $mmsId, $name, $ancestors);
+                $this->addHierarchyField($record, $mmsId, $name, $description, $ancestors);
                 $filename = $outputDir . '/collection-' . $mmsId . '.xml';
                 if (false === file_put_contents($filename, $record->ownerDocument->saveXML($record))) {
                     $output->writeln('Error writing file: ' . $filename);
@@ -445,10 +446,11 @@ class AlmaCollectionsCommand extends Command
     /**
      * Add a MARC 996 data field with the VuFind hierarchy fields to a record.
      *
-     * @param DOMNode $record    MARCXML record element
-     * @param string  $mmsId     MMS ID of the collection
-     * @param string  $name      Name of the collection
-     * @param array   $ancestors MMS IDs of the parent collections
+     * @param DOMNode $record      MARCXML record element
+     * @param string  $mmsId       MMS ID of the collection
+     * @param string  $name        Name of the collection
+     * @param string  $description Description of the collection
+     * @param array   $ancestors   MMS IDs of the parent collections
      *
      * @return void
      */
@@ -456,6 +458,7 @@ class AlmaCollectionsCommand extends Command
         DOMNode $record,
         string $mmsId,
         string $name,
+        string $description,
         array $ancestors
     ): void {
         $isTop = empty($ancestors);
@@ -473,6 +476,9 @@ class AlmaCollectionsCommand extends Command
         }
         $this->addSubfield($datafield, 'd', $topId);
         $this->addSubfield($datafield, 'e', $name . '{{{_ID_}}}' . $mmsId);
+        if ('' !== $description) {
+            $this->addSubfield($datafield, 'f', $description);
+        }
         $record->appendChild($datafield);
     }
 

@@ -120,7 +120,8 @@ class AlmaCollectionsCommandTest extends TestCase
         $parent = $this->getHierarchyField(file_get_contents($parentFile));
         $this->assertSame(
             ['a' => '9919814834502561', 'b' => 'Nachhaltigkeit 2023-2024',
-             'd' => '9919814834502561', 'e' => 'Nachhaltigkeit 2023-2024{{{_ID_}}}9919814834502561'],
+             'd' => '9919814834502561', 'e' => 'Nachhaltigkeit 2023-2024{{{_ID_}}}9919814834502561',
+             'f' => 'Test collection'],
             $parent
         );
         $this->assertArrayNotHasKey('c', $parent);
@@ -129,7 +130,8 @@ class AlmaCollectionsCommandTest extends TestCase
         $child = $this->getHierarchyField(file_get_contents($childFile));
         $this->assertSame(
             ['a' => '9919814836202561', 'b' => 'Sub-Collection', 'c' => '9919814834502561',
-             'd' => '9919814834502561', 'e' => 'Sub-Collection{{{_ID_}}}9919814836202561'],
+             'd' => '9919814834502561', 'e' => 'Sub-Collection{{{_ID_}}}9919814836202561',
+             'f' => 'Child collection'],
             $child
         );
     }
@@ -160,6 +162,33 @@ class AlmaCollectionsCommandTest extends TestCase
         );
         $this->assertArrayNotHasKey('c', $field);
         $this->assertSame('9919814836202561', $field['d']);
+    }
+
+    /**
+     * Test that a collection without a description gets no 996f subfield.
+     *
+     * @return void
+     */
+    public function testDownloadWithoutDescription(): void
+    {
+        $collections = '<?xml version="1.0"?>'
+            . '<collections total_record_count="1">'
+            . '<collection><pid>81368013690002561</pid>'
+            . '<mms_id>9919814834502561</mms_id>'
+            . '<name>Collection without description</name>'
+            . '<description/></collection>'
+            . '</collections>';
+        $httpService = $this->getHttpService(
+            $collections,
+            $this->getFixture('alma/bib-9919814834502561.xml', 'VuFindConsole')
+        );
+        $commandTester = new CommandTester($this->getCommand($httpService));
+        $commandTester->execute(['--output' => $this->outputDir]);
+        $this->assertSame(0, $commandTester->getStatusCode());
+        $field = $this->getHierarchyField(
+            file_get_contents($this->outputDir . '/collection-9919814834502561.xml')
+        );
+        $this->assertArrayNotHasKey('f', $field);
     }
 
     /**

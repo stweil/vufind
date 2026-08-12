@@ -46,16 +46,22 @@ use function count;
 use function end;
 use function file_put_contents;
 use function implode;
+use function in_array;
 use function is_array;
 use function is_dir;
 use function json_decode;
 use function json_encode;
 use function mb_strlen;
 use function mb_substr;
+use function microtime;
 use function mkdir;
+use function round;
 use function rtrim;
 use function simplexml_load_string;
+use function sleep;
 use function str_repeat;
+use function str_replace;
+use function time;
 use function trim;
 
 /**
@@ -238,6 +244,11 @@ class AlmaCollectionsCommand extends Command
     /**
      * Perform a GET request against the Alma API.
      *
+     * Transient errors (HTTP 429, 500 and 503) and network errors are retried
+     * with an increasing delay before giving up. The number of retries and the
+     * initial delay can be configured via http_retries and http_retry_sleep in
+     * the [Catalog] section of Alma.ini.
+     *
      * @param string          $path    API path (relative to the base URL)
      * @param array           $params  Query string parameters
      * @param int             $timeout Timeout in seconds
@@ -252,31 +263,61 @@ class AlmaCollectionsCommand extends Command
         OutputInterface $output
     ): ?string {
         $apiBaseUrl = $this->almaConfig['Catalog']['apiBaseUrl'] ?? null;
-        $output->writeln(
-            'Fetching ' . $path . ' from Alma...',
-            OutputInterface::VERBOSITY_VERBOSE
-        );
-        try {
-            $response = $this->httpService
-                ->get(rtrim($apiBaseUrl, '/') . '/' . $path, $params, $timeout);
-        } catch (\VuFindHttp\Exception\RuntimeException $e) {
-            $output->writeln('Error accessing the Alma API: ' . $e->getMessage());
-            return null;
-        }
-        $body = (string)$response->getBody();
-        $output->writeln(
-            'Alma API response: ' . $body,
-            OutputInterface::VERBOSITY_DEBUG
-        );
-        if (!$response->isSuccess()) {
-            $errorMessage = $this->extractError($body);
+        $retries = (int)($this->almaConfig['Catalog']['http_retries'] ?? 3);
+        $retrySleep = (int)($this->almaConfig['Catalog']['http_retry_sleep'] ?? 1);
+        $url = rtrim($apiBaseUrl, '/') . '/' . $path;
+        for ($attempt = 0; $attempt <= $retries; $attempt++) {
             $output->writeln(
-                'Error accessing the Alma API: HTTP ' . $response->getStatusCode()
-                . ($errorMessage ? ' (' . $errorMessage . ')' : '')
+                'Fetching ' . $path . ' from Alma'
+                . ($attempt > 0 ? ' (attempt ' . ($attempt + 1)
+                    . ' of ' . ($retries + 1) . ')' : '') . '...',
+                OutputInterface::VERBOSITY_VERBOSE
             );
-            return null;
+            $startTime = microtime(true);
+            try {
+                $response = $this->httpService->get($url, $params, $timeout);
+            } catch (\VuFindHttp\Exception\RuntimeException $e) {
+                if ($attempt < $retries) {
+                    $delay = $retrySleep * (2 ** $attempt);
+                    $output->writeln(
+                        'Error accessing the Alma API: ' . $e->getMessage()
+                        . '; retrying in ' . $delay . 's...'
+                    );
+                    sleep($delay);
+                    continue;
+                }
+                $output->writeln('Error accessing the Alma API: ' . $e->getMessage());
+                return null;
+            }
+            $statusCode = $response->getStatusCode();
+            $elapsed = microtime(true) - $startTime;
+            $body = (string)$response->getBody();
+            $output->writeln(
+                'Alma API response: HTTP ' . $statusCode . ' in '
+                . round($elapsed, 2) . 's: ' . $this->redactApiKey($body),
+                OutputInterface::VERBOSITY_DEBUG
+            );
+            if (!$response->isSuccess()) {
+                $errorMessage = $this->redactApiKey($this->extractError($body));
+                if ($attempt < $retries && in_array($statusCode, [429, 500, 503], true)) {
+                    $delay = $retrySleep * (2 ** $attempt);
+                    $output->writeln(
+                        'Error accessing the Alma API: HTTP ' . $statusCode
+                        . ($errorMessage ? ' (' . $errorMessage . ')' : '')
+                        . '; retrying in ' . $delay . 's...'
+                    );
+                    sleep($delay);
+                    continue;
+                }
+                $output->writeln(
+                    'Error accessing the Alma API: HTTP ' . $statusCode
+                    . ($errorMessage ? ' (' . $errorMessage . ')' : '')
+                );
+                return null;
+            }
+            return $body;
         }
-        return $body;
+        return null;
     }
 
     /**
@@ -337,6 +378,8 @@ class AlmaCollectionsCommand extends Command
         $failed = 0;
         $members = [];
         $memberRecords = [];
+        $writtenMembers = [];
+        $startTime = time();
         foreach ($items as $item) {
             $result = $this->downloadCollection(
                 $item,
@@ -351,12 +394,25 @@ class AlmaCollectionsCommand extends Command
             $written += $result['written'];
             $skipped += $result['skipped'];
             $failed += $result['failed'];
+            // Write the member records gathered so far. This fills the output
+            // directory while the download is still running and keeps the number
+            // of member records held in memory limited to the current tree.
+            $memberResult = $this->writeMembers(
+                $members,
+                $memberRecords,
+                $writtenMembers,
+                $outputDir,
+                $output
+            );
+            $failed += $memberResult['failed'];
+            $output->writeln(
+                count($writtenMembers) . ' member record(s) written so far.'
+            );
         }
-        $memberResult = $this->writeMembers($members, $memberRecords, $outputDir, $output);
-        $memberWritten = $memberResult['written'];
-        $failed += $memberResult['failed'];
+        $memberWritten = count($writtenMembers);
         $message = $written . ' collection record(s) and ' . $memberWritten
-            . ' member record(s) written to ' . $outputDir . '.';
+            . ' member record(s) written to ' . $outputDir
+            . ' (' . (time() - $startTime) . 's).';
         if ($skipped > 0) {
             $message .= ' ' . $skipped . ' skipped.';
         }
@@ -403,6 +459,9 @@ class AlmaCollectionsCommand extends Command
             );
             $result['skipped']++;
         } else {
+            $output->writeln(
+                'Processing collection "' . $name . '" (MMS ' . $mmsId . ').'
+            );
             $body = $this->request(
                 'bibs/' . $mmsId,
                 ['apikey' => $apiKey, 'expand' => 'marcxml'],
@@ -421,19 +480,23 @@ class AlmaCollectionsCommand extends Command
                     $output->writeln('Error writing file: ' . $filename);
                     $result['failed']++;
                 } else {
+                    $output->writeln(
+                        '  Collection record written: ' . $filename,
+                        OutputInterface::VERBOSITY_VERBOSE
+                    );
                     $result['written']++;
                 }
-             $memberResult = $this->downloadMembers(
-                 $this->elementValue($collection['pid'] ?? null),
-                 $name,
-                 $ancestors,
-                 $mmsId,
-                 $apiKey,
-                 $timeout,
-                 $output,
-                 $members,
-                 $memberRecords
-             );
+                $memberResult = $this->downloadMembers(
+                    $this->elementValue($collection['pid'] ?? null),
+                    $name,
+                    $ancestors,
+                    $mmsId,
+                    $apiKey,
+                    $timeout,
+                    $output,
+                    $members,
+                    $memberRecords
+                );
                 $result['failed'] += $memberResult['failed'];
             }
         }
@@ -498,6 +561,9 @@ class AlmaCollectionsCommand extends Command
         $limit = 100;
         $offset = 0;
         $total = 0;
+        $processed = 0;
+        $output->writeln('  Fetching members of "' . $name . '"...');
+        $startTime = time();
         do {
             $body = $this->request(
                 'bibs/collections/' . $collectionPid . '/bibs',
@@ -522,8 +588,9 @@ class AlmaCollectionsCommand extends Command
                 $data['@attributes']['total_record_count']
                 ?? $data['total_record_count'] ?? 0
             );
-            $count = 0;
-            foreach ($this->getElementList($data, 'bib') as $bib) {
+            $bibs = $this->getElementList($data, 'bib');
+            $count = count($bibs);
+            foreach ($bibs as $bib) {
                 $memberId = $this->elementValue($bib['mms_id'] ?? null);
                 if ('' === $memberId) {
                     continue;
@@ -556,9 +623,15 @@ class AlmaCollectionsCommand extends Command
                     'topId' => $topId,
                     'topTitle' => $topTitle,
                 ];
-                $count++;
+                $processed++;
             }
+            // Advance by the number of bibs in this page, not by the number of
+            // successfully processed members, to avoid re-fetching entries.
             $offset += $count;
+            $output->writeln(
+                '    ' . $name . ': ' . $processed . '/' . ($total ?: 'unknown')
+                . ' member(s) fetched in ' . (time() - $startTime) . 's.'
+            );
         } while ($count > 0 && ($offset < $total || (0 === $total && $count === $limit)));
         return $result;
     }
@@ -570,8 +643,14 @@ class AlmaCollectionsCommand extends Command
      * MARC 996 data field per collection it belongs to, so that records which are
      * members of several collections keep all their collection references.
      *
+     * Members whose slots have not changed since the last write (tracked in
+     * $written) are skipped, so the method can be called repeatedly while the
+     * download is still running.
+     *
      * @param array           $members       Member slots by MMS ID
      * @param array           $memberRecords MARCXML of the member records by MMS ID
+     * @param array           $written       Slots last written by MMS ID (passed by
+     *                                       reference)
      * @param string          $outputDir     Output directory
      * @param OutputInterface $output        Output object
      *
@@ -580,11 +659,17 @@ class AlmaCollectionsCommand extends Command
     protected function writeMembers(
         array $members,
         array $memberRecords,
+        array &$written,
         string $outputDir,
         OutputInterface $output
     ): array {
         $result = ['written' => 0, 'failed' => 0];
         foreach ($members as $memberId => $slots) {
+            $slotCount = count($slots);
+            if (($written[$memberId] ?? 0) === $slotCount) {
+                // No new slots since the last write; keep the existing file.
+                continue;
+            }
             $xml = $memberRecords[$memberId] ?? null;
             if (null === $xml) {
                 $result['failed']++;
@@ -610,6 +695,7 @@ class AlmaCollectionsCommand extends Command
                 $output->writeln('Error writing file: ' . $filename);
                 $result['failed']++;
             } else {
+                $written[$memberId] = $slotCount;
                 $result['written']++;
             }
         }
@@ -767,11 +853,13 @@ class AlmaCollectionsCommand extends Command
      */
     protected function parseResponse(string $body): ?array
     {
-        $xml = simplexml_load_string($body);
+        // Suppress parser warnings: error responses may contain non-XML content
+        // (e.g. an HTML error page which echoes the request URL).
+        $xml = @simplexml_load_string($body);
         if (false === $xml) {
             return null;
         }
-        $json = json_encode($xml);
+        $json = @json_encode($xml);
         if (false === $json) {
             return null;
         }
@@ -866,6 +954,25 @@ class AlmaCollectionsCommand extends Command
     protected function elementValue($value): string
     {
         return is_array($value) ? '' : trim((string)($value ?? ''));
+    }
+
+    /**
+     * Remove the Alma API key from a string so that it cannot leak into logs.
+     *
+     * Error responses may echo the request URL including the apikey query
+     * parameter; such text is shown in the debug output and error messages.
+     *
+     * @param string $text Text to redact
+     *
+     * @return string Redacted text
+     */
+    protected function redactApiKey(string $text): string
+    {
+        $apiKey = $this->almaConfig['Catalog']['apiKey'] ?? '';
+        if ('' !== $apiKey) {
+            $text = str_replace($apiKey, '***', $text);
+        }
+        return $text;
     }
 
     /**

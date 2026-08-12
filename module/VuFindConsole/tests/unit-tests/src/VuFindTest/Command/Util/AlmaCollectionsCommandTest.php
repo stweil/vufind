@@ -33,6 +33,7 @@ use DOMDocument;
 use DOMXPath;
 use Laminas\Http\Client\Adapter\Test as TestAdapter;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 use VuFindHttp\HttpService;
 use VuFindConsole\Command\Util\AlmaCollectionsCommand;
@@ -612,6 +613,51 @@ class AlmaCollectionsCommandTest extends TestCase
     }
 
     /**
+     * Test that a transient HTTP 503 error is retried and that the API key is
+     * redacted from the debug output.
+     *
+     * @return void
+     */
+    public function testRetryOnHttp503(): void
+    {
+        $collections = $this->makeCollectionsXml(
+            'retry1', '9991111111112561', 'Retry Collection', 'Retry desc'
+        );
+        $adapter = new TestAdapter();
+        $adapter->setResponse([
+            // 0: first attempt fails with a 503 HTML error page
+            $this->makeErrorResponse(503, 'Service Unavailable'),
+            // 1: retry succeeds
+            "HTTP/1.1 200 OK\r\nContent-Type: application/xml\r\n\r\n" . $collections,
+            // 2: collection MARCXML
+            "HTTP/1.1 200 OK\r\nContent-Type: application/xml\r\n\r\n"
+                . $this->makeBibRecord('9991111111112561', 'Retry Collection'),
+            // 3: empty member list
+            "HTTP/1.1 200 OK\r\nContent-Type: application/xml\r\n\r\n"
+                . $this->makeBibList([]),
+        ]);
+        $service = new HttpService();
+        $service->setDefaultAdapter($adapter);
+        $commandTester = new CommandTester(
+            $this->getCommand($service, ['http_retries' => 1, 'http_retry_sleep' => 0])
+        );
+        $commandTester->execute(
+            ['--output' => $this->outputDir],
+            ['verbosity' => OutputInterface::VERBOSITY_DEBUG]
+        );
+        $this->assertSame(0, $commandTester->getStatusCode());
+        $this->assertFileExists($this->outputDir . '/collection-9991111111112561.xml');
+        $display = $commandTester->getDisplay();
+        $this->assertStringContainsString(
+            'Error accessing the Alma API: HTTP 503; retrying',
+            $display
+        );
+        // The error page echoes the request URL with the apikey; it must not leak.
+        $this->assertStringNotContainsString('apikey=secret', $display);
+        $this->assertStringContainsString('apikey=***', $display);
+    }
+
+    /**
      * Build an HTTP service that returns the given response bodies in order.
      *
      * @param string ...$bodies Response bodies
@@ -632,20 +678,39 @@ class AlmaCollectionsCommandTest extends TestCase
     }
 
     /**
+     * Build an HTTP error response with an HTML body that echoes the request URL
+     * (like an Alma proxy error page).
+     *
+     * @param int    $status HTTP status code
+     * @param string $reason Reason phrase
+     *
+     * @return string
+     */
+    protected function makeErrorResponse(int $status, string $reason): string
+    {
+        $body = '<html><body>' . $reason
+            . ' at /ws/v1/bibs/9991111111112561?apikey=secret&expand=marcxml'
+            . '</body></html>';
+        return 'HTTP/1.1 ' . $status . ' ' . $reason
+            . "\r\nContent-Type: text/html\r\n\r\n" . $body;
+    }
+
+    /**
      * Build a command object.
      *
-     * @param HttpService $httpService HTTP service
+     * @param HttpService $httpService  HTTP service
+     * @param array       $catalogExtra Additional [Catalog] settings
      *
      * @return AlmaCollectionsCommand
      */
-    protected function getCommand(HttpService $httpService): AlmaCollectionsCommand
+    protected function getCommand(HttpService $httpService, array $catalogExtra = []): AlmaCollectionsCommand
     {
         return new AlmaCollectionsCommand(
             [
                 'Catalog' => [
                     'apiBaseUrl' => 'https://example.com/almaws/v1',
                     'apiKey' => 'secret',
-                ],
+                ] + $catalogExtra,
             ],
             $httpService
         );

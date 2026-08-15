@@ -54,6 +54,7 @@
 <?php $pageLinks = ob_get_contents(); ?>
 <?php ob_end_clean(); ?>
 
+<!--
 <?=$this->component('page-title', ['title' => $this->translate('Collection Browse')]);?>
 
 <?php if (!empty($filterList)): ?>
@@ -89,7 +90,10 @@
   <?php endforeach; ?>
 </ul>
 <?=$pageLinks ?>
+-->
 <div class="clearfix">
   <?=$this->render('collections/list.phtml')?>
 </div><br>
+<!--
 <?=$pageLinks ?>
+-->

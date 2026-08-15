@@ -1,11 +1,51 @@
 <div class="list-group">
   <?php foreach ($result as $i => $item): ?>
+
+<!--
+{* Sammlung-Vorschaubild anzeigen, falls vorhanden *}
+{assign var='pid' value=$record->getPid()}
+{assign var='thumbnailPath' value=$config.DocRoot|cat:'/public/thumbnails/'|cat:$pid|cat:'.jpg'}
+{assign var='thumbnailUrl' value=$config.BaseUrl|cat:'/thumbnails/'|cat:$pid|cat:'.jpg'}
+
+{if file_exists($thumbnailPath)}
+    <div class="collection-thumbnail-container">
+        <img src="{$thumbnailUrl}"
+             alt="Vorschaubild für Sammlung"
+             class="collection-thumbnail"
+             style="max-width: 200px; height: auto; margin-bottom: 1em;">
+    </div>
+{/if}
+-->
+
     <a class="list-group-item" href="<?=$this->url('collection', ['id' => $item['value']])?>">
+
+
+<?php
+/*
+$pid = $item->getField('pid');
+$pid = $record->getPid();
+//$thumbPath = $_SERVER['DOCUMENT_ROOT'] . '/public/thumbnails/' . $pid . '.jpg';
+//$thumbUrl  = $this->baseUrl() . '/public/thumbnails/' . $pid . '.jpg';
+//$thumbUrl  = 'https://uni-mannheim.alma.exlibrisgroup.com/view/delivery/thumbnail/49MAN_INST/' . $pid;
+//if (file_exists($thumbPath)) : ?>
+    <div class="collection-thumbnail mb-3">
+        <img src="<?= esc($thumbUrl) ?>"
+             alt="Vorschaubild für Sammlung"
+             class="img-fluid"
+             style="max-width:200px;">
+    </div>
+//<?php endif;
+*/
+?>
+
+      <img src="/vufind/thumbnails/<?= $item['value'] ?>.jpg" alt="dummy" style="max-width: 200px; height: auto; margin-right: 1em;">
       <strong><?=$this->escapeHtml($item['displayText'])?></strong>
+<!--
       <span class="badge">
         <?=$item['count']?> <?=$this->transEsc('items')?>
         <?=$this->icon('page-next') ?>
       </span>
+-->
     </a>
   <?php endforeach; ?>
 </div>

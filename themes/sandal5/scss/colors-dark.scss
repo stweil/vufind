@@ -191,6 +191,10 @@
   }
 
   /* --- Search --- */
+  // $mid-gray only has a contrast of 2.1:1 on the dark background.
+  .bulkActionButtons label {
+    color: $silver;
+  }
   .result {
     border-bottom-color: #444;
 

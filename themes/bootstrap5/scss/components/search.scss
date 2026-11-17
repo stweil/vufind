@@ -559,6 +559,22 @@ header .container.navbar {
     }
   }
 }
+@include color-mode(dark, true) {
+  // White boxes would hide the light text of dark mode.
+  .result.embedded {
+    .getFull.expanded {
+      border-color: var(--#{$prefix}border-color);
+
+      &::before {
+        color: var(--#{$prefix}secondary-color);
+      }
+    }
+    .loading,
+    .long-view {
+      background-color: var(--#{$prefix}body-bg);
+    }
+  }
+}
 
 /* ------ GRID VIEW ------ */
 .search-grid::after {
@@ -874,6 +890,17 @@ header .container.navbar {
 .clear-selection {
   font-weight: 700;
   flex-basis: 100%;
+}
+@include color-mode(dark, true) {
+  // $gray-dark on a slightly darkened background is unreadable in dark mode.
+  .clear-selection {
+    color: var(--#{$prefix}body-color);
+    background-color: rgba(255, 255, 255, .1);
+
+    &:hover {
+      background-color: rgba(255, 255, 255, .15);
+    }
+  }
 }
 
 .active-filters .filters a.filter-value:hover,

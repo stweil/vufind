@@ -193,6 +193,11 @@
     }
   }
 }
+@include color-mode(dark, true) {
+  .top-row .applied:hover {
+    color: var(--#{$prefix}danger-text-emphasis);
+  }
+}
 
 .full-facets {
   margin: 1rem 0;

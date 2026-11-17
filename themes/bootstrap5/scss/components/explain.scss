@@ -87,4 +87,11 @@
   .explain .inexact-match {
     color: #90B8BD;
   }
+  // Dark blue is invisible and pure red too dark (3.9:1) on the dark background.
+  .explain .field-name .icon {
+    color: var(--#{$prefix}link-color);
+  }
+  .explain .unknown-match {
+    color: var(--#{$prefix}danger-text-emphasis);
+  }
 }

@@ -103,6 +103,12 @@
     font-weight: bold;
   }
 }
+@include color-mode(dark, true) {
+  // Dark red has a contrast of 1.5:1 on the dark background.
+  .hierarchy-tree .hierarchy-tree__search-match > .hierarchy-tree__item-container a {
+    color: var(--#{$prefix}danger-text-emphasis);
+  }
+}
 @include media-breakpoint-up(sm) {
   .collection-hierarchytree {
     display: flex;

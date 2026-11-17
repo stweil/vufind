@@ -75,6 +75,10 @@
 .comment-name { font-style: italic; }
 .comment { margin-bottom: 1rem; }
 .comment-name .delete { color: $state-danger-text; }
+@include color-mode(dark, true) {
+  // $state-danger-text has a contrast of 1.7:1 on the dark background.
+  .comment-name .delete { color: var(--#{$prefix}danger-text-emphasis); }
+}
 .comment-form {
   .loading-spinner {
     display: inline-block;
@@ -396,6 +400,31 @@ $tag-remove-badge-color:          #a94442 !default;
     .rating__input:hover ~ .rating__label .rating__icon--star,
     .rating__input:hover ~ .rating__label--half .rating__icon--star {
       color: #ddd;
+    }
+  }
+}
+@include color-mode(dark, true) {
+  // On the dark background the light grey of the unselected stars is far brighter
+  // than the $warning color of the selected ones, which makes a rating look
+  // reversed. Use a bright color for selected stars and a grey for unselected
+  // ones which still has a contrast of 3:1, as they are clickable.
+  .star-rating {
+    .rating__icon--star {
+      color: var(--#{$prefix}warning-text-emphasis);
+    }
+    .rating__input:checked ~ .rating__label .rating__icon--star {
+      color: $gray-600;
+    }
+    &:not(.readonly)
+    {
+      &:hover .rating__label .rating__icon--star,
+      &:hover .rating__label--half .rating__icon--star {
+        color: var(--#{$prefix}warning-text-emphasis);
+      }
+      .rating__input:hover ~ .rating__label .rating__icon--star,
+      .rating__input:hover ~ .rating__label--half .rating__icon--star {
+        color: $gray-600;
+      }
     }
   }
 }

@@ -179,6 +179,13 @@ form {
   line-height: 1.5;
 }
 @include color-mode(dark, true) {
+  // The light hover background would hide the light text of dark mode.
+  .select-all-label {
+    &:hover,
+    &:focus {
+      background-color: var(--#{$prefix}tertiary-bg);
+    }
+  }
   // $gray-dark and black are unreadable on the dark background.
   .checkbox-select-number {
     color: var(--#{$prefix}secondary-color);

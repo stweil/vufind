@@ -7,6 +7,17 @@ a {
 // bootstrap-variable-overrides.scss) instead of a rule for the a element; such a
 // rule would also override the text color of buttons and navigation links.
 
+// The colored text utilities use the theme colors, which are chosen for a light
+// background and too dark for the dark one (e.g. 3.1:1 for .text-success and 2:1
+// for .text-danger); use Bootstrap's emphasis colors of the color mode instead.
+@include color-mode(dark, true) {
+  @each $color in (primary, secondary, success, info, warning, danger) {
+    .text-#{$color} {
+      color: var(--#{$prefix}#{$color}-text-emphasis);
+    }
+  }
+}
+
 /* AAA Color Contrasts */
 $breadcrumb-color: #535353 !default;
 $breadcrumb-active-color: #444 !default;

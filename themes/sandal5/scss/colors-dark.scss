@@ -79,7 +79,8 @@
     background-color: #37474f;
   }
   .breadcrumb {
-    color: $silver;
+    // $silver only has a contrast of 3.4:1 on the breadcrumb background.
+    color: $moon-gray;
   }
   .breadcrumb a {
     color: $light-blue;

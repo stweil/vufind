@@ -29,7 +29,8 @@
   td, tbody > tr > th {
     display: flex;
     align-items: first baseline;
-    background: #fff;
+    // Same as #fff in light mode, but follows the color mode:
+    background: var(--#{$prefix}body-bg);
     &:not(.unlabeled-column):before {
       display: flex;
       flex-basis: 40%;

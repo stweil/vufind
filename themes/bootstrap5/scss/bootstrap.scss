@@ -181,6 +181,9 @@ mark {
 .highlight,
   mark {
     background: #440;
+    // Set the text color as well: the link color of a highlighted term inside a
+    // link does not have enough contrast on this background.
+    color: var(--#{$prefix}highlight-color);
   }
 }
 
@@ -556,6 +559,21 @@ form .toolbar.account-action-toolbar { margin-block-end: 0; }
     color: #fff;
     background-color: transparent;
     border: 1px solid #fff;
+  }
+}
+// The theme colors of the status badges are too dark for the dark background;
+// the badges of the active link keep their white text.
+@include color-mode(dark, true) {
+  .myresearch-menu a:not(.active) .status .badge {
+    &.account-info {
+      color: var(--#{$prefix}success-text-emphasis);
+    }
+    &.account-warning {
+      color: var(--#{$prefix}warning-text-emphasis);
+    }
+    &.account-alert {
+      color: var(--#{$prefix}danger-text-emphasis);
+    }
   }
 }
 // Note: active links are excluded to keep their own background color, as these

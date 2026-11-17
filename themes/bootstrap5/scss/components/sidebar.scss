@@ -152,7 +152,7 @@
   display: flex;
   width: 100%;
   font-weight: bold;
-  color: $body-color;
+  color: var(--bs-body-color);
 }
 .facet-group > .checkbox,
 .sidebar .facet.checkbox {

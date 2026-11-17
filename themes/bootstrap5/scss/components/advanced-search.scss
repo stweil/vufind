@@ -25,6 +25,10 @@
   padding-bottom: .25rem;
 }
 .adv-group-close { color: $state-danger-text; }
+@include color-mode(dark, true) {
+  // $state-danger-text is too dark for the dark background.
+  .adv-group-close { color: var(--bs-danger-text-emphasis); }
+}
 .adv-search,
 .adv-search .input-group { width: 100%; }
 .adv-search {

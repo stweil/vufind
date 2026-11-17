@@ -18,6 +18,30 @@ a {
   }
 }
 
+// Bootstrap replaces the focus outline of many controls with a translucent ring in
+// the primary color. On the dark background that ring is nearly invisible (about
+// 1.2:1 for form controls and navigation links, 1.7:1 for buttons), so use a
+// lighter one with a contrast of about 4:1 in dark mode.
+$focus-ring-color-dark: rgba($link-color-dark, .75) !default;
+$focus-ring-box-shadow-dark: 0 0 $focus-ring-blur $focus-ring-width $focus-ring-color-dark !default;
+@include color-mode(dark, true) {
+  --#{$prefix}focus-ring-color: #{$focus-ring-color-dark};
+  .btn {
+    --#{$prefix}btn-focus-box-shadow: #{$focus-ring-box-shadow-dark};
+  }
+  .pagination {
+    --#{$prefix}pagination-focus-box-shadow: #{$focus-ring-box-shadow-dark};
+  }
+  .form-control:focus,
+  .form-select:focus,
+  .form-check-input:focus,
+  .nav-link:focus-visible,
+  .accordion-button:focus,
+  .navbar-toggler:focus {
+    box-shadow: $focus-ring-box-shadow-dark;
+  }
+}
+
 /* AAA Color Contrasts */
 $breadcrumb-color: #535353 !default;
 $breadcrumb-active-color: #444 !default;

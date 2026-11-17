@@ -24,7 +24,8 @@
 }
 @include color-mode(dark, true) {
   .channel {
-    background-color: var(--bs-gray-dark);
+    // Dark enough for the link color: --bs-gray-dark only gave a contrast of 4.4:1.
+    background-color: var(--#{$prefix}tertiary-bg);
   }
 }
 

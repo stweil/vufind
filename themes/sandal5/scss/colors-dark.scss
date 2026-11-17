@@ -271,6 +271,15 @@
   .pagination > li > a {
     color: $light-blue;
   }
+  // The light hover background of the theme ($pagination-hover-bg) hides the
+  // light text and icons of the pagination links.
+  .pagination {
+    --bs-pagination-hover-bg: #37474f; /* Material Blue Grey 800 */
+  }
+  .pager li > a:hover,
+  .pager li > a:focus {
+    background-color: #37474f;
+  }
 
   /* --- Keyboard --- */
   .keyboard-box {

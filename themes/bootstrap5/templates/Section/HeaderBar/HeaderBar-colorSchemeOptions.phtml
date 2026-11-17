@@ -11,6 +11,7 @@
               'label' => $option['label'],
               'icon' => $option['icon'],
               'url' => $this->url()->addQueryParameters(['color_scheme' => $option['name']]),
+              'setQueryParams' => ['color_scheme' => $option['name']],
               'selected' => $this->globals()['selectedColorScheme'] == $option['name'],
             ];
         },

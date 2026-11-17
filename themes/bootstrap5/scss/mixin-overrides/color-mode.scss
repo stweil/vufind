@@ -8,7 +8,11 @@
   @if $root == true {
     @media (prefers-color-scheme: $mode) {
       // Except ignore the media query if there is a data-bs-theme set.
-      :root:not([data-bs-theme]) {
+      // The :where() keeps this guard at zero specificity, so the
+      // media-query form has the same specificity as the data-bs-theme
+      // form below (which is emitted after it) and never wins over
+      // theme styles that override the data-bs-theme form.
+      :root:where(:not([data-bs-theme])) {
         @content;
       }
     }

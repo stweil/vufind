@@ -1055,6 +1055,18 @@ table.search-history-table {
     }
   }
 }
+@include color-mode(dark, true) {
+  // $body-color is identical to the dark body background, making the
+  // results counter invisible.
+  .pagination-simple .pager-text {
+    span {
+      color: var(--bs-body-color);
+      &:hover {
+        color: var(--bs-body-color);
+      }
+    }
+  }
+}
 
 .querySuggestions > h2, .spellingSuggestions > h2 {
   font-size: unset;

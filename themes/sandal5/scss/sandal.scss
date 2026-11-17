@@ -31,6 +31,17 @@ body {
   --bs-navbar-color: white;
   --bs-emphasis-color-rgb: white;
 }
+// The light-mode .navbar color variables introduced with the color-scheme
+// support (see bootstrap5 variables.scss) override the white navbar color
+// above; repeat it inside the light color mode.
+@include color-mode(light, true) {
+  .navbar {
+    --bs-navbar-color: white;
+    --bs-navbar-active-color: white;
+    --bs-navbar-brand-color: white;
+    --bs-navbar-brand-hover-color: white;
+  }
+}
 .banner {
   width: auto;
   color: $white;

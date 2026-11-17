@@ -93,6 +93,15 @@
     color: $white;
   }
 
+  // Form controls: the theme's $input-color (#333) is unreadable on the dark
+  // background that $input-bg resolves to.
+  .form-control,
+  .form-select,
+  .form-control:focus,
+  .form-select:focus {
+    color: var(--bs-body-color);
+  }
+
   .nav > li > a {
     color: $light-blue;
   }
@@ -126,6 +135,12 @@
     color: $white;
     background-color: #5c1a1a;
     a { color: $light-red; }
+  }
+  .alert-warning,
+  .alert-warning:hover {
+    color: #ffd54f; /* Material Amber 300 */
+    background-color: #33270d;
+    a { color: $light-blue; }
   }
 
   .btn-link {

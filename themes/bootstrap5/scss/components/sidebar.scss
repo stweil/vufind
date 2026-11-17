@@ -276,6 +276,16 @@ h3.facet-title {
 .multi-facet-selection-active .apply-filters {
   display: block;
 }
+// In multi-facet selection mode, a selected facet only swaps its square for a
+// checked icon, which is easy to miss; give it a visible highlight.
+.multi-facet-selection-active .checkbox-filters .facet.active {
+  background-color: var(--bs-tertiary-bg);
+  a,
+  .icon-link__icon,
+  .icon-link__label {
+    color: var(--bs-emphasis-color);
+  }
+}
 .sidebar .multi-filters-selection {
   position: sticky;
   top: 0;

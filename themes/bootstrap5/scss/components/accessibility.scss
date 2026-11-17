@@ -3,12 +3,9 @@
 a {
   text-decoration: underline;
 }
-@include color-mode(dark, true) {
-  a {
-    /* Light enough to be WCAG AA compliant */
-    color: #8CA2BA;
-  }
-}
+// Note: the dark mode link color is set with $link-color-dark (see
+// bootstrap-variable-overrides.scss) instead of a rule for the a element; such a
+// rule would also override the text color of buttons and navigation links.
 
 /* AAA Color Contrasts */
 $breadcrumb-color: #535353 !default;

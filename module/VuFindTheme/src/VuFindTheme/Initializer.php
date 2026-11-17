@@ -191,13 +191,16 @@ class Initializer
         // to display an error message!
         $this->setUpThemes(array_reverse($this->tools->getThemeInfo()));
 
+        // Initialize the color scheme; like the themes, this must happen even if
+        // there is an error, since the error page needs it as well. Ask the tools
+        // object for the theme, since it falls back to a safe value if the
+        // requested one was illegal.
+        $this->setUpColorSchemes($this->tools->getTheme());
+
         // If we encountered an error loading theme settings, fail now.
         if (isset($error)) {
             throw new \Exception($error->getMessage());
         }
-
-        // Initialize the color scheme
-        $this->setUpColorSchemes($currentTheme);
     }
 
     /**

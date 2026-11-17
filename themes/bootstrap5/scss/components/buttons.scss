@@ -16,27 +16,21 @@ $btn-default-border:     #ccc !default;
     );
   }
 }
+// A bright gray block with white text stands out too much in dark mode;
+// keep the default button subtle (dark gray with the body text color).
 @include color-mode(dark, true) {
   .btn-default {
     @include button-variant(
-      shade-color($btn-default-bg, 70%),
-      shade-color($btn-default-border, 50%),
+      #2a2a2a,
+      #444,
+      $color: $body-color-dark,
+      $hover-background: #333,
+      $hover-border: #555,
+      $hover-color: $body-color-dark,
+      $active-background: #1f1f1f,
+      $active-border: #555,
+      $active-color: $body-color-dark,
     );
-  }
-}
-// A bright gray block with white text stands out too much in dark mode;
-// keep the default button subtle (overrides the button-variant above).
-@include color-mode(dark, true) {
-  .btn-default {
-    --bs-btn-color: var(--bs-body-color);
-    --bs-btn-bg: #2a2a2a;
-    --bs-btn-border-color: #444;
-    --bs-btn-hover-color: var(--bs-body-color);
-    --bs-btn-hover-bg: #333;
-    --bs-btn-hover-border-color: #555;
-    --bs-btn-active-color: var(--bs-body-color);
-    --bs-btn-active-bg: #1f1f1f;
-    --bs-btn-active-border-color: #555;
   }
 }
 

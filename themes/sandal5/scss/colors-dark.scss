@@ -13,6 +13,14 @@
   }
 
   /* --- Header --- */
+  // The bootstrap5 theme restores Bootstrap's adaptive navbar colors in dark
+  // mode; keep the navbar text white on the colored header instead.
+  .navbar {
+    --bs-navbar-color: white;
+    --bs-navbar-active-color: white;
+    --bs-navbar-brand-color: white;
+    --bs-navbar-brand-hover-color: white;
+  }
   header {
     background-color: #263238; /* Material Blue Grey 900 */
 

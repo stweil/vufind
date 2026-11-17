@@ -78,13 +78,13 @@
 }
 
 @include color-mode(light, true) {
-  .inexact-match {
+  .explain .inexact-match {
     color: #436c71;
   }
 }
 
 @include color-mode(dark, true) {
-  .inexact-match {
-    color: #90B8BD
+  .explain .inexact-match {
+    color: #90B8BD;
   }
 }

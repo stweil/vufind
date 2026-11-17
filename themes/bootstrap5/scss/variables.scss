@@ -53,28 +53,20 @@ $home-facet-list-left-padding: 0 !default; // Overwrites the default left paddin
 $home-facet-list-list-style: none !default; // Removes list style bullets from <li>
 $home-facet-list-right-padding: 1rem !default; // Adds greater visual separation
 
-@include color-mode(light, true) {
-  .breadcrumb {
-    --bs-breadcrumb-bg: #f5f5f5;
-  }
-}
+// The breadcrumb, navbar and striped table colors set in
+// bootstrap-variable-overrides.scss are static colors for the light color mode.
+// Use an adaptive background and Bootstrap's own adaptive defaults in dark mode.
 @include color-mode(dark, true) {
   .breadcrumb {
     --bs-breadcrumb-bg: #{$dark-bg-subtle-dark};
   }
-}
-
-@include color-mode(light, true) {
   .navbar {
-    --bs-navbar-color: #{$primary};
-    --bs-navbar-active-color: #{#fff};
-    --bs-navbar-brand-color: #{$primary};
-    --bs-navbar-brand-hover-color: #{$primary};
+    --bs-navbar-color: rgba(var(--bs-emphasis-color-rgb), .65);
+    --bs-navbar-active-color: rgba(var(--bs-emphasis-color-rgb), 1);
+    --bs-navbar-brand-color: rgba(var(--bs-emphasis-color-rgb), 1);
+    --bs-navbar-brand-hover-color: rgba(var(--bs-emphasis-color-rgb), 1);
   }
-}
-
-@include color-mode(light, true) {
-  table.table-striped {
-    --bs-table-striped-bg: #f9f9f9;
+  .table {
+    --bs-table-striped-bg: rgba(var(--bs-emphasis-color-rgb), #{$table-striped-bg-factor});
   }
 }

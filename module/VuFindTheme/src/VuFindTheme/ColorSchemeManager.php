@@ -35,6 +35,8 @@ use VuFind\Cookie\CookieManager;
 use VuFind\View\GlobalsContainer;
 
 use function in_array;
+use function is_string;
+use function strlen;
 
 /**
  * Color Scheme Manager.
@@ -72,7 +74,10 @@ class ColorSchemeManager
     ) {
         $rawSupportedColorSchemes = $config['supported_color_schemes'][$currentTheme]
             ?? $config['supported_color_schemes']['*'] ?? '';
-        $this->supportedColorSchemes = $this->explodeListSetting($rawSupportedColorSchemes);
+        // Ignore empty entries (e.g. caused by a trailing comma) and unusable values:
+        $this->supportedColorSchemes = is_string($rawSupportedColorSchemes)
+            ? array_values(array_filter($this->explodeListSetting($rawSupportedColorSchemes), strlen(...)))
+            : [];
     }
 
     /**
@@ -139,20 +144,22 @@ class ColorSchemeManager
     protected function getColorSchemeOptions()
     {
         // Load all options from config
-        $rawOptions = $this->config['selectable_color_schemes'] ?? [];
-        $options = array_map(function ($rawOption) {
-            $option = explode(':', $rawOption);
-            return [
-                'name' => $option[0],
-                'label' => $option[1],
-                'icon' => $option[2] ?? false,
+        $rawOptions = (array)($this->config['selectable_color_schemes'] ?? []);
+        $options = [];
+        foreach ($rawOptions as $rawOption) {
+            $option = array_map(trim(...), explode(':', (string)$rawOption));
+            $name = $option[0];
+            // Only return valid options for the current theme
+            if (!$this->isSupportedColorScheme($name)) {
+                continue;
+            }
+            $options[] = [
+                'name' => $name,
+                // Fall back to the name if no label has been configured:
+                'label' => ($option[1] ?? '') !== '' ? $option[1] : $name,
+                'icon' => ($option[2] ?? '') !== '' ? $option[2] : false,
             ];
-        }, $rawOptions);
-
-        // Only return valid options for the current theme
-        $options = array_filter($options, function ($option) {
-            return $this->isSupportedColorScheme($option['name']);
-        });
+        }
 
         return $options;
     }
@@ -160,12 +167,14 @@ class ColorSchemeManager
     /**
      * Determines if the specified color scheme is supported under the current theme.
      *
-     * @param string $desiredColorScheme Color scheme name
+     * @param mixed $desiredColorScheme Color scheme name (anything but a string is
+     * unsupported)
      *
      * @return bool
      */
-    protected function isSupportedColorScheme($desiredColorScheme)
+    protected function isSupportedColorScheme(mixed $desiredColorScheme): bool
     {
-        return in_array($desiredColorScheme, $this->supportedColorSchemes);
+        return is_string($desiredColorScheme)
+            && in_array($desiredColorScheme, $this->supportedColorSchemes, true);
     }
 }

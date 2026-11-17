@@ -1,18 +1,41 @@
 /* Override of built-in color mode, to output both types */
 
+// The color mode is controlled by the data-bs-theme attribute of the root element:
+// - "dark" (or any other mode name): use that mode.
+// - "auto": follow the system preference (prefers-color-scheme media query).
+// - "light", no attribute or an unknown value: use the light mode.
+// Following the system preference is opt-in so that a page that does not set the
+// attribute (e.g. a customized layout template of a theme that does not support
+// dark mode) never switches to a mode that it was not designed for.
 @mixin color-mode($mode: light, $root: false) {
   // Generally ignore $color-mode-type. Output handlers for both types:
   // media queries and data-bs-theme DOM attributes.
 
-  // Handle media-query $color-mode-type
   @if $root == true {
-    @media (prefers-color-scheme: $mode) {
-      // Except ignore the media query if there is a data-bs-theme set.
-      // The :where() keeps this guard at zero specificity, so the
-      // media-query form has the same specificity as the data-bs-theme
-      // form below (which is emitted after it) and never wins over
-      // theme styles that override the data-bs-theme form.
-      :root:where(:not([data-bs-theme])) {
+    @if $mode == light {
+      // Light is the default mode. Its rules are wrapped in :where() so that they
+      // keep the specificity of the selectors they contain; otherwise styles of
+      // child themes could no longer override them like any other rule.
+      :where(:root:not([data-bs-theme="dark"]):not([data-bs-theme="auto"]), [data-bs-theme="light"]) {
+        @content;
+      }
+      @media (prefers-color-scheme: light) {
+        :where(:root[data-bs-theme="auto"]) {
+          @content;
+        }
+      }
+    } @else {
+      // Handle media-query $color-mode-type, but only if the root element asks
+      // for the system preference. The :where() keeps the attribute test at zero
+      // specificity, so this form has the same specificity as the data-bs-theme
+      // form below.
+      @media (prefers-color-scheme: $mode) {
+        :root:where([data-bs-theme="auto"]) {
+          @content;
+        }
+      }
+      // And handle data-bs-theme $color-mode-type
+      [data-bs-theme="#{$mode}"] {
         @content;
       }
     }
@@ -24,9 +47,9 @@
         @content;
       }
     }
-  }
-  // And handle data-bs-theme $color-mode-type
-  [data-bs-theme="#{$mode}"] {
-    @content;
+    // And handle data-bs-theme $color-mode-type
+    [data-bs-theme="#{$mode}"] {
+      @content;
+    }
   }
 }

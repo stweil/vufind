@@ -24,11 +24,21 @@ $danger-border-subtle:      color.adjust($danger-bg-subtle, $hue: -10deg, $light
 $input-border-color:        #888 !default;
 $form-select-border-color:  #888 !default;
 
+// Light enough on the dark body background to be WCAG AA compliant:
+$link-color-dark:                   #8CA2BA !default;
+
+// Note: the colors below are static values for the default (light) color mode;
+// variables.scss restores the adaptive Bootstrap defaults for the dark color mode.
+$breadcrumb-bg:                     #f5f5f5 !default;
 $breadcrumb-padding-y:              8px !default;
 $breadcrumb-padding-x:              15px !default;
 
 $nav-link-padding-y:                1rem !default;
 $navbar-nav-link-padding-x:         1rem !default;
+$navbar-light-color:                $primary !default;
+$navbar-light-active-color:         #fff !default;
+$navbar-light-brand-color:          $primary !default;
+$navbar-light-brand-hover-color:    $primary !default;
 
 $navbar-padding-x:                  15px !default;
 $navbar-padding-y:                  0 !default;
@@ -62,3 +72,5 @@ $enable-smooth-scroll:              false !default;
 // Disable validation icons that take a lot of room e.g. in select fields:
 $enable-validation-icons:           false !default;
 $form-select-indicator-padding:     .75rem !default;
+
+$table-striped-bg:                  #f9f9f9 !default;

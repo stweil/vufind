@@ -1,0 +1,137 @@
+/*
+ * Facets at the side of the result list (templates/Recommend/SideFacets*).
+ * .c-facets is the whole side bar, .c-facet one facet with its values.
+ */
+@layer components {
+  /* Narrow screen: the facets are folded behind this button. */
+  .c-facets__button {
+    display: flex;
+  }
+
+  .c-facets__body {
+    padding-block-start: var(--space-4);
+  }
+
+  /*
+   * Wide screen: the facets are always shown and the button is not needed. The
+   * width is the one at which .l-with-sidebar (layout.css) gets two columns; keep
+   * the two in step. Browsers without ::details-content keep the button.
+   */
+  @container (min-width: 56rem) {
+    @supports selector(::details-content) {
+      .c-facets__button {
+        display: none;
+      }
+
+      .c-facets::details-content {
+        content-visibility: visible;
+      }
+
+      .c-facets__body {
+        padding-block-start: 0;
+      }
+    }
+  }
+
+  .c-facet__title {
+    margin-block-end: var(--space-2);
+    font-size: var(--font-size-text);
+  }
+
+  .c-facet__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* The link which applies a value and, optionally, the one which excludes it. */
+  .c-facet__item {
+    display: flex;
+    gap: var(--space-1);
+  }
+
+  .c-facet__link {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: var(--space-2);
+    min-inline-size: 0;
+    min-block-size: var(--size-target-compact);
+    padding: var(--space-1) var(--space-2);
+    border: var(--border-width-control) solid transparent;
+    border-radius: var(--radius-small);
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .c-facet__link:hover {
+    background: var(--color-surface-sunken);
+    text-decoration: underline;
+  }
+
+  /* An applied value also has an icon (see the template) and bold text. */
+  .c-facet__link[aria-current] {
+    background: var(--color-selected);
+    color: var(--color-on-selected);
+    font-weight: var(--font-weight-strong);
+  }
+
+  .c-facet__text {
+    flex: 1;
+    min-inline-size: 0;
+  }
+
+  .c-facet__count {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-small);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .c-facet__exclude {
+    display: grid;
+    place-items: center;
+    min-inline-size: var(--size-target-compact);
+    border-radius: var(--radius-small);
+    color: var(--color-text-muted);
+  }
+
+  .c-facet__exclude:hover {
+    background: var(--color-surface-sunken);
+    color: var(--color-text);
+  }
+
+  /* "more…": the rest of a long list of values. */
+  .c-facet__more > summary {
+    min-block-size: var(--size-target-compact);
+    padding: var(--space-1) var(--space-2);
+    color: var(--color-link);
+  }
+
+  /* Range facet: two fields and a button. */
+  .c-facet__range {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: var(--space-2);
+  }
+
+  .c-facet__range-field {
+    display: grid;
+    flex: 1 1 5rem;
+    gap: var(--space-1);
+    font-size: var(--font-size-small);
+  }
+
+  /*
+   * Windows contrast themes remove the background which marks the applied value;
+   * use the system's selection colors for it instead.
+   */
+  @media (forced-colors: active) {
+    .c-facet__link[aria-current] {
+      forced-color-adjust: none;
+      border-color: Highlight;
+      background: Highlight;
+      color: HighlightText;
+    }
+  }
+}

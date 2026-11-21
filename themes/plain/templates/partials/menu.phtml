@@ -1,0 +1,46 @@
+<?php
+  /**
+   * Menu of links which opens below its button. It is a <details> element and
+   * works without JavaScript; js/modules/menu.js adds closing with the Escape key
+   * and by a click elsewhere. Only one menu of the header is open at a time
+   * (name attribute).
+   *
+   * @property string  $label    Translation key of the button label
+   * @property string  $iconName Icon of the button
+   * @property array[] $items    Entries with the keys labelHtml (escaped HTML),
+   *                             url, selected (bool), iconName (optional) and
+   *                             lang (language code of the label, optional)
+   */
+?>
+<details class="c-menu" name="plain-header-menu" data-menu>
+  <?php // The label is hidden on a narrow screen (menu.css); aria-label keeps the name of the button. ?>
+  <summary class="c-menu__button" aria-label="<?=$this->transEscAttr($this->label)?>">
+    <?=$this->icon($this->iconName)?>
+    <span class="c-menu__label"><?=$this->transEsc($this->label)?></span>
+    <?=$this->icon('menu-open', 'c-menu__arrow')?>
+  </summary>
+  <ul class="c-menu__list">
+    <?php foreach ($this->items as $item): ?>
+      <?php
+        $attributes = $this->htmlAttributes(['class' => 'c-menu__item', 'href' => $item['url'], 'rel' => 'nofollow']);
+        if ($item['selected']) {
+          $attributes->add('aria-current', 'true');
+        }
+        if (!empty($item['lang'])) {
+          $attributes->add('lang', $item['lang']);
+        }
+      ?>
+      <li>
+        <a<?=$attributes?>>
+          <?php if (!empty($item['iconName'])): ?>
+            <?=$this->icon($item['iconName'])?>
+          <?php endif; ?>
+          <span class="c-menu__text"><?=$item['labelHtml']?></span>
+          <?php if ($item['selected']): ?>
+            <?=$this->icon('menu-selected')?>
+          <?php endif; ?>
+        </a>
+      </li>
+    <?php endforeach; ?>
+  </ul>
+</details>

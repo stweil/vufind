@@ -1,0 +1,20 @@
+<?php
+  /**
+   * Place for the availability, location and call number of a record in the
+   * result list. It stays hidden without JavaScript; js/modules/item-status.js
+   * asks VuFind for the data and fills the parts.
+   *
+   * @property string $recordId Record ID
+   */
+?>
+<div
+  class="c-item-status"
+  hidden
+  data-item-status
+  data-record-id="<?=$this->escapeHtmlAttr($this->recordId)?>"
+  data-error-text="<?=$this->transEscAttr('status_unknown_message')?>"
+>
+  <span data-item-status-part="availability"><?=$this->transEsc('loading_ellipsis')?></span>
+  <span data-item-status-part="location"></span>
+  <span data-item-status-part="callnumber"></span>
+</div>

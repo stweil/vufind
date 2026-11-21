@@ -1,0 +1,13 @@
+/*
+ * Group of menus in the site header. On a narrow screen an open menu is as wide
+ * as the group, so it can never reach beyond the edge of the screen; menu.css
+ * positions the list.
+ */
+@layer components {
+  .c-menu-bar {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+}

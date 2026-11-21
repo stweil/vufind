@@ -1,0 +1,16 @@
+<?php
+  /**
+   * Links to related records, followed by notes about the relationship.
+   *
+   * @property array[] $data Links: title (translation key), value and link
+   */
+?>
+<?php foreach ($this->data as $recordLink): ?>
+  <div>
+    <?=$this->transEsc($recordLink['title'])?>:
+    <a href="<?=$this->escapeHtmlAttr($this->recordLinker()->related($recordLink['link'], $this->driver->getSourceIdentifier()))?>"><?=$this->escapeHtml($recordLink['value'])?></a>
+  </div>
+<?php endforeach; ?>
+<?php foreach ($this->driver->getRelationshipNotes() as $note): ?>
+  <div><?=$this->escapeHtml($note)?></div>
+<?php endforeach; ?>

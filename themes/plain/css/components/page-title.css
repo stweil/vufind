@@ -1,0 +1,14 @@
+/*
+ * Main heading of a page.
+ */
+@layer components {
+  .c-page-title {
+    margin-block: 0 var(--space-4);
+  }
+
+  /* On the search home page: centered above the search form. */
+  .c-page-title--hero {
+    margin-block-start: var(--space-7);
+    text-align: center;
+  }
+}

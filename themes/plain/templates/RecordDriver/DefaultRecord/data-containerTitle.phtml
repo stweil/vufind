@@ -1,0 +1,15 @@
+<?php
+  /**
+   * The journal or book a record is part of, with a link to its record or to a
+   * search for its title.
+   *
+   * @property string $data Title of the container
+   */
+  $containerId = $this->driver->getContainerRecordID();
+  // Both are escaped URLs: the first by this template, the second by the record helper.
+  $urlHtml = $containerId
+    ? $this->escapeHtmlAttr($this->recordLinker()->getUrl($this->driver->getSourceIdentifier() . '|' . $containerId))
+    : $this->record($this->driver)->getLink('journaltitle', $this->data);
+?>
+<a href="<?=$urlHtml?>"><?=$this->escapeHtml($this->data)?></a>
+<?=$this->escapeHtml($this->driver->getContainerReference())?>

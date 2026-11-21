@@ -1,0 +1,74 @@
+<?php
+  /**
+   * Applied filters, each as a link which removes it.
+   *
+   * @property array                              $filterList      Applied facet filters by field label
+   * @property array[]                            $checkboxFilters Checkbox filters (only the selected ones are shown)
+   * @property \VuFind\Search\Base\Params         $params          Search parameters
+   * @property ?\VuFind\Search\UrlQueryHelper     $urlQuery        URL builder of the current search; without it the
+   *                                                               links change the search kept in the search memory
+   * @property string                             $searchClassId   Search backend
+   */
+  $urlQuery = $this->urlQuery;
+  $searchMemory = $this->searchMemory();
+  $searchClassId = $this->searchClassId;
+  $joinWords = ['NOT' => $this->transEsc('NOT'), 'OR' => $this->transEsc('OR'), 'AND' => $this->transEsc('AND')];
+
+  // URLs from the URL query helper and from the search memory are already escaped.
+  $entries = [];
+  foreach ($this->checkboxFilters as $filter) {
+    if ($filter['selected']) {
+      $entries[] = [
+        'urlHtml' => $urlQuery
+          ? $urlQuery->removeFilter($filter['filter'])
+          : $searchMemory->getEditLink($searchClassId, 'removeFilter', $filter['filter']),
+        'labelHtml' => $this->transEsc($filter['desc']),
+      ];
+    }
+  }
+  foreach ($this->filterList as $field => $values) {
+    foreach ($values as $index => $value) {
+      // "NOT" is always shown; "AND" and "OR" join the second and later values of a field.
+      $join = ($index > 0 || 'NOT' === $value['operator']) ? ($joinWords[$value['operator']] ?? '') : '';
+      $entries[] = [
+        'urlHtml' => $urlQuery
+          ? $urlQuery->removeFacet($value['field'], $value['value'], $value['operator'])
+          : $searchMemory->getEditLink($searchClassId, 'removeFacet', $value),
+        'labelHtml' => $this->transEsc($field) . ': ' . trim($join . ' ' . $this->escapeHtml($value['displayText'])),
+      ];
+    }
+  }
+  $entries = array_filter($entries, fn ($entry) => $entry['urlHtml']);
+  if (!$entries) {
+    return;
+  }
+
+  // The reset link is pointless while only the default filters are applied.
+  $options = $this->searchOptions($searchClassId);
+  $defaultFilters = $options->getDefaultFilters();
+  $onlyDefaultsApplied = count($defaultFilters) === count($entries)
+    && !array_filter($defaultFilters, fn ($filter) => !$this->params->hasFilter($filter));
+  $resetUrlHtml = null;
+  if (!$onlyDefaultsApplied && $options->shouldDisplayResetFilters()) {
+    $resetUrlHtml = $urlQuery
+      ? $urlQuery->removeAllFilters()->resetDefaultFilters()
+      : $searchMemory->getEditLink($searchClassId, 'removeAllFilters', 1);
+  }
+?>
+<div class="c-filter-list">
+  <span class="c-filter-list__label" id="applied-filters-label"><?=$this->transEsc('applied_filters')?></span>
+  <ul class="c-filter-list__items" aria-labelledby="applied-filters-label">
+    <?php foreach ($entries as $entry): ?>
+      <li>
+        <a class="c-filter-list__filter" href="<?=$entry['urlHtml']?>" rel="nofollow">
+          <span class="u-visually-hidden"><?=$this->transEsc('Remove filter')?></span>
+          <span><?=$entry['labelHtml']?></span>
+          <?=$this->icon('search-filter-remove')?>
+        </a>
+      </li>
+    <?php endforeach; ?>
+  </ul>
+  <?php if ($resetUrlHtml): ?>
+    <a class="c-filter-list__reset" href="<?=$resetUrlHtml?>" rel="nofollow"><?=$this->transEsc('reset_filters_button')?></a>
+  <?php endif; ?>
+</div>

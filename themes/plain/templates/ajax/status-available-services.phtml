@@ -1,0 +1,18 @@
+<?php
+  /**
+   * Availability label "available" which names what the item is available for
+   * (loan, reading room use, ...; see ajax/status.phtml).
+   *
+   * @property string[] $services Services the library system reports
+   */
+  $services = $this->services;
+  // One service may have a message of its own.
+  $labelHtml = count($services) === 1
+    ? $this->transEsc('HoldingStatus::service_available_' . $services[0], [], '')
+    : '';
+  if ('' === $labelHtml) {
+    $names = array_map(fn ($service) => $this->transEsc('HoldingStatus::service_' . $service, [], $service), $services);
+    // HTML is intentionally allowed in this message.
+    $labelHtml = $this->translate('HoldingStatus::services_available_html', ['%%list%%' => implode(', ', $names)]);
+  }
+  echo $this->render('partials/status.phtml', ['variant' => 'available', 'labelHtml' => $labelHtml]);

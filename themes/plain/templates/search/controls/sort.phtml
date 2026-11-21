@@ -1,0 +1,18 @@
+<?php
+  /**
+   * Sort order of the result list.
+   */
+  $choices = [];
+  foreach ($this->params->getSortList() as $value => $sort) {
+    $choices[] = ['value' => $value, 'labelHtml' => $this->transEsc($sort['desc']), 'selected' => $sort['selected']];
+  }
+  echo $this->render(
+      'partials/select-form.phtml',
+      [
+        'name' => 'sort',
+        'label' => 'Sort',
+        'choices' => $choices,
+        // Already escaped by the URL query helper.
+        'hiddenFieldsHtml' => $this->results->getUrlQuery()->asHiddenFields(['sort' => '/.*/', 'page' => '/.*/']),
+      ]
+  );

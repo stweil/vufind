@@ -1,0 +1,21 @@
+<?php
+  /**
+   * Subject headings. Every part of a heading links to a search for the heading
+   * up to that part.
+   *
+   * @property array[] $data Headings, each an array of parts
+   */
+?>
+<?php foreach ($this->data as $heading): ?>
+  <?php
+    $parts = count($heading) === 1 ? explode('--', $heading[0]) : $heading;
+    $subject = '';
+  ?>
+  <div<?=$this->schemaOrg()->getAttributes(['property' => 'keywords'])?>>
+    <?php foreach (array_values($parts) as $index => $part): ?>
+      <?php $subject = trim($subject . ' ' . $part); ?>
+      <?=$index > 0 ? '&gt;' : ''?>
+      <a href="<?=$this->record($this->driver)->getLink('subject', $subject)?>" rel="nofollow"><?=$this->escapeHtml(trim($part))?></a>
+    <?php endforeach; ?>
+  </div>
+<?php endforeach; ?>

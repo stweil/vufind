@@ -1,0 +1,28 @@
+<?php
+  /**
+   * Pagination. Rendered by the paginationControl view helper, which provides
+   * pageCount, current, previous, next and pagesInRange.
+   *
+   * @property array $params Either ['results' => search results] or request parameters for the page links
+   */
+  if ($this->pageCount < 2) {
+    return;
+  }
+  $item = fn (int $page, string $label, string $contentHtml): string => $this->render(
+      'Helpers/pagination-item.phtml',
+      ['params' => $this->params, 'current' => $this->current, 'page' => $page, 'label' => $label, 'contentHtml' => $contentHtml]
+  );
+?>
+<nav class="c-pagination" aria-label="<?=$this->transEscAttr('pagination_label')?>">
+  <ul class="c-pagination__list">
+    <?php if (isset($this->previous)): ?>
+      <?=$item($this->previous, $this->translate('page_prev'), $this->icon('page-prev') . '<span>' . $this->transEsc('Prev') . '</span>')?>
+    <?php endif; ?>
+    <?php foreach ($this->pagesInRange as $page): ?>
+      <?=$item($page, $this->translate('page_num', ['%%page%%' => $page]), $this->escapeHtml($this->localizedNumber($page)))?>
+    <?php endforeach; ?>
+    <?php if (isset($this->next)): ?>
+      <?=$item($this->next, $this->translate('page_next'), '<span>' . $this->transEsc('Next') . '</span>' . $this->icon('page-next'))?>
+    <?php endif; ?>
+  </ul>
+</nav>

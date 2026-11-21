@@ -1,0 +1,35 @@
+<?php
+  /**
+   * Values of one facet. The first ones are shown; the rest is folded behind
+   * "more…" (a <details> element, so it works without JavaScript).
+   *
+   * @property string                        $field        Facet field
+   * @property array[]                       $values       Facet values
+   * @property int                           $visibleCount Number of values shown before "more…"
+   * @property bool                          $allowExclude Offer a link which excludes a value
+   * @property \VuFind\Search\UrlQueryHelper $urlQuery     URL builder of the search
+   */
+  if (!$this->values) {
+    echo '<p>' . $this->transEsc('facet_list_empty') . '</p>';
+    return;
+  }
+  $renderValues = fn (array $values): string => implode('', array_map(
+      fn ($value) => $this->render(
+          'Recommend/SideFacets/facet-value.phtml',
+          ['field' => $this->field, 'value' => $value, 'allowExclude' => $this->allowExclude, 'urlQuery' => $this->urlQuery]
+      ),
+      $values
+  ));
+  $more = array_slice($this->values, $this->visibleCount);
+?>
+<ul class="c-facet__list">
+  <?=$renderValues(array_slice($this->values, 0, $this->visibleCount))?>
+</ul>
+<?php if ($more): ?>
+  <details class="c-facet__more">
+    <summary><?=$this->transEsc('more_ellipsis')?></summary>
+    <ul class="c-facet__list">
+      <?=$renderValues($more)?>
+    </ul>
+  </details>
+<?php endif; ?>

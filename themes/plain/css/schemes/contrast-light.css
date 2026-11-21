@@ -1,0 +1,52 @@
+/*
+ * Color scheme "contrast-light": high contrast, dark on light.
+ * Same properties, same order as light.css.
+ *
+ * Contrast target: WCAG 2.2 AAA (text 7:1; controls and focus ring 4.5:1).
+ * Nothing is told apart by a background shade: all backgrounds are the same
+ * white, and selected, highlighted and status items differ by a strong color
+ * pair, a border, an icon or an underline instead. Lines are thicker.
+ */
+@layer tokens {
+  :root {
+    color-scheme: light;
+
+    --color-canvas: #ffffff;
+    --color-surface: #ffffff;
+    --color-surface-sunken: #ffffff;
+
+    --color-text: #000000;
+    --color-text-muted: #1f1f1f;
+    --color-link: #00309e;
+    --color-link-hover: #000000;
+
+    --color-border: #000000;
+    --color-border-control: #000000;
+
+    --color-focus: #9b0079;
+
+    --color-accent: #000000;
+    --color-accent-hover: #00309e;
+    --color-on-accent: #ffffff;
+
+    --color-selected: #000000;
+    --color-on-selected: #ffffff;
+
+    --color-highlight: #ffe600;
+    --color-on-highlight: #000000;
+
+    --color-success: #004d1a;
+    --color-success-surface: #ffffff;
+    --color-danger: #8a0000;
+    --color-danger-surface: #ffffff;
+    --color-warning: #5c3d00;
+    --color-warning-surface: #ffffff;
+    --color-info: #00309e;
+    --color-info-surface: #ffffff;
+
+    --shadow-raised: none;
+    --border-width: 1px;
+    --border-width-control: 2px;
+    --focus-width: 4px;
+  }
+}

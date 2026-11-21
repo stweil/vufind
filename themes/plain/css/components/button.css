@@ -1,0 +1,46 @@
+/*
+ * Button. Also used on <a> and <summary> elements which act like one.
+ */
+@layer components {
+  .c-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-block-size: var(--size-target);
+    padding: var(--space-2) var(--space-4);
+    border: var(--border-width-control) solid var(--color-border-control);
+    border-radius: var(--radius-small);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-weight: var(--font-weight-strong);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color var(--duration-short), border-color var(--duration-short);
+  }
+
+  .c-button:hover {
+    border-color: var(--color-text);
+    background: var(--color-surface-sunken);
+    text-decoration: underline;
+  }
+
+  /* The main action of a form. */
+  .c-button--primary {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+
+  .c-button--primary:hover {
+    border-color: var(--color-accent-hover);
+    background: var(--color-accent-hover);
+    color: var(--color-on-accent);
+  }
+
+  /* For dense places such as the tool bar above the result list. */
+  .c-button--compact {
+    min-block-size: var(--size-target-compact);
+    padding: var(--space-1) var(--space-3);
+  }
+}

@@ -1,0 +1,26 @@
+<?php
+  /**
+   * Authors of one kind (main, corporate, other), each with a link to a search
+   * for the name and, where known, the roles.
+   *
+   * @property array  $data               Authors by kind: name => further data
+   * @property string $type               Kind of author to show
+   * @property string $schemaLabel        Schema.org property
+   * @property array  $requiredDataFields Further data to show: name and translation prefix
+   */
+  $authors = [];
+  foreach ($this->data[$this->type] ?? [] as $author => $details) {
+    $html = '<a href="' . $this->record($this->driver)->getLink('author', $author) . '">'
+      . $this->escapeHtml(rtrim($author, ',')) . '</a>';
+    foreach ($this->requiredDataFields ?? [] as $field) {
+      $values = array_unique(array_map(
+          fn ($value) => $this->transEsc(($field['prefix'] ?? '') . $value),
+          $details[$field['name']] ?? []
+      ));
+      if ($values) {
+        $html .= ' (' . implode(', ', $values) . ')';
+      }
+    }
+    $authors[] = '<span' . $this->schemaOrg()->getAttributes(['property' => $this->schemaLabel]) . '>' . $html . '</span>';
+  }
+  echo implode(', ', $authors);

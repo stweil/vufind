@@ -1,0 +1,19 @@
+<?php
+  /**
+   * "Showing 1 - 20 results of 272 for search 'x'".
+   *
+   * @property \VuFind\Search\Base\Results $results    Search results
+   * @property string                      $searchType basic or advanced
+   * @property string                      $lookfor    Search terms
+   */
+  $tokens = [
+    '%%start%%' => $this->localizedNumber($this->results->getStartRecord()),
+    '%%end%%' => $this->localizedNumber($this->results->getEndRecord()),
+    '%%total%%' => $this->localizedNumber($this->results->getResultTotal()),
+    '%%lookfor%%' => $this->escapeHtml($this->lookfor),
+  ];
+  $key = 'basic' === $this->searchType && '' !== $this->lookfor
+    ? 'showing_results_of_for_html'
+    : 'showing_results_of_html';
+  // HTML is intentionally allowed in these messages.
+  echo $this->translate($key, $tokens);

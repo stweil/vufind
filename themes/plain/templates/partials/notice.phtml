@@ -1,0 +1,18 @@
+<?php
+  /**
+   * Message box with an icon.
+   *
+   * @property string  $variant     info, warning or danger
+   * @property string  $titleHtml   Heading (escaped HTML)
+   * @property ?string $bodyHtml    Further content (HTML)
+   * @property ?int    $headingRank Rank of the heading (default: 2)
+   */
+  $heading = 'h' . (int)($this->headingRank ?? 2);
+?>
+<div class="c-notice c-notice--<?=$this->escapeHtmlAttr($this->variant)?>">
+  <?=$this->icon('notice-' . $this->variant)?>
+  <div class="c-notice__body">
+    <<?=$heading?> class="c-notice__title"><?=$this->titleHtml?></<?=$heading?>>
+    <?=$this->bodyHtml ?? ''?>
+  </div>
+</div>

@@ -1,0 +1,16 @@
+<?php
+  /**
+   * Suggestions for a search without results: changed search terms.
+   */
+  if (!($suggestions = $this->recommend->getSuggestions())) {
+    return;
+  }
+  $urlQuery = $this->recommend->getResults()->getUrlQuery();
+?>
+<h2><?=$this->transEsc('switchquery_intro')?></h2>
+<ul>
+  <?php foreach ($suggestions as $description => $query): ?>
+    <?php // The URL query helper returns escaped URLs. ?>
+    <li><?=$this->transEsc($description)?>: <a href="<?=$urlQuery->setSearchTerms($query)?>"><?=$this->escapeHtml($query)?></a></li>
+  <?php endforeach; ?>
+</ul>

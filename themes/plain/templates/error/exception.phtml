@@ -1,0 +1,15 @@
+<?php
+  /**
+   * Details of an exception. Only shown in the development environment
+   * (view_manager/display_exceptions).
+   *
+   * @property \Throwable $exception Exception
+   */
+?>
+<?php for ($exception = $this->exception; $exception; $exception = $exception->getPrevious()): ?>
+  <details>
+    <summary><?=$this->transEsc('Exception')?>: <?=$this->escapeHtml($exception::class)?></summary>
+    <p><?=$this->escapeHtml($exception->getMessage())?></p>
+    <pre><?=$this->escapeHtml($exception->getTraceAsString())?></pre>
+  </details>
+<?php endfor; ?>

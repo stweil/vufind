@@ -1,0 +1,21 @@
+/*
+ * Availability, location and call number of a record in the result list
+ * (templates/partials/item-status.phtml), filled by js/modules/item-status.js.
+ */
+@layer components {
+  .c-item-status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-3);
+    font-size: var(--font-size-small);
+  }
+
+  /* One location when a record is held at several (ajax/itemLocationList.phtml). */
+  .c-item-status__location {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-2);
+  }
+}

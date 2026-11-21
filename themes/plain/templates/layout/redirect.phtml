@@ -1,0 +1,14 @@
+<?php
+  /**
+   * Body of a 302 response. It is normally never shown, so it is not translated.
+   */
+  echo $this->doctype();
+?>
+<html lang="en">
+  <head>
+    <title>Redirect</title>
+  </head>
+  <body>
+    302 Redirect to <?=$this->escapeHtml($this->redirectUrl ?? '[unavailable]')?>
+  </body>
+</html>

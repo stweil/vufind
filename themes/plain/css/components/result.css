@@ -1,0 +1,32 @@
+/*
+ * One record in the result list: cover at the side, text next to it.
+ */
+@layer components {
+  .c-result {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+
+  .c-result__body {
+    display: grid;
+    align-content: start;
+    gap: var(--space-2);
+  }
+
+  .c-result__title {
+    margin: 0;
+    font-size: var(--font-size-heading-3);
+  }
+
+  .c-result__line {
+    margin: 0;
+  }
+
+  .c-result__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-3);
+  }
+}

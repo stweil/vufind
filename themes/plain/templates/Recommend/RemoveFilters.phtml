@@ -1,0 +1,13 @@
+<?php
+  /**
+   * Suggestion for a search without results: repeat it without the filters.
+   */
+  if (!$this->recommend->hasFilters()) {
+    return;
+  }
+?>
+<p>
+  <?=$this->transEsc('nohit_active_filters')?>
+  <?php // The URL is already escaped. ?>
+  <a href="<?=$this->recommend->getFilterlessUrl()?>"><?=$this->transEsc('nohit_query_without_filters')?></a>
+</p>

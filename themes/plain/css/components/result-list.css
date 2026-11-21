@@ -1,0 +1,31 @@
+/*
+ * Numbered list of search results. The number is drawn by this stylesheet from
+ * the counter of the <ol> (which honours its start attribute), so that it can
+ * be aligned with the first line of the result.
+ */
+@layer components {
+  .c-result-list {
+    margin: 0;
+    padding: 0;
+    border-block-end: var(--border-width) solid var(--color-border);
+    list-style: none;
+  }
+
+  .c-result-list__item {
+    display: grid;
+    /* A grid is not a list item any more, so it has to count itself. */
+    counter-increment: list-item;
+    grid-template-columns: minmax(2ch, auto) minmax(0, 1fr);
+    gap: var(--space-3);
+    padding-block: var(--space-4);
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+
+  .c-result-list__item::before {
+    content: counter(list-item) ".";
+    color: var(--color-text-muted);
+    font-size: var(--font-size-small);
+    font-variant-numeric: tabular-nums;
+    text-align: end;
+  }
+}

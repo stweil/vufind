@@ -1,0 +1,13 @@
+/*
+ * Small label for a property of a record, for example its format.
+ */
+@layer components {
+  .c-tag {
+    display: inline-block;
+    padding-inline: var(--space-2);
+    border: var(--border-width) solid var(--color-border-control);
+    border-radius: var(--radius-small);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-small);
+  }
+}

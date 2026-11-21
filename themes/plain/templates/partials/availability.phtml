@@ -1,0 +1,16 @@
+<?php
+  /**
+   * Status label for an availability status of the library system.
+   *
+   * @property \VuFind\ILS\Logic\AvailabilityStatusInterface $status      Availability status
+   * @property ?string                                       $description Translation key to use instead of the status description
+   */
+  $status = $this->status;
+  $variant = match (true) {
+    $status->is($status::STATUS_UNAVAILABLE) => 'unavailable',
+    $status->is($status::STATUS_AVAILABLE) => 'available',
+    $status->is($status::STATUS_UNKNOWN) => 'unknown',
+    default => 'uncertain',
+  };
+  $labelHtml = $this->transEsc($this->description ?? $status->getStatusDescription(), $status->getStatusDescriptionTokens());
+  echo $this->render('partials/status.phtml', ['variant' => $variant, 'labelHtml' => $labelHtml]);

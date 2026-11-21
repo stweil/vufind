@@ -1,0 +1,41 @@
+<?php
+  /**
+   * Table of copies with their status.
+   *
+   * @property array[] $items       Items from the library system
+   * @property string  $captionHtml Caption of the table (escaped HTML)
+   */
+  if (!$this->items) {
+    return;
+  }
+?>
+<div class="c-table c-table--even">
+  <table>
+    <caption class="u-visually-hidden"><?=$this->captionHtml?></caption>
+    <thead>
+      <tr>
+        <th scope="col"><?=$this->transEsc('Copy')?></th>
+        <th scope="col"><?=$this->transEsc('Status')?></th>
+      </tr>
+    </thead>
+    <tbody>
+      <?php foreach ($this->items as $item): ?>
+        <?php $onReserve = 'Y' === ($item['reserve'] ?? 'N'); ?>
+        <tr>
+          <th scope="row">
+            <?=$this->escapeHtml(trim(($item['number'] ?? '') . ' ' . ($item['enumchron'] ?? '')))?>
+          </th>
+          <td>
+            <?=$this->render('partials/availability.phtml', ['status' => $item['availability'], 'description' => $onReserve ? 'On Reserve - Ask at Circulation Desk' : null])?>
+            <?php if (!$item['availability']->isAvailable() && !empty($item['duedate'])): ?>
+              <span><?=$this->transEsc('Due')?>: <?=$this->escapeHtml($item['duedate'])?></span>
+            <?php endif; ?>
+            <?php foreach ($item['item_notes'] ?? [] as $note): ?>
+              <div><?=$this->escapeHtml($note)?></div>
+            <?php endforeach; ?>
+          </td>
+        </tr>
+      <?php endforeach; ?>
+    </tbody>
+  </table>
+</div>

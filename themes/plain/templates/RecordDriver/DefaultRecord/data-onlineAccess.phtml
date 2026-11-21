@@ -1,0 +1,8 @@
+<?php
+  /**
+   * Links to the online version. OpenURL and identifier links are not covered.
+   */
+?>
+<?php foreach ($this->record($this->driver)->getLinkDetails() as $link): ?>
+  <div><a href="<?=$this->escapeHtmlAttr($this->proxyUrl($link['url']))?>"><?=$this->escapeHtml($link['desc'])?></a></div>
+<?php endforeach; ?>

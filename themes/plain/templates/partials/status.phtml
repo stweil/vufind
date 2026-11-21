@@ -1,0 +1,12 @@
+<?php
+  /**
+   * Status label: an icon and a text, so that the meaning does not depend on the color.
+   *
+   * @property string $variant   available, unavailable, uncertain or unknown
+   * @property string $labelHtml Text of the label (escaped HTML)
+   */
+?>
+<span class="c-status c-status--<?=$this->escapeHtmlAttr($this->variant)?>">
+  <?=$this->icon('status-' . $this->variant)?>
+  <span><?=$this->labelHtml?></span>
+</span>

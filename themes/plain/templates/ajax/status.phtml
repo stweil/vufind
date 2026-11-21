@@ -1,0 +1,8 @@
+<?php
+  /**
+   * Availability label of a record in the result list (answer of the AJAX
+   * handler getItemStatuses).
+   *
+   * @property \VuFind\ILS\Logic\AvailabilityStatusInterface $availabilityStatus Availability status
+   */
+  echo $this->availabilityStatus()->renderStatusForAjaxResponse($this->availabilityStatus);

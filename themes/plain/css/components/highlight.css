@@ -1,0 +1,13 @@
+/*
+ * Search terms found in a result. The class name has no prefix because the
+ * markup comes from VuFind (VuFind\View\Helper\Root\Highlight), not from this
+ * theme. Bold text marks the terms where the background is not shown.
+ */
+@layer components {
+  .highlight {
+    border-radius: var(--radius-small);
+    background: var(--color-highlight);
+    color: var(--color-on-highlight);
+    font-weight: var(--font-weight-strong);
+  }
+}

@@ -1,0 +1,33 @@
+<?php
+  /**
+   * Head of the record page: cover, title, summary and the bibliographic fields.
+   *
+   * Not covered: QR code, ratings, previews, record versions and user lists.
+   */
+  $this->metadata()->generateMetatags($this->driver);
+  $record = $this->record($this->driver);
+  $titleHtml = implode(' ', array_filter(array_map(
+      fn ($part) => $this->escapeOrCleanHtml($part, 'title', renderingContext: 'heading'),
+      [$this->driver->getShortTitle(), $this->driver->getSubtitle(), $this->driver->getTitleSection()]
+  )));
+  $summary = $this->driver->getSummary()[0] ?? null;
+  $shortSummary = null === $summary ? null : $this->truncate($summary, 300);
+?>
+<div class="c-record__core"<?=$this->schemaOrg()->getAttributes(['vocab' => 'http://schema.org/', 'resource' => '#record', 'typeof' => $this->schemaOrg()->getRecordTypes($this->driver)])?>>
+  <?=$record->getCoverDetails('core', 'medium')['html']?>
+  <div class="l-stack">
+    <h1 class="c-page-title"<?=$this->schemaOrg()->getAttributes(['property' => 'name'])?>><?=$titleHtml?></h1>
+    <?php foreach ($this->driver->tryMethod('getFullTitlesAltScript', [], []) as $altTitle): ?>
+      <p><?=$this->escapeOrCleanHtml($altTitle, 'title-alt')?></p>
+    <?php endforeach; ?>
+    <?php if (null !== $shortSummary): ?>
+      <p>
+        <?=$this->escapeOrCleanHtml($shortSummary, 'summary', true)?>
+        <?php if ($shortSummary !== $summary): ?>
+          <a href="<?=$this->escapeHtmlAttr($this->recordLinker()->getTabUrl($this->driver, 'Description'))?>#tabnav"><?=$this->transEsc('Full description')?></a>
+        <?php endif; ?>
+      </p>
+    <?php endif; ?>
+    <?=$record->renderTemplate('core-fields.phtml', ['driver' => $this->driver, 'defaults' => 'core'])?>
+  </div>
+</div>

@@ -1,0 +1,8 @@
+<?php
+  /**
+   * Link to a search for the records which are part of this one.
+   *
+   * @property int $data Number of child records
+   */
+?>
+<a href="<?=$this->escapeHtmlAttr($this->recordLinker()->getChildRecordSearchUrl($this->driver))?>"><?=$this->transEsc('child_record_count', ['%%count%%' => $this->data])?></a>

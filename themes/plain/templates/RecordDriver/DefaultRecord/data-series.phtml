@@ -1,0 +1,19 @@
+<?php
+  /**
+   * Series, each with a link to a search for it.
+   *
+   * @property array $data Series: either a name, or an array with name and number
+   */
+?>
+<?php foreach ($this->data as $series): ?>
+  <?php
+    $name = is_array($series) ? ($series['name'] ?? '') : $series;
+    $number = is_array($series) ? ($series['number'] ?? '') : '';
+  ?>
+  <?php if ('' !== $name): ?>
+    <div>
+      <a href="<?=$this->record($this->driver)->getLink('series', $name)?>"><?=$this->escapeHtml($name)?></a>
+      <?=$this->escapeHtml($number)?>
+    </div>
+  <?php endif; ?>
+<?php endforeach; ?>

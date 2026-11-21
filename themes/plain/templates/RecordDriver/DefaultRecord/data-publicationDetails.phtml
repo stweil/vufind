@@ -1,0 +1,22 @@
+<?php
+  /**
+   * Place, publisher and date of each publication statement.
+   *
+   * @property \VuFind\RecordDriver\Response\PublicationDetails[] $data Publication statements
+   */
+?>
+<?php foreach ($this->data as $details): ?>
+  <div>
+    <span<?=$this->schemaOrg()->getAttributes(['property' => 'publisher', 'typeof' => 'Organization'])?>>
+      <?php if ($place = $details->getPlace()): ?>
+        <span<?=$this->schemaOrg()->getAttributes(['property' => 'location'])?>><?=$this->escapeHtml($place)?></span>
+      <?php endif; ?>
+      <?php if ($name = $details->getName()): ?>
+        <a<?=$this->schemaOrg()->getAttributes(['property' => 'name'])?> href="<?=$this->record($this->driver)->getLink('publisher', $name)?>"><?=$this->escapeHtml($name)?></a>
+      <?php endif; ?>
+    </span>
+    <?php if ($date = $details->getDate()): ?>
+      <span<?=$this->schemaOrg()->getAttributes(['property' => 'datePublished'])?>><?=$this->escapeHtml($date)?></span>
+    <?php endif; ?>
+  </div>
+<?php endforeach; ?>

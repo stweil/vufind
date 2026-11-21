@@ -1,0 +1,53 @@
+<?php
+  /**
+   * One record in the result list.
+   *
+   * Not covered: favorites, cart, QR code, OpenURL and identifier links, record
+   * versions, duplicate records, collections, previews and the search explanation.
+   */
+  $record = $this->record($this->driver);
+  $recordUrl = $this->recordLinker($this->results)->getUrl($this->driver);
+  $authors = $this->driver->isCollection() ? [] : $this->driver->getPrimaryAuthorsWithHighlighting();
+  $snippet = $this->driver->getHighlightedSnippet();
+?>
+<article class="c-result">
+  <?=$record->getCoverDetails('result-list', 'medium')['html']?>
+  <div class="c-result__body">
+    <h2 class="c-result__title">
+      <a href="<?=$this->escapeHtmlAttr($recordUrl)?>"><?=$record->getTitleHtml()?></a>
+    </h2>
+    <?php if ($authors): ?>
+      <p class="c-result__line">
+        <?=$this->transEsc('by')?>
+        <?php foreach (array_values($authors) as $index => $author): ?>
+          <?php // getLink() returns an escaped URL; the helper removes the highlighting markers for the link. ?>
+          <a href="<?=$record->getLink('author', $this->highlight($author, null, true, false))?>"><?=$this->highlight(rtrim($author, ','))?></a><?=$index + 1 < count($authors) ? ',' : ''?>
+        <?php endforeach; ?>
+      </p>
+    <?php endif; ?>
+    <?=$this->render('RecordDriver/DefaultRecord/result-published.phtml')?>
+    <?php if (!empty($snippet['snippet'])): ?>
+      <p class="c-result__line">
+        <?php if (!empty($snippet['caption'])): ?>
+          <strong><?=$this->transEsc($snippet['caption'])?>:</strong>
+        <?php endif; ?>
+        <?php // HTML is intentionally allowed in this message. ?>
+        <?=$this->translate('highlight_snippet_html', ['%%snippet%%' => $this->highlight($snippet['snippet'])])?>
+      </p>
+    <?php endif; ?>
+    <div class="c-result__meta">
+      <?=$record->getFormatList()?>
+      <?php if ($this->driver->supportsAjaxStatus()): ?>
+        <?=$this->render('partials/item-status.phtml', ['recordId' => $this->driver->getUniqueID()])?>
+      <?php endif; ?>
+    </div>
+    <?php foreach ($this->driver->isCollection() ? [] : $record->getLinkDetails() as $link): ?>
+      <p class="c-result__line">
+        <a href="<?=$this->escapeHtmlAttr($this->proxyUrl($link['url']))?>">
+          <?=$this->icon('external-link')?>
+          <?=$link['url'] === $link['desc'] ? $this->transEsc('Get full text') : $this->escapeHtml($link['desc'])?>
+        </a>
+      </p>
+    <?php endforeach; ?>
+  </div>
+</article>

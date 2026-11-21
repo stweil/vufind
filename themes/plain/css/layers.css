@@ -1,0 +1,9 @@
+/*
+ * Order of the cascade layers, lowest priority first. This file must be the first
+ * stylesheet of the theme (see theme.config.php).
+ *
+ * Because the layers decide which rule wins, no file needs !important or a more
+ * specific selector to override another one: a utility always beats a component,
+ * and a component always beats an element default.
+ */
+@layer tokens, base, layout, components, utilities;

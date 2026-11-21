@@ -1,0 +1,11 @@
+<?php
+  /**
+   * Fields of a record as chosen by the record data formatter.
+   *
+   * @property string $defaults Name of the field set: core or description
+   */
+  $formatter = $this->recordDataFormatter($this->driver);
+  echo $this->render(
+      'partials/field-list.phtml',
+      ['fields' => $formatter->getData($formatter->getDefaults($this->defaults ?? 'core'))]
+  );

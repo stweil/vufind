@@ -1,0 +1,10 @@
+<?php
+  /**
+   * Formats of a record ("Book", "eBook") as tags.
+   */
+?>
+<?php foreach ($this->driver->getFormats() as $format): ?>
+  <?php if ($label = $this->transEsc($format)): ?>
+    <span class="c-tag"><?=$label?></span>
+  <?php endif; ?>
+<?php endforeach; ?>

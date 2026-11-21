@@ -1,0 +1,148 @@
+/*
+ * Element defaults: a small reset, typography, links, the focus ring and the
+ * adjustments for user preferences. Only element selectors are used here, so
+ * every rule can be overridden by a single class in a later layer.
+ */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    /* Do not let mobile browsers enlarge text on their own. */
+    text-size-adjust: none;
+    scroll-padding-block-start: var(--space-4);
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-canvas);
+    color: var(--color-text);
+    font-family: var(--font-family-text);
+    font-size: var(--font-size-text);
+    line-height: var(--line-height-text);
+    /* Long words (URLs, identifiers) must not force horizontal scrolling. */
+    overflow-wrap: break-word;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin-block: 0 var(--space-3);
+    font-weight: var(--font-weight-strong);
+    line-height: var(--line-height-heading);
+  }
+
+  h1 {
+    font-size: var(--font-size-heading-1);
+    text-wrap: balance;
+  }
+
+  h2 {
+    font-size: var(--font-size-heading-2);
+  }
+
+  h3,
+  h4 {
+    font-size: var(--font-size-heading-3);
+  }
+
+  p,
+  ul,
+  ol,
+  dl,
+  pre,
+  table {
+    margin-block: 0 var(--space-4);
+  }
+
+  dd {
+    margin-inline-start: 0;
+  }
+
+  /* Links are always underlined: color alone must not be what marks a link. */
+  a {
+    color: var(--color-link);
+    text-decoration-line: underline;
+    text-decoration-thickness: from-font;
+    text-underline-offset: 0.15em;
+  }
+
+  a:hover {
+    color: var(--color-link-hover);
+    text-decoration-thickness: 0.125em;
+  }
+
+  img,
+  svg {
+    max-inline-size: 100%;
+    vertical-align: middle;
+  }
+
+  pre,
+  code {
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-small);
+  }
+
+  pre {
+    overflow-x: auto;
+    padding: var(--space-3);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-small);
+    background: var(--color-surface-sunken);
+  }
+
+  /* Form controls do not inherit the font by default. */
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+
+  summary {
+    cursor: pointer;
+  }
+
+  /*
+   * Focus ring: an outline (never a box-shadow, which Windows contrast themes
+   * remove), separated from the element by a gap in which the background shows,
+   * so that it is also visible around elements filled with the focus color.
+   */
+  :focus-visible {
+    outline: var(--focus-width) solid var(--color-focus);
+    outline-offset: var(--focus-offset);
+  }
+
+  /* The target of the skip link is focused by script-free navigation; it is not a control. */
+  main:focus {
+    outline: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --duration-short: 0s;
+    }
+
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto;
+      animation-duration: 0s;
+      animation-iteration-count: 1;
+    }
+  }
+
+  /*
+   * Windows contrast themes (forced-colors: active) replace all colors with the
+   * user's palette. Nothing is needed here for the focus ring: an outline
+   * survives, and the browser draws it in the user's text color. Do not set it
+   * to the system color Highlight, which may be translucent. Components which
+   * mark a state by their background handle that in their own file.
+   */
+}

@@ -1,0 +1,21 @@
+<?php
+  /**
+   * Menu to choose the language of the user interface.
+   */
+  $globals = $this->globals();
+  $languages = $globals['allLangs'] ?? [];
+  if (count($languages) < 2) {
+    return;
+  }
+  $items = [];
+  foreach ($languages as $code => $name) {
+    $items[] = [
+      'labelHtml' => $this->displayLanguageOption($name),
+      'url' => $this->url()->addQueryParameters(['lng' => $code]),
+      'selected' => $globals['userLang'] === $code,
+      // Each language name is written in its own language.
+      'lang' => $code,
+    ];
+  }
+?>
+<?=$this->render('partials/menu.phtml', ['label' => 'Language', 'iconName' => 'menu-language', 'items' => $items])?>

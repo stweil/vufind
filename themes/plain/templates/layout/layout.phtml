@@ -1,0 +1,56 @@
+<?php
+  /**
+   * Page frame: skip link, header, main area, footer.
+   */
+
+  // Whoops (the error handler of the development environment) renders a complete
+  // page of its own; output it and nothing else.
+  $children = $this->layout()->getChildren();
+  if ($children && $children[0]?->getTemplate() === 'laminas_whoops/simple_error') {
+    echo $this->layout()->content;
+    return;
+  }
+
+  $globals = $this->globals();
+
+  // A page template may have set its own search box (search/results.phtml) or
+  // switched it off with false (search/home.phtml). Nothing is rendered after a
+  // rendering error, because the search box could fail again.
+  if (!isset($globals['searchbox'])) {
+    $globals['searchbox'] = isset($globals['renderingError'])
+      ? false
+      : $this->context($this)->renderInContext('search/searchbox.phtml', []);
+  }
+
+  // VuFind calls the scheme which follows the system preference "normal"; its
+  // stylesheet is css/schemes/auto.css. Fall back to light if the theme could not
+  // be initialized.
+  $selectedColorScheme = $globals['selectedColorScheme'] ?? 'light';
+  $colorScheme = 'normal' === $selectedColorScheme ? 'auto' : $selectedColorScheme;
+
+  $basePath = rtrim($this->url('home'), '/');
+
+  echo $this->doctype();
+?>
+<html
+  lang="<?=$this->escapeHtmlAttr($globals['userLang'])?>"<?php if ($globals['rtl']): ?> dir="rtl"<?php endif; ?>
+  data-bs-theme="<?=$this->escapeHtmlAttr($colorScheme)?>"
+>
+  <head>
+    <?=$this->render('layout/head.phtml', ['colorScheme' => $colorScheme])?>
+  </head>
+  <?php // The data attributes are read by js/modules/site.js. ?>
+  <body
+    class="l-page"
+    data-base-path="<?=$this->escapeHtmlAttr($basePath)?>"
+    data-search-id="<?=$this->escapeHtmlAttr($globals['searchId'] ?? '')?>"
+  >
+    <a class="c-skip-link" href="#content"><?=$this->transEsc('Skip to content')?></a>
+    <?=$this->render('header.phtml')?>
+    <main id="content" class="l-page__main l-container" tabindex="-1">
+      <?=$this->layout()->content?>
+    </main>
+    <?=$this->render('footer.phtml')?>
+    <?=$this->assetManager()->outputFooterAssets()?>
+  </body>
+</html>

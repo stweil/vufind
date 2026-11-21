@@ -1,0 +1,48 @@
+/*
+ * Color scheme "contrast-dark": high contrast, light on dark.
+ * Same properties, same order as light.css; see contrast-light.css for the rules
+ * a high contrast scheme follows.
+ */
+@layer tokens {
+  :root {
+    color-scheme: dark;
+
+    --color-canvas: #000000;
+    --color-surface: #000000;
+    --color-surface-sunken: #000000;
+
+    --color-text: #ffffff;
+    --color-text-muted: #e6e6e6;
+    --color-link: #ffe45c;
+    --color-link-hover: #ffffff;
+
+    --color-border: #ffffff;
+    --color-border-control: #ffffff;
+
+    --color-focus: #00e5ff;
+
+    --color-accent: #ffffff;
+    --color-accent-hover: #ffe45c;
+    --color-on-accent: #000000;
+
+    --color-selected: #ffffff;
+    --color-on-selected: #000000;
+
+    --color-highlight: #ffe45c;
+    --color-on-highlight: #000000;
+
+    --color-success: #7dffa8;
+    --color-success-surface: #000000;
+    --color-danger: #ffb3b3;
+    --color-danger-surface: #000000;
+    --color-warning: #ffd866;
+    --color-warning-surface: #000000;
+    --color-info: #9dd1ff;
+    --color-info-surface: #000000;
+
+    --shadow-raised: none;
+    --border-width: 1px;
+    --border-width-control: 2px;
+    --focus-width: 4px;
+  }
+}

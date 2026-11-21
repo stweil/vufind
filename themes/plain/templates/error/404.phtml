@@ -1,0 +1,10 @@
+<?php
+  /**
+   * Page for an address which does not exist.
+   */
+  $this->headTitle($this->translate('Page not found.'));
+  $bodyHtml = !empty($this->reason) ? '<p>' . $this->transEsc($this->reason) . '</p>' : '';
+  echo $this->render(
+      'partials/notice.phtml',
+      ['variant' => 'warning', 'titleHtml' => $this->transEsc($this->message), 'bodyHtml' => $bodyHtml, 'headingRank' => 1]
+  );

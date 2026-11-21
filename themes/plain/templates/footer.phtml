@@ -1,0 +1,13 @@
+<?php
+  /**
+   * Site footer. The footer menu of the standard theme links to pages this theme
+   * does not have, so the only link leads back to the standard theme.
+   */
+  $standardThemeUrl = $this->url()->addQueryParameters(['ui' => 'standard']);
+?>
+<footer class="c-site-footer">
+  <div class="l-container l-cluster l-cluster--spread">
+    <p class="c-site-footer__note"><?=$this->transEsc('plain_prototype_note')?></p>
+    <a class="c-site-footer__link" href="<?=$this->escapeHtmlAttr($standardThemeUrl)?>" rel="nofollow"><?=$this->transEsc('Go to Standard View')?></a>
+  </div>
+</footer>

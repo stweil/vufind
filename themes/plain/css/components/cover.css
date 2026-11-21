@@ -1,0 +1,33 @@
+/*
+ * Cover of a record: a box with the proportions of a book which shows a
+ * placeholder icon until, or instead of, the image.
+ */
+@layer components {
+  .c-cover {
+    position: relative;
+    display: grid;
+    place-items: center;
+    /* Smaller on a narrow screen. */
+    inline-size: min(var(--size-cover), 20vi);
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-small);
+    background: var(--color-surface-sunken);
+    color: var(--color-text-muted);
+  }
+
+  /* On the record page. */
+  .c-cover--core {
+    inline-size: min(var(--size-cover-large), 30vi);
+  }
+
+  .c-cover__image {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    background: var(--color-surface);
+    object-fit: contain;
+  }
+}

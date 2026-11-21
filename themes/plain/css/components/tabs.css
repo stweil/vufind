@@ -1,0 +1,58 @@
+/*
+ * Record tabs (templates/record/tabs.phtml): a row of links and the content of
+ * the selected one. The row wraps on a narrow screen.
+ */
+@layer components {
+  .c-tabs__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    border-block-end: var(--border-width-control) solid var(--color-border-control);
+    list-style: none;
+  }
+
+  .c-tabs__tab {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--size-target);
+    padding: var(--space-2) var(--space-4);
+    border: var(--border-width-control) solid transparent;
+    border-block-end: 0;
+    border-start-start-radius: var(--radius-small);
+    border-start-end-radius: var(--radius-small);
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .c-tabs__tab:hover {
+    background: var(--color-surface-sunken);
+    text-decoration: underline;
+  }
+
+  /* The selected tab also has a border and bold text. */
+  .c-tabs__tab[aria-current] {
+    border-color: var(--color-border-control);
+    background: var(--color-selected);
+    color: var(--color-on-selected);
+    font-weight: var(--font-weight-strong);
+  }
+
+  .c-tabs__panel {
+    padding-block-start: var(--space-5);
+  }
+
+  /*
+   * Windows contrast themes remove the background which marks the selected tab;
+   * use the system's selection colors for it instead.
+   */
+  @media (forced-colors: active) {
+    .c-tabs__tab[aria-current] {
+      forced-color-adjust: none;
+      border-color: Highlight;
+      background: Highlight;
+      color: HighlightText;
+    }
+  }
+}

@@ -1,0 +1,32 @@
+<?php
+  /**
+   * Filters which are switched on and off, shown above the facets.
+   *
+   * @property array[]                       $checkboxFilters Filters: filter, desc, selected, count (optional)
+   * @property \VuFind\Search\UrlQueryHelper $urlQuery        URL builder of the search
+   */
+?>
+<ul class="c-facet__list">
+  <?php foreach ($this->checkboxFilters as $filter): ?>
+    <?php
+      // The URL query helper returns escaped URLs.
+      $urlHtml = $filter['selected']
+        ? $this->urlQuery->removeFilter($filter['filter'])
+        : $this->urlQuery->addFilter($filter['filter']);
+    ?>
+    <li class="c-facet__item">
+      <a class="c-facet__link" href="<?=$urlHtml?>" rel="nofollow"<?=$filter['selected'] ? ' aria-current="true"' : ''?>>
+        <?=$this->icon($filter['selected'] ? 'facet-checked' : 'facet-unchecked')?>
+        <span class="c-facet__text">
+          <?php if ($filter['selected']): ?>
+            <span class="u-visually-hidden"><?=$this->transEsc('applied_filter')?></span>
+          <?php endif; ?>
+          <?=$this->transEsc($filter['desc'])?>
+        </span>
+        <?php if (!$filter['selected'] && isset($filter['count'])): ?>
+          <span class="c-facet__count"><?=$this->escapeHtml($this->localizedNumber($filter['count']))?></span>
+        <?php endif; ?>
+      </a>
+    </li>
+  <?php endforeach; ?>
+</ul>

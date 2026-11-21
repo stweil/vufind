@@ -1,0 +1,81 @@
+/*
+ * Layout objects (prefix l-): they arrange their children and have no colors,
+ * borders or type of their own.
+ */
+@layer layout {
+  /* Page shell: header, main area and footer; the footer stays at the bottom. */
+  .l-page {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    min-block-size: 100vb;
+  }
+
+  /* Centered column with a side gutter. */
+  .l-container {
+    inline-size: 100%;
+    max-inline-size: var(--size-content);
+    margin-inline: auto;
+    padding-inline: var(--space-4);
+  }
+
+  .l-page__main {
+    padding-block: var(--space-5) var(--space-7);
+  }
+
+  /* Vertical flow with an even gap. */
+  .l-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .l-stack > * {
+    margin-block: 0;
+  }
+
+  .l-stack--large {
+    gap: var(--space-6);
+  }
+
+  /* Items in a row which wrap when there is not enough room. */
+  .l-cluster {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-4);
+  }
+
+  .l-cluster--spread {
+    justify-content: space-between;
+  }
+
+  /*
+   * Main content with a side bar. One column by default; two columns as soon as
+   * the main area (not the viewport) is wide enough. components/facet.css uses
+   * the same width; keep the two in step.
+   */
+  .l-page__main {
+    container-type: inline-size;
+  }
+
+  .l-with-sidebar {
+    display: grid;
+    gap: var(--space-5);
+    /* Without minmax(0, ...), long content could make the column wider than the page. */
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  @container (min-width: 56rem) {
+    .l-with-sidebar {
+      grid-template-columns: var(--size-sidebar) minmax(0, 1fr);
+      gap: var(--space-6);
+      align-items: start;
+    }
+  }
+
+  /* Centered narrow column, for the search home page and messages. */
+  .l-center {
+    max-inline-size: var(--size-measure);
+    margin-inline: auto;
+  }
+}

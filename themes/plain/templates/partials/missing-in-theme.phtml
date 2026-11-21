@@ -1,0 +1,20 @@
+<?php
+  /**
+   * Message for a page or a part of a page which this theme does not have, with
+   * a link which opens the same address in the standard theme.
+   *
+   * @property ?int $headingRank Rank of the heading (default: 2)
+   */
+  $standardThemeUrl = $this->url()->addQueryParameters(['ui' => 'standard']);
+  $bodyHtml = '<p>' . $this->transEsc('plain_missing_page_text') . '</p>'
+    . '<p><a href="' . $this->escapeHtmlAttr($standardThemeUrl) . '" rel="nofollow">'
+    . $this->transEsc('plain_missing_page_link') . '</a></p>';
+  echo $this->render(
+      'partials/notice.phtml',
+      [
+        'variant' => 'info',
+        'titleHtml' => $this->transEsc('plain_missing_page_title'),
+        'bodyHtml' => $bodyHtml,
+        'headingRank' => $this->headingRank ?? 2,
+      ]
+  );

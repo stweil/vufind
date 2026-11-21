@@ -1,0 +1,13 @@
+<?php
+  /**
+   * Record tab "Description".
+   */
+  $this->headTitle($this->translate('Description') . ': ' . $this->driver->getBreadcrumb());
+  $formatter = $this->recordDataFormatter($this->driver);
+  $fields = $formatter->getData($formatter->getDefaults('description'));
+?>
+<?php if ($fields): ?>
+  <?=$this->render('partials/field-list.phtml', ['fields' => $fields])?>
+<?php else: ?>
+  <p><?=$this->transEsc('no_description')?></p>
+<?php endif; ?>

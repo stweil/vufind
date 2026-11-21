@@ -1,0 +1,26 @@
+<?php
+  /**
+   * Small form with one select element and a button which applies the choice.
+   * The form is not submitted when the selection changes: a page which reloads
+   * while a keyboard user moves through the options is hard to use.
+   *
+   * @property string  $name             Name of the request parameter
+   * @property string  $label            Translation key of the label
+   * @property array[] $choices          Options: value, labelHtml (escaped HTML), selected (bool)
+   * @property string  $hiddenFieldsHtml Hidden fields with the other parameters of the page (escaped HTML)
+   */
+  if (count($this->choices) < 2) {
+    return;
+  }
+  $id = 'select-form-' . $this->name;
+?>
+<form class="c-toolbar__form" method="get" action="<?=$this->escapeHtmlAttr($this->currentPath())?>">
+  <?=$this->hiddenFieldsHtml?>
+  <label for="<?=$this->escapeHtmlAttr($id)?>"><?=$this->transEsc($this->label)?></label>
+  <select class="c-field c-field--compact" id="<?=$this->escapeHtmlAttr($id)?>" name="<?=$this->escapeHtmlAttr($this->name)?>">
+    <?php foreach ($this->choices as $choice): ?>
+      <option value="<?=$this->escapeHtmlAttr($choice['value'])?>"<?=$choice['selected'] ? ' selected' : ''?>><?=$choice['labelHtml']?></option>
+    <?php endforeach; ?>
+  </select>
+  <button class="c-button c-button--compact" type="submit"><?=$this->transEsc('Set')?></button>
+</form>

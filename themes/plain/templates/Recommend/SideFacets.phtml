@@ -1,0 +1,55 @@
+<?php
+  /**
+   * Facets at the side of the result list.
+   *
+   * On a narrow screen the facets are folded behind a button (a <details>
+   * element); on a wide screen the stylesheet shows them permanently.
+   *
+   * Not covered: hierarchical facets, selecting several values at once, the full
+   * list of values in a dialog and the date slider (a range has two plain fields).
+   */
+  $results = $this->recommend->getResults();
+  $hasResults = $results->getResultTotal() > 0;
+  $checkboxFilters = array_filter(
+      $this->recommend->getCheckboxFacetSet(),
+      fn ($filter) => $hasResults || $filter['selected'] || $filter['alwaysVisible']
+  );
+  $facetSet = $hasResults ? $this->recommend->getFacetSet() : [];
+  if (!$checkboxFilters && !$facetSet) {
+    return;
+  }
+  $rangeFacets = $this->recommend->getAllRangeFacets();
+?>
+<details class="c-facets">
+  <summary class="c-facets__button c-button"><?=$this->transEsc('Refine Results')?></summary>
+  <div class="c-facets__body l-stack">
+    <h2 class="u-visually-hidden"><?=$this->transEsc('Refine Results')?></h2>
+    <p class="u-visually-hidden"><?=$this->transEsc('page_reload_on_select_hint')?></p>
+    <?php if ($checkboxFilters): ?>
+      <?=$this->render('Recommend/SideFacets/checkbox-filters.phtml', ['checkboxFilters' => $checkboxFilters, 'urlQuery' => $results->getUrlQuery()])?>
+    <?php endif; ?>
+    <?php foreach ($facetSet as $field => $cluster): ?>
+      <?php $titleId = 'facet-title-' . preg_replace('/[^a-zA-Z0-9_-]/', '-', $field); ?>
+      <?php // Data-title attribute is for analytics use. Do not remove. ?>
+      <section class="c-facet" aria-labelledby="<?=$this->escapeHtmlAttr($titleId)?>" data-title="<?=$this->escapeHtmlAttr($cluster['label'])?>">
+        <h3 class="c-facet__title" id="<?=$this->escapeHtmlAttr($titleId)?>"><?=$this->transEsc($cluster['label'])?></h3>
+        <?php if (isset($rangeFacets[$field])): ?>
+          <?=$this->render('Recommend/SideFacets/range.phtml', ['field' => $field, 'range' => $rangeFacets[$field], 'urlQuery' => $results->getUrlQuery()])?>
+        <?php else: ?>
+          <?=
+            $this->render(
+                'Recommend/SideFacets/facet-list.phtml',
+                [
+                  'field' => $field,
+                  'values' => $cluster['list'],
+                  'visibleCount' => $this->recommend->getShowMoreSetting($field),
+                  'allowExclude' => $this->recommend->excludeAllowed($field),
+                  'urlQuery' => $results->getUrlQuery(),
+                ]
+            )
+          ?>
+        <?php endif; ?>
+      </section>
+    <?php endforeach; ?>
+  </div>
+</details>

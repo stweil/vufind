@@ -1,0 +1,16 @@
+<?php
+  /**
+   * Search home page: a heading and the search form. The content blocks of the
+   * standard theme (facet lists, ILS status) are not covered.
+   */
+  $this->headTitle($this->translate('Search Home'));
+
+  // The form is shown in the page here, not in the header.
+  $this->globals()['searchbox'] = false;
+
+  $siteTitle = $this->config()->getArray('config')['Site']['title'];
+?>
+<div class="l-center l-stack">
+  <h1 class="c-page-title c-page-title--hero"><?=$this->escapeHtml($siteTitle)?></h1>
+  <?=$this->context($this)->renderInContext('search/searchbox.phtml', ['focusOnLoad' => true])?>
+</div>

@@ -1,0 +1,19 @@
+<?php
+  /**
+   * Record tab "Staff View" for records without MARC data: the fields of the
+   * search index.
+   */
+  $this->headTitle($this->translate('Staff View') . ': ' . $this->driver->getBreadcrumb());
+  $fields = $this->driver->getRawData();
+  ksort($fields);
+?>
+<div class="c-table">
+  <table>
+    <?php foreach ($fields as $name => $values): ?>
+      <tr>
+        <th scope="row"><?=$this->escapeHtml($name)?></th>
+        <td><?=$this->printArrayHtml($values)?></td>
+      </tr>
+    <?php endforeach; ?>
+  </table>
+</div>

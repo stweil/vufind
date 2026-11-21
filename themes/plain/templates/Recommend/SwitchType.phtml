@@ -1,0 +1,13 @@
+<?php
+  /**
+   * Suggestion for a search without results: repeat it with a wider search type.
+   */
+  if (!($handler = $this->recommend->getNewHandler())) {
+    return;
+  }
+?>
+<p>
+  <?=$this->transEsc('widen_prefix')?>
+  <?php // The URL query helper returns escaped URLs. ?>
+  <a href="<?=$this->recommend->getResults()->getUrlQuery()->setHandler($handler)?>"><?=$this->transEsc($this->recommend->getNewHandlerName())?></a>.
+</p>

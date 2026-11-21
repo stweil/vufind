@@ -1,0 +1,35 @@
+<?php
+  /**
+   * Range facet (for example the year of publication): two fields and a button.
+   *
+   * @property string                        $field    Facet field
+   * @property array                         $range    Range settings: type (date, fulldate, numeric, generic) and values
+   * @property \VuFind\Search\UrlQueryHelper $urlQuery URL builder of the search
+   */
+  $type = $this->range['type'];
+  // Reduce the current values to what the field accepts.
+  $clean = match ($type) {
+    'date' => fn ($value) => preg_replace('/^.*?(-?\d+).*/', '$1', $value),
+    'fulldate' => fn ($value) => substr($value, 0, 10),
+    'numeric' => fn ($value) => preg_replace('/^.*?(-?[\d.]+).*/', '$1', $value),
+    default => fn ($value) => $value,
+  };
+  $values = array_map($clean, $this->range['values'] ?? []);
+  $inputAttributes = 'date' === $type
+    ? ['type' => 'number', 'min' => '-9999', 'max' => '9999', 'inputmode' => 'numeric']
+    : ['type' => 'text'];
+  $bounds = ['from' => ['date_from', $values[0] ?? ''], 'to' => ['date_to', $values[1] ?? '']];
+?>
+<form class="c-facet__range" method="get" action="<?=$this->escapeHtmlAttr($this->currentPath())?>">
+  <?php // Already escaped by the URL query helper. ?>
+  <?=$this->urlQuery->asHiddenFields(['page' => '/./', 'filter' => "/^{$this->field}:.*/"])?>
+  <input type="hidden" name="<?=$this->escapeHtmlAttr($type)?>range[]" value="<?=$this->escapeHtmlAttr($this->field)?>">
+  <?php foreach ($bounds as $bound => [$label, $value]): ?>
+    <?php $id = $this->field . $bound; ?>
+    <div class="c-facet__range-field">
+      <label for="<?=$this->escapeHtmlAttr($id)?>"><?=$this->transEsc($label)?></label>
+      <input<?=$this->htmlAttributes($inputAttributes + ['class' => 'c-field c-field--compact', 'id' => $id, 'name' => $id, 'value' => $value])?>>
+    </div>
+  <?php endforeach; ?>
+  <button class="c-button c-button--compact" type="submit"><?=$this->transEsc('Set')?></button>
+</form>

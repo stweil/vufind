@@ -1,0 +1,5 @@
+<?php
+  /**
+   * Availability label "unknown" (see ajax/status.phtml).
+   */
+  echo $this->render('partials/status.phtml', ['variant' => 'unknown', 'labelHtml' => $this->transEsc('status_unknown_message')]);

@@ -1,0 +1,42 @@
+/*
+ * Table. The class is on a wrapper, which scrolls sideways if the table is too
+ * wide; the cells are styled by element, because some tables come from VuFind
+ * itself (the MARC view is made by an XSLT stylesheet).
+ */
+@layer components {
+  .c-table {
+    overflow-x: auto;
+  }
+
+  .c-table table {
+    inline-size: 100%;
+    margin: 0;
+    border-collapse: collapse;
+  }
+
+  .c-table :is(th, td) {
+    padding: var(--space-2) var(--space-3);
+    border-block-end: var(--border-width) solid var(--color-border);
+    text-align: start;
+    vertical-align: top;
+  }
+
+  .c-table th {
+    font-weight: var(--font-weight-strong);
+  }
+
+  .c-table thead th {
+    border-block-end: var(--border-width-control) solid var(--color-border-control);
+  }
+
+  /* Columns of equal width, so that tables below each other line up. */
+  .c-table--even table {
+    table-layout: fixed;
+  }
+
+  /* MARC view: field tags and indicators in a fixed-width font. */
+  .c-table--marc th {
+    font-family: var(--font-family-mono);
+    white-space: nowrap;
+  }
+}

@@ -1,0 +1,23 @@
+<?php
+  /**
+   * One link of the pagination.
+   *
+   * @property array  $params      See Helpers/pagination.phtml
+   * @property int    $current     Current page
+   * @property int    $page        Page the link leads to
+   * @property string $label       Accessible name of the link (plain text)
+   * @property string $contentHtml Visible content (escaped HTML)
+   */
+  $results = $this->params['results'] ?? null;
+  $attributes = $this->htmlAttributes([
+    'class' => 'c-pagination__link',
+    'aria-label' => $this->label,
+    'href' => null !== $results
+      ? $results->getUrlQuery()->setPage($this->page)->getParams(false)
+      : $this->currentPath() . '?' . http_build_query(array_merge($this->params ?? [], ['page' => $this->page])),
+  ]);
+  if ($this->page === $this->current) {
+    $attributes->add('aria-current', 'page');
+  }
+?>
+<li><a<?=$attributes?>><?=$this->contentHtml?></a></li>

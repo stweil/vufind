@@ -1,0 +1,18 @@
+<?php
+  /**
+   * Labelled values of a record as a description list.
+   *
+   * @property array[] $fields Fields from the record data formatter: label (translation key) and value (HTML)
+   */
+  if (!$this->fields) {
+    return;
+  }
+?>
+<dl class="c-field-list">
+  <?php foreach ($this->fields as $field): ?>
+    <div class="c-field-list__row">
+      <dt class="c-field-list__label"><?=$this->transEsc($field['label'])?></dt>
+      <dd class="c-field-list__value"><?=$field['value']?></dd>
+    </div>
+  <?php endforeach; ?>
+</dl>

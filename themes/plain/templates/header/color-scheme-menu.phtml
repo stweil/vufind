@@ -1,0 +1,21 @@
+<?php
+  /**
+   * Menu to choose the color scheme ([Site] selectable_color_schemes in
+   * config.ini, limited to the schemes this theme supports).
+   */
+  $globals = $this->globals();
+  $schemes = $globals['colorSchemeOptions'] ?? [];
+  if (count($schemes) < 2) {
+    return;
+  }
+  $items = [];
+  foreach ($schemes as $scheme) {
+    $items[] = [
+      'labelHtml' => $this->transEsc($scheme['label']),
+      'url' => $this->url()->addQueryParameters(['color_scheme' => $scheme['name']]),
+      'selected' => $globals['selectedColorScheme'] === $scheme['name'],
+      'iconName' => $scheme['icon'],
+    ];
+  }
+?>
+<?=$this->render('partials/menu.phtml', ['label' => 'color_scheme', 'iconName' => 'menu-color-scheme', 'items' => $items])?>

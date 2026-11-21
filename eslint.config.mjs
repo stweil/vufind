@@ -141,5 +141,12 @@ export default [
       //"jsdoc/require-throws": "error",
       //"jsdoc/sort-tags": "error",
     }
+  },
+  {
+    // The "plain" theme uses ES modules instead of classic scripts.
+    files: ["themes/plain/js/**/*.js"],
+    languageOptions: {
+      sourceType: "module"
+    }
   }
 ];

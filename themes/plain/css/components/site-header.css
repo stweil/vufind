@@ -1,0 +1,34 @@
+/*
+ * Site header: a bar with the site name and the settings menus, and below it
+ * the search form with the applied filters.
+ */
+@layer components {
+  .c-site-header {
+    border-block-end: var(--border-width) solid var(--color-border);
+    background: var(--color-surface);
+  }
+
+  .c-site-header__bar {
+    padding-block: var(--space-2);
+  }
+
+  .c-site-header__brand {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--size-target);
+    color: var(--color-text);
+    font-size: var(--font-size-heading-2);
+    font-weight: var(--font-weight-strong);
+    text-decoration: none;
+  }
+
+  .c-site-header__brand:hover {
+    text-decoration: underline;
+  }
+
+  .c-site-header__search {
+    display: grid;
+    gap: var(--space-3);
+    padding-block: var(--space-2) var(--space-4);
+  }
+}

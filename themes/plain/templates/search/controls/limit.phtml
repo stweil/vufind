@@ -1,0 +1,18 @@
+<?php
+  /**
+   * Number of results per page.
+   */
+  $choices = [];
+  foreach ($this->params->getLimitList() as $value => $limit) {
+    $choices[] = ['value' => $value, 'labelHtml' => $this->escapeHtml($limit['desc']), 'selected' => $limit['selected']];
+  }
+  echo $this->render(
+      'partials/select-form.phtml',
+      [
+        'name' => 'limit',
+        'label' => 'Results per page',
+        'choices' => $choices,
+        // Already escaped by the URL query helper.
+        'hiddenFieldsHtml' => $this->results->getUrlQuery()->asHiddenFields(['limit' => '/.*/', 'page' => '/.*/']),
+      ]
+  );

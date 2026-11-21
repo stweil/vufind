@@ -1,0 +1,60 @@
+/*
+ * Color scheme "light".
+ *
+ * A scheme is this one block and nothing else: every scheme file sets the same
+ * custom properties, in the same order, so that two files can be compared line by
+ * line. Contrast target: WCAG 2.2 AA (text 4.5:1, controls and focus ring 3:1).
+ */
+@layer tokens {
+  :root {
+    /* Tells the browser how to draw form controls and scroll bars. */
+    color-scheme: light;
+
+    /* Backgrounds: page, raised areas (header, menus), recessed areas (table stripes). */
+    --color-canvas: #f6f7f9;
+    --color-surface: #ffffff;
+    --color-surface-sunken: #eceff3;
+
+    /* Text. */
+    --color-text: #1b1f24;
+    --color-text-muted: #4f5a68;
+    --color-link: #0b55ad;
+    --color-link-hover: #083c7c;
+
+    /* Lines: separators carry no information; control borders mark what can be used. */
+    --color-border: #d3d8df;
+    --color-border-control: #6b7684;
+
+    /* Keyboard focus ring. */
+    --color-focus: #0b55ad;
+
+    /* Primary actions. */
+    --color-accent: #0b55ad;
+    --color-accent-hover: #083c7c;
+    --color-on-accent: #ffffff;
+
+    /* The current item of a menu, a tab bar or the pagination; an applied filter. */
+    --color-selected: #dce8f8;
+    --color-on-selected: #0a2f5e;
+
+    /* Search terms found in a result. */
+    --color-highlight: #fff0a3;
+    --color-on-highlight: #1b1f24;
+
+    /* Status: text and icon color, and the background of the label or notice. */
+    --color-success: #14603a;
+    --color-success-surface: #e3f3e8;
+    --color-danger: #a1232b;
+    --color-danger-surface: #fbe6e8;
+    --color-warning: #734a00;
+    --color-warning-surface: #fff2cc;
+    --color-info: #1f4f8f;
+    --color-info-surface: #e4edfa;
+
+    /* Scheme-dependent values which are not colors. */
+    --shadow-raised: 0 0.25rem 1rem rgb(0 0 0 / 15%);
+    --border-width: 1px;
+    --border-width-control: 1px;
+    --focus-width: 3px;
+  }
+}

@@ -1,0 +1,8 @@
+<?php
+  /**
+   * URL of a search for records of this publisher. The name is not searched as
+   * an exact phrase, because publisher names are written in many ways.
+   *
+   * @property string $lookfor Value to search for
+   */
+  echo $this->render('RecordDriver/DefaultRecord/link-generic.phtml', ['driver' => $this->driver, 'lookfor' => $this->lookfor, 'type' => 'Publisher', 'quoteQuery' => false]);

@@ -1,0 +1,54 @@
+/*
+ * Pagination below the result list.
+ */
+@layer components {
+  .c-pagination__list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .c-pagination__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-1);
+    min-inline-size: var(--size-target);
+    min-block-size: var(--size-target);
+    padding-inline: var(--space-2);
+    border: var(--border-width-control) solid transparent;
+    border-radius: var(--radius-small);
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .c-pagination__link:hover {
+    background: var(--color-surface-sunken);
+    text-decoration: underline;
+  }
+
+  /* The current page also has a border and bold text. */
+  .c-pagination__link[aria-current] {
+    border-color: var(--color-border-control);
+    background: var(--color-selected);
+    color: var(--color-on-selected);
+    font-weight: var(--font-weight-strong);
+  }
+
+  /*
+   * Windows contrast themes remove the background which marks the current page;
+   * use the system's selection colors for it instead.
+   */
+  @media (forced-colors: active) {
+    .c-pagination__link[aria-current] {
+      forced-color-adjust: none;
+      border-color: Highlight;
+      background: Highlight;
+      color: HighlightText;
+    }
+  }
+}

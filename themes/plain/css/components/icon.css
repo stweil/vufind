@@ -1,0 +1,11 @@
+/*
+ * Icon from the SVG sprite (templates/Helpers/icons/sprite.phtml). It has the
+ * color of the text around it and scales with the font size.
+ */
+@layer components {
+  .c-icon {
+    flex: none;
+    inline-size: var(--size-icon);
+    block-size: var(--size-icon);
+  }
+}

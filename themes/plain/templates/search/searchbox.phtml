@@ -1,0 +1,96 @@
+<?php
+  /**
+   * Basic search form: search terms, search type and the applied filters.
+   *
+   * The setup follows the search box of the standard theme, so that filters,
+   * sort order and page size of the last search are kept. Not covered: search
+   * tabs, the advanced search, autocomplete, the virtual keyboard, shards and the
+   * geographic search.
+   *
+   * @property ?\VuFind\Search\Base\Results $results     Current search, if any
+   * @property ?string                      $lookfor     Search terms to show
+   * @property ?string                      $searchIndex Selected search type
+   * @property ?bool                        $focusOnLoad Put the cursor into the field
+   */
+
+  // Initialize from the current search (if available and not explicitly overridden) or from defaults:
+  $fromSearchMemory = null === $this->results;
+  $results = $fromSearchMemory ? $this->searchMemory()->getCurrentSearch() : $this->results;
+  $params = $results ? $results->getParams() : null;
+  if ($params) {
+    $this->searchClassId = $params->getSearchClassId();
+  } else {
+    $this->searchClassId ??= $this->config()->getArray('config')['Site']['defaultSearchBackend'] ?? 'Solr';
+  }
+  if ($params && !$params->isSpecializedSearch()) {
+    $hiddenFilters = $params->getHiddenFilters();
+    $lastSort = $params->getSort();
+    $lastLimit = $params->getLimit();
+    $options = $params->getOptions();
+  } else {
+    $hiddenFilters = $this->searchTabs()->getHiddenFilters($this->searchClassId, true, $this->ignoreHiddenFiltersInRequest ?? false);
+    $lastSort = $this->searchMemory()->getLastSort($this->searchClassId);
+    $lastLimit = $this->searchMemory()->getLastLimit($this->searchClassId);
+    $options = $this->searchOptions($this->searchClassId);
+  }
+
+  $handlers = $this->searchbox()->getHandlers($this->searchClassId, $this->searchIndex ?? null, $hiddenFilters);
+
+  // Applied filters: taken from the current search or from the last one.
+  $params ??= $this->searchMemory()->getLastSearchParams($this->searchClassId);
+  $filterList = $this->filterList ?? $params->getFilterList(true);
+  $checkboxFilters = $this->checkboxFilters ?? $params->getCheckboxFacets();
+  $retainFilters = $this->retainFilters ?? $options->getRetainFilterSetting();
+  $showFilters = $results && !$fromSearchMemory || $retainFilters;
+
+  $queryAttributes = [
+    'id' => 'searchForm_lookfor',
+    'class' => 'c-field c-search-form__query',
+    'type' => 'search',
+    'name' => 'lookfor',
+    'value' => $this->lookfor,
+  ];
+  if ($placeholder = $this->searchbox()->getPlaceholderText($this->searchClassId)) {
+    $queryAttributes['placeholder'] = $this->translate($placeholder);
+  }
+  if ($this->focusOnLoad) {
+    $queryAttributes['autofocus'] = true;
+  }
+?>
+<form class="c-search-form" role="search" method="get" action="<?=$this->escapeHtmlAttr($this->url($options->getSearchAction()))?>">
+  <div class="c-search-form__controls">
+    <label class="u-visually-hidden" for="searchForm_lookfor"><?=$this->transEsc('search_terms')?></label>
+    <input<?=$this->htmlAttributes($queryAttributes)?>>
+    <?=$this->render('search/searchbox/type-select.phtml', ['handlers' => $handlers])?>
+    <button class="c-button c-button--primary" type="submit">
+      <?=$this->icon('search')?>
+      <span><?=$this->transEsc('Find')?></span>
+    </button>
+  </div>
+  <?=
+    $this->render(
+        'search/searchbox/hidden-fields.phtml',
+        [
+          'filterDetails' => $retainFilters ? $this->searchbox()->getFilterDetails($filterList, $checkboxFilters) : [],
+          'defaultsApplied' => $retainFilters && ($this->hasDefaultsApplied ?? false),
+          'hiddenFilters' => $hiddenFilters,
+          'limit' => $lastLimit !== $options->getDefaultLimit() ? $lastLimit : null,
+          'sort' => $lastSort !== $params->getDefaultSort() && $params->isValidSort($lastSort, allowHiddenSort: false) ? $lastSort : null,
+        ]
+    )
+  ?>
+</form>
+<?php if ($showFilters): ?>
+  <?=
+    $this->render(
+        'search/filters.phtml',
+        [
+          'filterList' => $filterList,
+          'checkboxFilters' => $checkboxFilters,
+          'params' => $params,
+          'urlQuery' => $results && !$fromSearchMemory ? $results->getUrlQuery() : null,
+          'searchClassId' => $this->searchClassId,
+        ]
+    )
+  ?>
+<?php endif; ?>

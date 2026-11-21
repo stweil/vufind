@@ -1,0 +1,25 @@
+/*
+ * Row above the result list: the summary of the search on one side, the forms
+ * for page size and sort order on the other.
+ */
+@layer components {
+  .c-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3) var(--space-5);
+  }
+
+  .c-toolbar__summary {
+    margin: 0;
+  }
+
+  .c-toolbar__form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--font-size-small);
+  }
+}

@@ -1,0 +1,18 @@
+<?php
+  /**
+   * Menu to choose the theme ([Site] selectable_themes in config.ini).
+   */
+  $themes = $this->globals()['themeOptions'] ?? [];
+  if (count($themes) < 2) {
+    return;
+  }
+  $items = [];
+  foreach ($themes as $theme) {
+    $items[] = [
+      'labelHtml' => $this->transEsc($theme['desc']),
+      'url' => $this->url()->addQueryParameters(['ui' => $theme['name']]),
+      'selected' => $theme['selected'],
+    ];
+  }
+?>
+<?=$this->render('partials/menu.phtml', ['label' => 'Theme', 'iconName' => 'menu-theme', 'items' => $items])?>

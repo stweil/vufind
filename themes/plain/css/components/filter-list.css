@@ -1,0 +1,49 @@
+/*
+ * Applied filters below the search form; each one is a link which removes it.
+ */
+@layer components {
+  .c-filter-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--font-size-small);
+  }
+
+  .c-filter-list__label {
+    font-weight: var(--font-weight-strong);
+  }
+
+  .c-filter-list__items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .c-filter-list__filter {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    min-block-size: var(--size-target-compact);
+    padding: var(--space-1) var(--space-3);
+    border: var(--border-width-control) solid var(--color-border-control);
+    border-radius: var(--radius-round);
+    background: var(--color-selected);
+    color: var(--color-on-selected);
+    text-decoration: none;
+  }
+
+  .c-filter-list__filter:hover {
+    color: var(--color-on-selected);
+    text-decoration: underline;
+  }
+
+  .c-filter-list__reset {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--size-target-compact);
+  }
+}

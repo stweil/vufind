@@ -1,0 +1,15 @@
+<?php
+  /**
+   * Icon from the SVG sprite (images/icons.svg). Rendered by the icon view helper
+   * for the icon set "Sprite" of theme.config.php. Icons are decorative; the text
+   * next to them, or a visually hidden text, names the thing.
+   *
+   * @property string $icon  Id of the symbol in the sprite
+   * @property string $src   File name of the sprite
+   * @property string $attrs Further attributes, already escaped by the helper
+   * @property array  $extra The same attributes as an array (used for the class)
+   */
+  $class = trim('c-icon ' . ($this->extra['class'] ?? ''));
+  $href = $this->imageLink($this->src) . '#' . $this->icon;
+?>
+<svg class="<?=$this->escapeHtmlAttr($class)?>"<?=$this->attrs?> aria-hidden="true" focusable="false"><use href="<?=$this->escapeHtmlAttr($href)?>"></use></svg>

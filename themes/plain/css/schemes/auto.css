@@ -1,0 +1,9 @@
+/*
+ * Color scheme "auto" (VuFind's "normal"): follows the settings of the browser
+ * or the operating system. It has no values of its own; it picks one of the other
+ * scheme files. A later line wins over an earlier one when both apply.
+ */
+@import url("light.css");
+@import url("dark.css") (prefers-color-scheme: dark);
+@import url("contrast-light.css") (prefers-contrast: more);
+@import url("contrast-dark.css") (prefers-contrast: more) and (prefers-color-scheme: dark);

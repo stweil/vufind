@@ -1,0 +1,42 @@
+/*
+ * Message box (templates/partials/notice.phtml). The icon and the border have
+ * the color of the variant; the text keeps the normal text color.
+ */
+@layer components {
+  .c-notice {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-3);
+    padding: var(--space-4);
+    border: var(--border-width-control) solid currentColor;
+    border-radius: var(--radius-medium);
+  }
+
+  .c-notice--info {
+    background: var(--color-info-surface);
+    color: var(--color-info);
+  }
+
+  .c-notice--warning {
+    background: var(--color-warning-surface);
+    color: var(--color-warning);
+  }
+
+  .c-notice--danger {
+    background: var(--color-danger-surface);
+    color: var(--color-danger);
+  }
+
+  .c-notice__body {
+    color: var(--color-text);
+  }
+
+  .c-notice__body > :last-child {
+    margin-block-end: 0;
+  }
+
+  .c-notice__title {
+    margin-block-end: var(--space-2);
+    font-size: var(--font-size-heading-3);
+  }
+}

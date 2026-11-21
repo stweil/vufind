@@ -1,0 +1,20 @@
+<?php
+  /**
+   * Record tab "Staff View" for MARC records. The table is made by VuFind's
+   * record-marc.xsl; its markup cannot be changed here.
+   */
+  $this->headTitle($this->translate('Staff View') . ': ' . $this->driver->getBreadcrumb());
+  $xml = $this->driver->getXML('marc21');
+?>
+<h3>MARC</h3>
+<?php if (false !== $xml): ?>
+  <div class="c-table c-table--marc">
+    <?=\VuFind\XSLT\Processor::process('record-marc.xsl', $xml)?>
+  </div>
+<?php else: ?>
+  <p><?=$this->transEsc('error_creating_marc_xml')?></p>
+<?php endif; ?>
+<?php if ($this->config()->alwaysDisplayIndexRecordInStaffView()): ?>
+  <h3><?=$this->transEsc('Record in the Search Index')?></h3>
+  <?=$this->render('RecordTab/staffviewarray.phtml')?>
+<?php endif; ?>

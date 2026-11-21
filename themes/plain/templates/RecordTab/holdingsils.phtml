@@ -1,0 +1,45 @@
+<?php
+  /**
+   * Record tab "Holdings": links to online versions and, for each location, the
+   * call numbers and the status of every copy.
+   *
+   * Read-only: holds, recalls, storage retrieval and interlibrary loan requests,
+   * "Get This" and the library card selection are not covered.
+   */
+  $this->headTitle($this->translate('Holdings') . ': ' . $this->driver->getBreadcrumb());
+  $links = $this->record($this->driver)->getLinkDetails();
+  $offline = 'ils-offline' === $this->ils()->getOfflineMode();
+  try {
+    $holdings = $this->driver->getRealTimeHoldings();
+  } catch (\VuFind\Exception\ILS $e) {
+    $holdings = ['holdings' => [], 'electronic_holdings' => []];
+    $offline = true;
+  }
+  $paginator = empty($holdings['total'])
+    ? null
+    : $this->tab->getPaginator($holdings['total'], $holdings['page'], $holdings['itemLimit']);
+?>
+<?php if ($offline): ?>
+  <?=$this->render('partials/notice.phtml', ['variant' => 'warning', 'titleHtml' => $this->transEsc('ils_offline_holdings_message'), 'headingRank' => 3])?>
+<?php endif; ?>
+<?php if ($links): ?>
+  <h3><?=$this->transEsc('Internet')?></h3>
+  <ul>
+    <?php foreach ($links as $link): ?>
+      <li><a href="<?=$this->escapeHtmlAttr($this->proxyUrl($link['url']))?>"><?=$this->escapeHtml($link['desc'])?></a></li>
+    <?php endforeach; ?>
+  </ul>
+<?php endif; ?>
+<?php if (!empty($holdings['electronic_holdings'])): ?>
+  <h3><?=$this->transEsc('Electronic')?></h3>
+  <?=$this->render('RecordTab/holdingsils/items.phtml', ['items' => $holdings['electronic_holdings'], 'captionHtml' => $this->transEsc('Electronic')])?>
+<?php endif; ?>
+<?php foreach ($holdings['holdings'] ?? [] as $holding): ?>
+  <?=$this->render('RecordTab/holdingsils/location.phtml', ['holding' => $holding, 'tab' => $this->tab])?>
+<?php endforeach; ?>
+<?php if ($paginator): ?>
+  <?=$this->paginationControl($paginator, 'Sliding', 'Helpers/pagination.phtml', ['page' => $holdings['page']])?>
+<?php endif; ?>
+<?php if (!$offline && !$links && empty($holdings['electronic_holdings']) && empty($holdings['holdings'])): ?>
+  <p><?=$this->transEsc('no_holdings_found')?></p>
+<?php endif; ?>

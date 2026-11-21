@@ -1,0 +1,12 @@
+<?php
+  /**
+   * Summaries from the record and from content providers.
+   */
+  $summaries = $this->driver->getSummary();
+  foreach ($this->summaries($this->driver->getCleanISBN()) as $providerSummaries) {
+    $summaries = array_merge($summaries, $providerSummaries);
+  }
+?>
+<?php foreach ($summaries as $summary): ?>
+  <p><?=$this->escapeOrCleanHtml($summary, 'summary', true)?></p>
+<?php endforeach; ?>

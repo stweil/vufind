@@ -1,0 +1,13 @@
+<?php
+  /**
+   * Notes about the author from content providers. Like the summaries of the
+   * same providers, the notes are HTML and cleaned before output.
+   */
+  $isbn = $this->driver->getCleanISBN();
+  $notes = empty($isbn) ? [] : $this->authorNotes($isbn);
+?>
+<?php foreach ($notes as $providerNotes): ?>
+  <?php foreach ($providerNotes as $note): ?>
+    <p><?=$this->cleanHtml($note['Content'])?></p>
+  <?php endforeach; ?>
+<?php endforeach; ?>

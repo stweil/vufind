@@ -1,0 +1,22 @@
+<?php
+  /**
+   * Message for a search without results, with the suggestions VuFind offers.
+   *
+   * @property \VuFind\Search\Base\Results $results    Search results
+   * @property string                      $lookfor    Search terms
+   * @property bool                        $parseError The search backend could not parse the query
+   */
+  $top = $this->results->getRecommendations('top');
+  $noResults = array_udiff(
+      $this->results->getRecommendations('noresults'),
+      $top,
+      $this->results->getRecommendations('bottom'),
+      fn ($a, $b) => spl_object_id($a) <=> spl_object_id($b)
+  );
+  // HTML is intentionally allowed in the first message.
+  $bodyHtml = '<p>' . $this->translate('nohit_lookfor_html', ['%%lookfor%%' => $this->escapeHtml($this->lookfor)]) . '</p>'
+    . ($this->parseError ? '<p>' . $this->transEsc('nohit_parse_error') . '</p>' : '');
+?>
+<?=$this->render('partials/notice.phtml', ['variant' => 'info', 'titleHtml' => $this->transEsc('nohit_heading'), 'bodyHtml' => $bodyHtml])?>
+<?=$this->render('search/recommendations.phtml', ['recommendations' => $top, 'location' => 'top'])?>
+<?=$this->render('search/recommendations.phtml', ['recommendations' => $noResults, 'location' => 'noresults'])?>

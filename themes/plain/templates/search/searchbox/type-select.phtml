@@ -1,0 +1,39 @@
+<?php
+  /**
+   * Search type ("All Fields", "Title", ...) of the search form.
+   *
+   * @property array[] $handlers Search types from the searchbox view helper
+   */
+  $handlers = $this->handlers;
+  if (count($handlers) === 1) {
+    echo '<input type="hidden" name="type" value="' . $this->escapeHtmlAttr($handlers[0]['value']) . '">';
+  }
+  if (count($handlers) < 2) {
+    return;
+  }
+
+  // Put consecutive search types with the same group label together.
+  $groups = [];
+  foreach ($handlers as $handler) {
+    $label = (string)($handler['group'] ?? '');
+    $last = array_key_last($groups);
+    if (null === $last || $groups[$last]['label'] !== $label) {
+      $groups[] = ['label' => $label, 'handlers' => []];
+      $last = array_key_last($groups);
+    }
+    $groups[$last]['handlers'][] = $handler;
+  }
+?>
+<select class="c-field c-search-form__type" name="type" aria-label="<?=$this->transEscAttr('Search Type')?>">
+  <?php foreach ($groups as $group): ?>
+    <?php if ('' !== $group['label']): ?>
+      <optgroup label="<?=$this->escapeHtmlAttr($group['label'])?>">
+    <?php endif; ?>
+    <?php foreach ($group['handlers'] as $handler): ?>
+      <option value="<?=$this->escapeHtmlAttr($handler['value'])?>"<?=$handler['selected'] ? ' selected' : ''?>><?=$handler['indent'] ? '-- ' : ''?><?=$this->transEsc($handler['label'])?></option>
+    <?php endforeach; ?>
+    <?php if ('' !== $group['label']): ?>
+      </optgroup>
+    <?php endif; ?>
+  <?php endforeach; ?>
+</select>

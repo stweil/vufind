@@ -1,0 +1,21 @@
+/*
+ * Record page.
+ */
+@layer components {
+  .c-record {
+    container-type: inline-size;
+  }
+
+  /* Cover above the text; next to it where there is room. */
+  .c-record__core {
+    display: grid;
+    gap: var(--space-5);
+    align-items: start;
+  }
+
+  @container (min-width: 36rem) {
+    .c-record__core {
+      grid-template-columns: auto minmax(0, 1fr);
+    }
+  }
+}

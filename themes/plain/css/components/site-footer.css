@@ -1,0 +1,23 @@
+/*
+ * Site footer.
+ */
+@layer components {
+  .c-site-footer {
+    padding-block: var(--space-4);
+    border-block-start: var(--border-width) solid var(--color-border);
+    background: var(--color-surface);
+    font-size: var(--font-size-small);
+  }
+
+  /* High enough to be hit easily; the text is centered in it. */
+  .c-site-footer__link {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--size-target-compact);
+  }
+
+  .c-site-footer__note {
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+}

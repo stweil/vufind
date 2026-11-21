@@ -1,0 +1,47 @@
+/*
+ * Color scheme "dark". Same properties, same order as light.css.
+ * Contrast target: WCAG 2.2 AA (text 4.5:1, controls and focus ring 3:1).
+ */
+@layer tokens {
+  :root {
+    color-scheme: dark;
+
+    --color-canvas: #14171c;
+    --color-surface: #1d2128;
+    --color-surface-sunken: #272c35;
+
+    --color-text: #e6e8eb;
+    --color-text-muted: #aab2bd;
+    --color-link: #8fb8ff;
+    --color-link-hover: #bdd5ff;
+
+    --color-border: #363d48;
+    --color-border-control: #8c96a5;
+
+    --color-focus: #8fb8ff;
+
+    --color-accent: #8fb8ff;
+    --color-accent-hover: #bdd5ff;
+    --color-on-accent: #0b1a30;
+
+    --color-selected: #1f3557;
+    --color-on-selected: #dbe8ff;
+
+    --color-highlight: #5a4a00;
+    --color-on-highlight: #ffffff;
+
+    --color-success: #7ddc9f;
+    --color-success-surface: #12301f;
+    --color-danger: #ffa3a8;
+    --color-danger-surface: #3b1619;
+    --color-warning: #f3c969;
+    --color-warning-surface: #382b06;
+    --color-info: #a3c6ff;
+    --color-info-surface: #15273f;
+
+    --shadow-raised: 0 0.25rem 1rem rgb(0 0 0 / 60%);
+    --border-width: 1px;
+    --border-width-control: 1px;
+    --focus-width: 3px;
+  }
+}

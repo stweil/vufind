@@ -1,0 +1,28 @@
+<?php
+  /**
+   * Settings of the last search which a new search keeps.
+   *
+   * @property array[] $filterDetails   Applied filters to keep (id and value)
+   * @property bool    $defaultsApplied Whether default filters have been applied
+   * @property array   $hiddenFilters   Hidden filters: field => values
+   * @property ?int    $limit           Page size, if it is not the default
+   * @property ?string $sort            Sort order, if it is not the default
+   */
+?>
+<?php foreach ($this->filterDetails as $filter): ?>
+  <input type="hidden" name="filter[]" value="<?=$this->escapeHtmlAttr($filter['value'])?>">
+<?php endforeach; ?>
+<?php if ($this->defaultsApplied): ?>
+  <input type="hidden" name="dfApplied" value="1">
+<?php endif; ?>
+<?php foreach ($this->hiddenFilters as $field => $values): ?>
+  <?php foreach ($values as $value): ?>
+    <input type="hidden" name="hiddenFilters[]" value="<?=$this->escapeHtmlAttr($field . ':"' . $value . '"')?>">
+  <?php endforeach; ?>
+<?php endforeach; ?>
+<?php if ($this->limit): ?>
+  <input type="hidden" name="limit" value="<?=$this->escapeHtmlAttr($this->limit)?>">
+<?php endif; ?>
+<?php if ($this->sort): ?>
+  <input type="hidden" name="sort" value="<?=$this->escapeHtmlAttr($this->sort)?>">
+<?php endif; ?>

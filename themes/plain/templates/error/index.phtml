@@ -1,0 +1,39 @@
+<?php
+  /**
+   * Error page. VuFind also shows it when a template is missing; for a theme
+   * which covers only part of VuFind that is the expected case, so it gets a
+   * message of its own instead of the error.
+   */
+  $this->headTitle($this->translate('An error has occurred'));
+
+  // Is a missing template the cause? Look at the exception and the ones before it.
+  $missingTemplate = false;
+  for ($exception = $this->exception ?? null; $exception; $exception = $exception->getPrevious()) {
+    if (
+      $exception instanceof \Laminas\View\Exception\RuntimeException
+      && str_contains($exception->getMessage(), 'resolver could not resolve to a file')
+    ) {
+      $missingTemplate = true;
+    }
+  }
+?>
+<div class="l-stack">
+  <?php if ($missingTemplate): ?>
+    <?=$this->render('partials/missing-in-theme.phtml', ['headingRank' => 1])?>
+  <?php else: ?>
+    <?=
+      $this->render(
+          'partials/notice.phtml',
+          [
+            'variant' => 'danger',
+            'titleHtml' => $this->transEsc('An error has occurred'),
+            'bodyHtml' => $this->message ? '<p>' . $this->transEsc($this->message) . '</p>' : '',
+            'headingRank' => 1,
+          ]
+      )
+    ?>
+  <?php endif; ?>
+  <?php if (($this->display_exceptions ?? false) && isset($this->exception)): ?>
+    <?=$this->render('error/exception.phtml', ['exception' => $this->exception])?>
+  <?php endif; ?>
+</div>

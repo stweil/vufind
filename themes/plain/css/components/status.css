@@ -1,0 +1,36 @@
+/*
+ * Status label (templates/partials/status.phtml). Every variant has its own
+ * icon and text; the color only supports them.
+ */
+@layer components {
+  .c-status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding-inline: var(--space-2);
+    border: var(--border-width) solid currentColor;
+    border-radius: var(--radius-small);
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-strong);
+  }
+
+  .c-status--available {
+    background: var(--color-success-surface);
+    color: var(--color-success);
+  }
+
+  .c-status--unavailable {
+    background: var(--color-danger-surface);
+    color: var(--color-danger);
+  }
+
+  .c-status--uncertain {
+    background: var(--color-warning-surface);
+    color: var(--color-warning);
+  }
+
+  .c-status--unknown {
+    background: var(--color-surface-sunken);
+    color: var(--color-text-muted);
+  }
+}

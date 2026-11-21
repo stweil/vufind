@@ -1,0 +1,51 @@
+<?php
+  /**
+   * One facet value: a link which applies it or, if it is applied, removes it,
+   * and optionally a link which excludes it.
+   *
+   * @property string                        $field        Facet field
+   * @property array                         $value        Facet value from the search results
+   * @property bool                          $allowExclude Offer a link which excludes the value
+   * @property \VuFind\Search\UrlQueryHelper $urlQuery     URL builder of the search
+   */
+  $value = $this->value;
+  $isActive = $value['isApplied'] || $value['isExcluded'];
+  // The URL query helper returns escaped URLs.
+  $toggleUrlHtml = $isActive
+    ? $this->urlQuery->removeFacet($this->field, $value['value'], $value['operator'])
+    : $this->urlQuery->addFacet($this->field, $value['value'], $value['operator']);
+  $text = (string)($value['displayText'] ?? '');
+  if ('' === $text) {
+    $text = '' !== (string)($value['value'] ?? '') ? (string)$value['value'] : '-';
+  }
+  // A facet whose values are combined with OR looks like a group of checkboxes.
+  $isCheckbox = 'OR' === $value['operator'];
+?>
+<li class="c-facet__item">
+  <a class="c-facet__link" href="<?=$toggleUrlHtml?>" rel="nofollow"<?=$isActive ? ' aria-current="true"' : ''?>>
+    <?php if ($isCheckbox): ?>
+      <?=$this->icon($value['isApplied'] ? 'facet-checked' : 'facet-unchecked')?>
+    <?php elseif ($isActive): ?>
+      <?=$this->icon($value['isExcluded'] ? 'facet-exclude' : 'menu-selected')?>
+    <?php endif; ?>
+    <span class="c-facet__text">
+      <?php if ($isActive): ?>
+        <span class="u-visually-hidden"><?=$this->transEsc($value['isExcluded'] ? 'excluded' : 'applied_filter')?></span>
+      <?php endif; ?>
+      <?=$this->escapeHtml($text)?>
+    </span>
+    <?php if (!$isActive && null !== $value['count']): ?>
+      <?php $count = $this->localizedNumber($value['count']); ?>
+      <span class="c-facet__count">
+        <span class="u-visually-hidden"><?=$this->transEsc('result_count', ['%%count%%' => $count])?></span>
+        <span aria-hidden="true"><?=$this->escapeHtml($count)?></span>
+      </span>
+    <?php endif; ?>
+  </a>
+  <?php if ($this->allowExclude && !$isActive): ?>
+    <a class="c-facet__exclude" href="<?=$this->urlQuery->addFacet($this->field, $value['value'], 'NOT')?>" rel="nofollow">
+      <?=$this->icon('facet-exclude')?>
+      <span class="u-visually-hidden"><?=$this->transEsc('exclude_facet')?>: <?=$this->escapeHtml($text)?></span>
+    </a>
+  <?php endif; ?>
+</li>

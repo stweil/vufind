@@ -1,0 +1,15 @@
+<?php
+  /**
+   * Locations of a record with their status and call numbers (answer of the AJAX
+   * handler getItemStatuses when [Item_Status] multiple_locations = group).
+   *
+   * @property array[] $locationList Locations: location, availability, callnumberHtml
+   */
+?>
+<?php foreach ($this->locationList as $location): ?>
+  <span class="c-item-status__location">
+    <?=$this->render('partials/availability.phtml', ['status' => $location['availability'], 'description' => null])?>
+    <span><?=$this->escapeHtml($location['location'])?></span>
+    <span><?=$location['callnumberHtml']?></span>
+  </span>
+<?php endforeach; ?>

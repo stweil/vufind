@@ -1,0 +1,24 @@
+<?php
+  /**
+   * Site header: site name, settings menus and the search box.
+   */
+  $globals = $this->globals();
+  $siteTitle = $this->config()->getArray('config')['Site']['title'];
+?>
+<header class="c-site-header">
+  <div class="c-site-header__bar l-container l-cluster l-cluster--spread">
+    <a class="c-site-header__brand" href="<?=$this->escapeHtmlAttr($this->url('home'))?>"><?=$this->escapeHtml($siteTitle)?></a>
+    <?php if (!isset($globals['renderingError'])): ?>
+      <nav class="c-menu-bar" aria-label="<?=$this->transEscAttr('plain_settings_menu')?>">
+        <?=$this->render('header/language-menu.phtml')?>
+        <?=$this->render('header/theme-menu.phtml')?>
+        <?=$this->render('header/color-scheme-menu.phtml')?>
+      </nav>
+    <?php endif; ?>
+  </div>
+  <?php if ($searchbox = $globals['searchbox']): ?>
+    <div class="c-site-header__search l-container">
+      <?=$searchbox?>
+    </div>
+  <?php endif; ?>
+</header>

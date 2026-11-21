@@ -1,0 +1,10 @@
+<?php
+  /**
+   * Call number of a record in the result list (answer of the AJAX handler
+   * getItemStatuses). The link to the call number browse is not covered.
+   *
+   * @property ?string $displayCallnumber Call number
+   */
+  echo '' === trim($this->displayCallnumber ?? '')
+    ? $this->transEsc('No call number')
+    : $this->escapeHtml($this->displayCallnumber);

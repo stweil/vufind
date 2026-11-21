@@ -1,0 +1,39 @@
+<?php
+  /**
+   * Content of the <head> element.
+   *
+   * @property string $colorScheme Name of the color scheme file in css/schemes/
+   */
+
+  // Stylesheets and scripts listed in theme.config.php:
+  $this->setupThemeResources();
+
+  // The color scheme: one file with the values of all color tokens. It is kept out
+  // of the asset pipeline because auto.css imports the other scheme files by
+  // relative URL.
+  $this->assetManager()->appendStyleLink(
+      'schemes/' . $this->colorScheme . '.css',
+      'all',
+      '',
+      [],
+      ['exclude_from_pipeline' => true]
+  );
+
+  // Format the page title using the translation system. Escaping is switched off
+  // while the parts are put together and applied once to the whole title.
+  $siteConfig = $this->config()->getArray('config')['Site'];
+  $this->headTitle()->setAutoEscape(false);
+  $fullTitle = $this->translate(
+      'title_wrapper',
+      [
+        '%%pageTitle%%' => $this->headTitle()->renderTitle(),
+        '%%siteTitle%%' => $siteConfig['title'],
+        '%%titleSeparator%%' => $siteConfig['titleSeparator'] ?? '::',
+      ]
+  );
+  $this->headTitle()->setAutoEscape(true);
+?>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<?=$this->headMeta()?>
+<?=$this->headTitle($fullTitle, \Laminas\View\Helper\Placeholder\Container\AbstractContainer::SET)?>
+<?=$this->assetManager()->outputHeaderAssets()?>

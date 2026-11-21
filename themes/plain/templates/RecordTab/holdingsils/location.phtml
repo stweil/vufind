@@ -1,0 +1,48 @@
+<?php
+  /**
+   * Holdings of one location: call numbers, notes and the copies.
+   *
+   * @property array                         $holding Holdings of the location
+   * @property \VuFind\RecordTab\HoldingsILS $tab     Holdings tab
+   */
+  $holding = $this->holding;
+  $locationHtml = $this->transEscWithPrefix('location_', $holding['location']);
+  $callNumbers = $this->tab->getUniqueCallNumbers($holding['items'], true);
+  $notes = [];
+  foreach ($holding['textfields'] ?? [] as $name => $texts) {
+    // "summary" is shown as "Volume Holdings" for backwards compatibility.
+    $notes['summary' === $name ? 'Volume Holdings' : ucfirst($name)] = $texts;
+  }
+?>
+<h3>
+  <?php if (!empty($holding['locationhref'])): ?>
+    <a href="<?=$this->escapeHtmlAttr($holding['locationhref'])?>"><?=$locationHtml?></a>
+  <?php else: ?>
+    <?=$locationHtml?>
+  <?php endif; ?>
+</h3>
+<?php if ($callNumbers || $notes): ?>
+  <dl class="c-field-list">
+    <?php if ($callNumbers): ?>
+      <div class="c-field-list__row">
+        <dt class="c-field-list__label"><?=$this->transEsc('Call Number')?></dt>
+        <dd class="c-field-list__value"><?=implode('<br>', array_map(fn ($callNumber) => $this->escapeHtml($callNumber['display']), $callNumbers))?></dd>
+      </div>
+    <?php endif; ?>
+    <?php foreach ($notes as $label => $texts): ?>
+      <div class="c-field-list__row">
+        <dt class="c-field-list__label"><?=$this->transEsc($label)?></dt>
+        <dd class="c-field-list__value"><?=implode('<br>', array_map(fn ($text) => $this->linkify($this->escapeHtml($text)), $texts))?></dd>
+      </div>
+    <?php endforeach; ?>
+  </dl>
+<?php endif; ?>
+<?=
+  $this->render(
+      'RecordTab/holdingsils/items.phtml',
+      [
+        'items' => array_filter($holding['items'], fn ($item) => $this->holdings()->holdingIsVisible($item)),
+        'captionHtml' => $this->transEsc('holdings_details_from', ['%%location%%' => $this->translate($holding['location'])]),
+      ]
+  )
+?>

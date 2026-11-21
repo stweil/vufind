@@ -1,0 +1,27 @@
+<?php
+  /**
+   * Line of a result with the journal or book the record is part of and the
+   * publication date.
+   */
+  $containerTitle = $this->driver->getContainerTitle();
+  $date = $this->driver->getHumanReadablePublicationDates()[0] ?? '';
+  if ($this->driver->isCollection() || ('' === (string)$containerTitle && '' === $date)) {
+    return;
+  }
+  if ('' !== (string)$containerTitle) {
+    $containerId = $this->driver->getContainerRecordID();
+    // Both are escaped URLs: the first by this template, the second by the record helper.
+    $containerUrlHtml = $containerId
+      ? $this->escapeHtmlAttr($this->recordLinker($this->results)->getUrl($this->driver->getSourceIdentifier() . '|' . $containerId))
+      : $this->record($this->driver)->getLink('journaltitle', $this->highlight($containerTitle, null, true, false));
+  }
+?>
+<p class="c-result__line">
+  <?php if ('' !== (string)$containerTitle): ?>
+    <?=$this->transEsc('Published in')?>
+    <a href="<?=$containerUrlHtml?>"><?=$this->highlight($containerTitle)?></a>
+    <?='' !== $date ? '(' . $this->escapeHtml($date) . ')' : ''?>
+  <?php else: ?>
+    <?=$this->transEsc('Published')?> <?=$this->escapeHtml($date)?>
+  <?php endif; ?>
+</p>

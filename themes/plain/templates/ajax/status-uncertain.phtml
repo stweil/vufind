@@ -1,0 +1,5 @@
+<?php
+  /**
+   * Availability label "uncertain" (see ajax/status.phtml).
+   */
+  echo $this->render('partials/status.phtml', ['variant' => 'uncertain', 'labelHtml' => $this->transEsc('HoldingStatus::availability_uncertain')]);

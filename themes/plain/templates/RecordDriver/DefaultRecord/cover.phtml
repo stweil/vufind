@@ -1,0 +1,30 @@
+<?php
+  /**
+   * Cover of a record. The image is decorative (the title is next to it), so its
+   * alternative text is empty. The box keeps its size while the image loads and
+   * shows a placeholder icon if there is none.
+   *
+   * @property string|false|null $cover   Image URL; false: no cover; null: to be looked up by js/modules/covers.js
+   * @property string            $size    small, medium or large
+   * @property string            $context Where the cover is shown (result-list, core)
+   */
+  $imageAttributes = ['class' => 'c-cover__image', 'alt' => ''];
+  if ($this->cover) {
+    $imageAttributes += ['src' => $this->cover, 'loading' => 'lazy'];
+  } elseif (null === $this->cover) {
+    $imageAttributes += [
+      'hidden' => true,
+      'data-cover' => true,
+      'data-record-id' => $this->driver->getUniqueID(),
+      'data-record-source' => $this->driver->getSourceIdentifier(),
+      'data-size' => $this->size,
+      'data-context' => $this->context,
+    ];
+  }
+?>
+<div class="c-cover c-cover--<?=$this->escapeHtmlAttr($this->context)?>">
+  <?=$this->icon('cover-missing')?>
+  <?php if (false !== $this->cover): ?>
+    <img<?=$this->htmlAttributes($imageAttributes)?>>
+  <?php endif; ?>
+</div>

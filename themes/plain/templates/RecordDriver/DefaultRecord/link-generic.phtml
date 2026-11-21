@@ -1,0 +1,21 @@
+<?php
+  /**
+   * URL of a search for a value of a record (an author, a subject, ...). Used
+   * through the record helper's getLink(), which expects an escaped URL.
+   *
+   * @property string $lookfor    Value to search for
+   * @property string $type       Search type
+   * @property ?bool  $quoteQuery Search for the exact phrase (default: true)
+   */
+  $backendId = $this->driver->getSearchBackendIdentifier();
+  $options = $this->searchOptions($backendId);
+  $query = [
+    'type' => $this->type,
+    'lookfor' => ($this->quoteQuery ?? true) ? '"' . $this->lookfor . '"' : $this->lookfor,
+  ];
+  // Keep the page size of the last search.
+  $limit = $this->searchMemory()->getLastLimit($backendId);
+  if ($limit && $limit !== $options->getDefaultLimit()) {
+    $query['limit'] = $limit;
+  }
+  echo $this->escapeHtmlAttr($this->url($options->getSearchAction(), [], ['query' => $query]));

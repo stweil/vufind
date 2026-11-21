@@ -1,0 +1,64 @@
+<?php
+  /**
+   * Search result page: summary, sort and page size, result list, pagination
+   * and, at the side, the facets.
+   *
+   * Not covered: grid and other list views, bulk actions, the tools below the
+   * list (RSS, e-mail, save search) and restricted view warnings.
+   */
+  $lookfor = $this->results->getUrlQuery()->isQuerySuppressed() ? '' : $this->params->getDisplayQuery();
+  $this->headTitle($this->translate('Search Results') . ('' === $lookfor ? '' : " - {$lookfor}"));
+
+  // The search box of the header shows this search.
+  $globals = $this->globals();
+  $globals['searchbox'] = $this->context($this)->renderInContext(
+      'search/searchbox.phtml',
+      [
+        'lookfor' => $lookfor,
+        'searchIndex' => $this->params->getSearchHandler(),
+        'checkboxFilters' => $this->params->getCheckboxFacets(),
+        'filterList' => $this->params->getFilterList(true),
+        'hasDefaultsApplied' => $this->params->hasDefaultsApplied(),
+        'ignoreHiddenFiltersInRequest' => $this->ignoreHiddenFiltersInRequest ?? false,
+      ]
+  );
+  // Needed by the item status request (see layout/layout.phtml).
+  $globals['searchId'] = $this->results->getSearchId();
+
+  $recordTotal = $this->results->getResultTotal();
+  // The side bar only takes room if a recommendation module has something to show.
+  $sidebar = trim($this->render(
+      'search/recommendations.phtml',
+      ['recommendations' => $this->results->getRecommendations('side'), 'location' => 'side']
+  ));
+?>
+<h1 class="c-page-title"><?=$this->transEsc('Search Results')?></h1>
+
+<div<?='' !== $sidebar ? ' class="l-with-sidebar"' : ''?>>
+  <?php if ('' !== $sidebar): ?>
+    <aside aria-label="<?=$this->transEscAttr('Search sidebar')?>">
+      <?=$sidebar?>
+    </aside>
+  <?php endif; ?>
+
+  <div class="l-stack">
+    <?php if ($recordTotal > 0): ?>
+      <?=$this->render('search/recommendations.phtml', ['recommendations' => $this->results->getRecommendations('top'), 'location' => 'top'])?>
+      <div class="c-toolbar">
+        <?php // Data-record-total attribute is for analytics use. Do not remove. ?>
+        <p class="c-toolbar__summary" data-record-total="<?=$this->escapeHtmlAttr($recordTotal)?>">
+          <?=$this->render('search/controls/showing.phtml', ['results' => $this->results, 'searchType' => $this->params->getSearchType(), 'lookfor' => $lookfor])?>
+        </p>
+        <div class="l-cluster">
+          <?=$this->render('search/controls/limit.phtml')?>
+          <?=$this->render('search/controls/sort.phtml')?>
+        </div>
+      </div>
+      <?=$this->render('search/list-list.phtml')?>
+      <?=$this->paginationControl($this->results->getPaginator(), 'Sliding', 'Helpers/pagination.phtml', ['params' => ['results' => $this->results]])?>
+    <?php else: ?>
+      <?=$this->render('search/no-results.phtml', ['results' => $this->results, 'lookfor' => $lookfor, 'parseError' => $this->parseError ?? false])?>
+    <?php endif; ?>
+    <?=$this->render('search/recommendations.phtml', ['recommendations' => $this->results->getRecommendations('bottom'), 'location' => 'bottom'])?>
+  </div>
+</div>

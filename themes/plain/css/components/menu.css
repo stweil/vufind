@@ -1,0 +1,118 @@
+/*
+ * Menu of links which opens below its button (templates/partials/menu.phtml).
+ * A <details> element: the button is its <summary>.
+ */
+@layer components {
+  .c-menu__button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-block-size: var(--size-target);
+    padding: var(--space-2) var(--space-3);
+    border: var(--border-width-control) solid var(--color-border-control);
+    border-radius: var(--radius-small);
+    background: var(--color-surface);
+    /* Remove the triangle of the summary element. */
+    list-style: none;
+    user-select: none;
+  }
+
+  .c-menu__button::-webkit-details-marker {
+    display: none;
+  }
+
+  .c-menu__button:hover {
+    border-color: var(--color-text);
+    background: var(--color-surface-sunken);
+  }
+
+  /* Narrow screen: icon only. The button keeps its name (aria-label). */
+  .c-menu__label {
+    display: none;
+  }
+
+  .c-menu__arrow {
+    transition: rotate var(--duration-short);
+  }
+
+  .c-menu[open] .c-menu__arrow {
+    rotate: 180deg;
+  }
+
+  /* Narrow screen: as wide as the menu bar (see menu-bar.css). */
+  .c-menu__list {
+    position: absolute;
+    inset-block-start: calc(100% + var(--space-1));
+    inset-inline: 0;
+    z-index: 10;
+    max-block-size: min(24rem, 70vb);
+    margin: 0;
+    padding: var(--space-1);
+    overflow-y: auto;
+    border: var(--border-width-control) solid var(--color-border-control);
+    border-radius: var(--radius-medium);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-raised);
+    list-style: none;
+  }
+
+  /* Wider screen: below its own button, aligned with the end of the button. */
+  @media (min-width: 40rem) {
+    .c-menu {
+      position: relative;
+    }
+
+    .c-menu__label {
+      display: inline;
+    }
+
+    .c-menu__list {
+      inset-inline: auto 0;
+      inline-size: max-content;
+      min-inline-size: 100%;
+      max-inline-size: 20rem;
+    }
+  }
+
+  .c-menu__item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-block-size: var(--size-target);
+    padding: var(--space-2) var(--space-3);
+    /* Invisible border: Windows contrast themes draw it and so outline every item. */
+    border: var(--border-width-control) solid transparent;
+    border-radius: var(--radius-small);
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .c-menu__item:hover {
+    background: var(--color-surface-sunken);
+    text-decoration: underline;
+  }
+
+  /* The current choice also has a check mark (see the template) and bold text. */
+  .c-menu__item[aria-current] {
+    background: var(--color-selected);
+    color: var(--color-on-selected);
+    font-weight: var(--font-weight-strong);
+  }
+
+  .c-menu__text {
+    flex: 1;
+  }
+
+  /*
+   * Windows contrast themes remove the background which marks the current choice;
+   * use the system's selection colors for it instead.
+   */
+  @media (forced-colors: active) {
+    .c-menu__item[aria-current] {
+      forced-color-adjust: none;
+      border-color: Highlight;
+      background: Highlight;
+      color: HighlightText;
+    }
+  }
+}

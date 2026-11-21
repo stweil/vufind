@@ -1,0 +1,23 @@
+<?php
+  /**
+   * Record page: the core metadata and the record tabs.
+   *
+   * The tabs are links to pages of their own, and the content of the selected tab
+   * is part of the page, so the page works without JavaScript.
+   *
+   * Not covered: the toolbar (cite, e-mail, export, favorites), browsing to the
+   * previous and next record, and related items at the side.
+   */
+  $this->headTitle($this->driver->getBreadcrumb());
+  $this->headLink(['rel' => 'canonical', 'href' => $this->recordLinker()->getUrl($this->driver, ['excludeSearchId' => true])]);
+  $searchUrl = $this->searchMemory()->getLastSearchUrl();
+?>
+<article class="c-record l-stack l-stack--large">
+  <?php if ($searchUrl): ?>
+    <p><a href="<?=$this->escapeHtmlAttr($searchUrl)?>"><?=$this->transEsc('Back to Search Results')?></a></p>
+  <?php endif; ?>
+  <?=$this->record($this->driver)->getCoreMetadata()?>
+  <?php if ($this->tabs): ?>
+    <?=$this->render('record/tabs.phtml', ['driver' => $this->driver, 'tabs' => $this->tabs, 'activeTab' => $this->activeTab])?>
+  <?php endif; ?>
+</article>

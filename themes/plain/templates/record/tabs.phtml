@@ -1,0 +1,49 @@
+<?php
+  /**
+   * Record tabs: a row of links and the content of the selected tab.
+   *
+   * VuFind offers more tabs than this theme has templates for. A tab without a
+   * template in templates/RecordTab/ is left out of the row; if such a tab is
+   * requested directly, a message with a link to the standard theme is shown.
+   *
+   * @property \VuFind\RecordDriver\AbstractBase  $driver    Record
+   * @property \VuFind\RecordTab\TabInterface[]   $tabs      Tabs by name
+   * @property string                             $activeTab Name of the selected tab in lower case
+   */
+  $record = $this->record($this->driver);
+  $hasTemplate = fn ($tab): bool => (bool)$this->resolver(
+      'RecordTab/' . strtolower(substr(strrchr($tab::class, '\\'), 1)) . '.phtml'
+  );
+  $supportedTabs = array_filter($this->tabs, fn ($tab) => $tab->isVisible() && $hasTemplate($tab));
+  $activeTab = null;
+  foreach ($this->tabs as $name => $tab) {
+    if (strtolower($name) === $this->activeTab) {
+      $activeTab = $tab;
+    }
+  }
+?>
+<div class="c-tabs" id="tabnav">
+  <nav aria-label="<?=$this->transEscAttr('plain_record_tabs')?>">
+    <ul class="c-tabs__list">
+      <?php foreach ($supportedTabs as $name => $tab): ?>
+        <li>
+          <a
+            class="c-tabs__tab"
+            href="<?=$this->escapeHtmlAttr($this->recordLinker()->getTabUrl($this->driver, $name))?>#tabnav"
+            <?=$tab === $activeTab ? 'aria-current="page"' : ''?>
+          ><?=$this->transEsc($tab->getDescription())?></a>
+        </li>
+      <?php endforeach; ?>
+    </ul>
+  </nav>
+  <?php if ($activeTab): ?>
+    <section class="c-tabs__panel l-stack">
+      <?php if ($hasTemplate($activeTab)): ?>
+        <h2 class="u-visually-hidden"><?=$this->transEsc($activeTab->getDescription())?></h2>
+        <?=$record->getTab($activeTab)?>
+      <?php else: ?>
+        <?=$this->render('partials/missing-in-theme.phtml')?>
+      <?php endif; ?>
+    </section>
+  <?php endif; ?>
+</div>

@@ -1,0 +1,18 @@
+<?php
+  /**
+   * Recommendation modules of one location of the result page.
+   *
+   * VuFind has about forty recommendation modules and this theme has templates
+   * for a few of them. A module without a template here is left out, so that a
+   * configured but unsupported module does not break the page.
+   *
+   * @property \VuFind\Recommend\RecommendInterface[] $recommendations Modules
+   * @property string                                 $location        top, side, bottom or noresults
+   */
+?>
+<?php foreach ($this->recommendations as $index => $recommendation): ?>
+  <?php $className = substr(strrchr($recommendation::class, '\\'), 1); ?>
+  <?php if ($this->resolver("Recommend/{$className}.phtml")): ?>
+    <?=$this->recommend($recommendation, $this->location, $index)?>
+  <?php endif; ?>
+<?php endforeach; ?>

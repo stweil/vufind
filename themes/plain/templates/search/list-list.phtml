@@ -1,0 +1,15 @@
+<?php
+  /**
+   * Result list. The stylesheet draws the numbers from the counter of the list.
+   * role="list" keeps the list a list for screen readers which drop the role of
+   * lists without markers.
+   */
+?>
+<ol class="c-result-list" role="list" start="<?=$this->escapeHtmlAttr($this->results->getStartRecord())?>">
+  <?php foreach ($this->results->getResults() as $index => $current): ?>
+    <?php // Data-record-number attribute is for analytics use. Do not remove. ?>
+    <li class="c-result-list__item" data-record-number="<?=$this->escapeHtmlAttr($this->results->getStartRecord() + $index)?>">
+      <?=$this->record($current)->getSearchResult('list')?>
+    </li>
+  <?php endforeach; ?>
+</ol>

@@ -1,0 +1,19 @@
+/*
+ * Text field or select element.
+ */
+@layer components {
+  .c-field {
+    max-inline-size: 100%;
+    min-block-size: var(--size-target);
+    padding: var(--space-2) var(--space-3);
+    border: var(--border-width-control) solid var(--color-border-control);
+    border-radius: var(--radius-small);
+    background: var(--color-surface);
+    color: var(--color-text);
+  }
+
+  .c-field--compact {
+    min-block-size: var(--size-target-compact);
+    padding-block: var(--space-1);
+  }
+}
